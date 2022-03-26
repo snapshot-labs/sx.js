@@ -3166,10 +3166,10 @@ stack-utils@^2.0.3:
   dependencies:
     escape-string-regexp "^2.0.0"
 
-starknet@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.2.0.tgz#fa6a3ad09bb720680a24ad45e1a6fa57ca6e22e5"
-  integrity sha512-U1nWdU0Ebka5WrZeHnh1E8Yr1Cj2UjSyJMmBW1F3qzNSBDjFM3hfKrpq6ra7NtoRJCfN68dLJ0dvWDrDdgEKQg==
+starknet@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/starknet/-/starknet-3.5.1.tgz#b51fc89105235e14a71a576c60db5034e51d9734"
+  integrity sha512-iFmdx2FF16x1hItQysMVRvCQr2VYEp+WBfSk5c3VAyDI22HIa+5Zh3p9S6Q9YL2eLKJK8Ys/b2fRmeTPtnxHTw==
   dependencies:
     axios "^0.23.0"
     bn.js "^5.2.0"
