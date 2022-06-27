@@ -29,7 +29,7 @@ export const EIP712_TYPES = {
 
 export interface MetaTransaction {
   to: string;
-  value: string | number ;
+  value: string | number;
   data: string;
   operation: number;
   nonce: number;
