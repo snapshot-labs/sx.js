@@ -37,9 +37,9 @@ export class IntsSequence {
   static fromUint(uint: bigint): IntsSequence {
     let hex = uint.toString(16);
     if (hex.length % 2 != 0) {
-      hex = '0x0' + hex;
+      hex = `0x0${hex}`;
     } else {
-      hex = '0x' + hex;
+      hex = `0x${hex}`;
     }
     return IntsSequence.fromBytes(hexToBytes(hex));
   }

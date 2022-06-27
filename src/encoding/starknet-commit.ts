@@ -10,8 +10,8 @@ import { computeHashOnElements } from 'starknet/dist/utils/hash';
  * @returns A Pedersen hash of the data as a Big Int
  */
 export function getCommit(target: bigint, selector: bigint, calldata: bigint[]): bigint {
-  const targetBigNum = toBN('0x' + target.toString(16));
-  const selectorBigNum = toBN('0x' + selector.toString(16));
-  const calldataBigNum = calldata.map((x) => toBN('0x' + x.toString(16)));
+  const targetBigNum = toBN(`0x${target.toString(16)}`);
+  const selectorBigNum = toBN(`0x${selector.toString(16)}`);
+  const calldataBigNum = calldata.map((x) => toBN(`0x${x.toString(16)}`));
   return BigInt(computeHashOnElements([targetBigNum, selectorBigNum, ...calldataBigNum]));
 }

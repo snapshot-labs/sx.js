@@ -1,5 +1,4 @@
 import Common, { Chain, Hardfork } from '@ethereumjs/common';
-import { bufferToHex } from 'ethereumjs-util';
 import blockFromRpc from '@ethereumjs/block/dist/from-rpc';
 import { IntsSequence } from '../utils/ints-sequence';
 import { hexToBytes } from '../utils/bytes';
@@ -22,11 +21,11 @@ export function getProcessBlockInputs(
   chain: Chain = Chain.Mainnet,
   hardfork: Hardfork = Hardfork.London
 ): ProcessBlockInputs {
-  block.difficulty = '0x' + BigInt(block.difficulty).toString(16);
-  block.totalDifficulty = '0x' + BigInt(block.totalDifficulty).toString(16);
+  block.difficulty = `0x${BigInt(block.difficulty).toString(16)}`;
+  block.totalDifficulty = `0x${BigInt(block.totalDifficulty).toString(16)}`;
   const common = new Common({ chain: chain, hardfork: hardfork });
   const header = blockFromRpc(block, [], { common }).header;
-  const headerRlp = bufferToHex(header.serialize());
+  const headerRlp = `0x${header.serialize().toString('hex')}`;
   const headerInts = IntsSequence.fromBytes(hexToBytes(headerRlp));
   return {
     blockNumber: block.number as number,

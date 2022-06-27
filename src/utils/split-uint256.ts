@@ -23,7 +23,7 @@ export class SplitUint256 {
   }
 
   toHex(): string {
-    return '0x' + this.toUint().toString(16);
+    return `0x${this.toUint().toString(16)}`;
   }
 
   static fromObj(s: { low: bigint; high: bigint }): SplitUint256 {
