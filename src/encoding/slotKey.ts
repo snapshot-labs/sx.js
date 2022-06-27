@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { keccak256 } from '@ethersproject/keccak256';
 
 /**
  * Computes the EVM slot key for a specific mapping value in a contract
@@ -11,5 +11,5 @@ import { utils } from 'ethers';
 export function getSlotKey(mappingKey: bigint, slotIndex: bigint): string {
   const paddedSlot = slotIndex.toString(16).padStart(64, '0');
   const paddedAddress = mappingKey.toString(16).padStart(64, '0');
-  return utils.keccak256(utils.keccak256(`0x${paddedAddress}${paddedSlot}`));
+  return keccak256(`0x${paddedAddress}${paddedSlot}`);
 }

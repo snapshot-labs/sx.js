@@ -1,5 +1,6 @@
-import { utils, BigNumber } from 'ethers';
 import { _TypedDataEncoder } from '@ethersproject/hash';
+import { keccak256 } from '@ethersproject/keccak256';
+import { AbiCoder } from '@ethersproject/abi';
 
 export const EIP712_TYPES = {
   Transaction: [
@@ -28,7 +29,7 @@ export const EIP712_TYPES = {
 
 export interface MetaTransaction {
   to: string;
-  value: string | number | BigNumber;
+  value: string | number ;
   data: string;
   operation: number;
   nonce: number;
@@ -53,8 +54,8 @@ export function createExecutionHash(
     verifyingContract: verifyingContract
   };
   const txHashes = txs.map((tx) => _TypedDataEncoder.hash(domain, EIP712_TYPES, tx));
-  const abiCoder = new utils.AbiCoder();
-  const executionHash = utils.keccak256(abiCoder.encode(['bytes32[]'], [txHashes]));
+  const abiCoder = new AbiCoder();
+  const executionHash = keccak256(abiCoder.encode(['bytes32[]'], [txHashes]));
   return {
     executionHash: executionHash,
     txHashes: txHashes

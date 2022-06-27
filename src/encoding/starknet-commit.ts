@@ -1,5 +1,7 @@
 import { toBN } from 'starknet/dist/utils/number';
-import { computeHashOnElements } from 'starknet/dist/utils/hash';
+import { hash } from 'starknet';
+
+const { computeHashOnElements } = hash;
 
 /**
  * Computes the Pedersen hash of a execution payload for StarkNet
