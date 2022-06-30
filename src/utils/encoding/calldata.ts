@@ -36,7 +36,7 @@ export function flatten2DArray(array2D: bigint[][]): bigint[] {
  * @returns Calldata array
  */
 export function getProposeCalldata(
-  proposerEthAddress: string,
+  proposerAddress: string,
   metadataUri: bigint[],
   executorAddress: bigint,
   usedVotingStrategies: bigint[],
@@ -45,7 +45,7 @@ export function getProposeCalldata(
 ): bigint[] {
   const usedVotingStrategyParamsFlat = flatten2DArray(usedVotingStrategyParams);
   return [
-    BigInt(proposerEthAddress),
+    BigInt(proposerAddress),
     BigInt(metadataUri.length),
     ...metadataUri,
     executorAddress,
@@ -68,7 +68,7 @@ export function getProposeCalldata(
  * @returns Calldata array
  */
 export function getVoteCalldata(
-  voterEthAddress: string,
+  voterAddress: string,
   proposalID: bigint,
   choice: Choice,
   usedVotingStrategies: bigint[],
@@ -76,7 +76,7 @@ export function getVoteCalldata(
 ): bigint[] {
   const usedVotingStrategyParamsFlat = flatten2DArray(usedVotingStrategyParams);
   return [
-    BigInt(voterEthAddress),
+    BigInt(voterAddress),
     proposalID,
     BigInt(choice),
     BigInt(usedVotingStrategies.length),
