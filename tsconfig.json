@@ -8,7 +8,8 @@
     "esModuleInterop": true,
     "strict": true,
     "resolveJsonModule": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false
   },
   "include": [
     "src/**/*"
