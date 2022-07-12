@@ -3,7 +3,8 @@ import {
   AddTransactionResponse,
   Contract,
   defaultProvider as provider,
-  hash, Abi
+  hash,
+  Abi
 } from 'starknet';
 import abi from './abi/auth.json';
 import constants from './constants.json';
