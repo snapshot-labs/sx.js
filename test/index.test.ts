@@ -1,9 +1,14 @@
 import { StarkNetTx } from '../src/clients';
-import { config } from 'dotenv'
+import { config } from 'dotenv';
+import { Account, defaultProvider as provider, ec } from 'starknet';
+
 config()
 
 const space = '0x0625dc1290b6e936be5f1a3e963cf629326b1f4dfd5a56738dea98e1ad31b7f3';
-const client = new StarkNetTx();
+const starkKeyPair = ec.getKeyPair(process.env.PK as string);
+const account = new Account(provider, process.env.ADDRESS as string, starkKeyPair);
+
+const client = new StarkNetTx(account);
 
 describe('', () => {
   it('StarkNetTx.propose()', async () => {

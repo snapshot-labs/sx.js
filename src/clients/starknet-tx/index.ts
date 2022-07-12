@@ -1,20 +1,25 @@
-import { Account, ec, AddTransactionResponse, Contract, defaultProvider as provider, hash } from 'starknet';
+import {
+  Account,
+  AddTransactionResponse,
+  Contract,
+  defaultProvider as provider,
+  hash
+} from 'starknet';
 import abi from './abi/auth.json';
 import constants from './constants.json';
-import { strToShortStringArr, shortStrToFelt } from '../../utils/strings';
+import { strToShortStringArr } from '../../utils/strings';
 
 const { getSelectorFromName } = hash;
 
 export class StarkNetTx {
-
   public auth: Contract;
-
-  constructor() {
+  public account: Account;
+  constructor(_account: Account) {
     // @ts-ignore
     this.auth = new Contract(abi as Abi, constants.auth, provider);
-    const starkKeyPair = ec.getKeyPair(process.env.PK as string)
-    const account = new Account(provider, process.env.ADDRESS as string, starkKeyPair)
-    this.auth.connect(account)
+    this.account = _account;
+
+    this.auth.connect(this.account);
   }
 
   async propose(
@@ -33,14 +38,18 @@ export class StarkNetTx {
     calldata.push(blockNum);
     calldata.push(params.length.toString());
 
-    const receipt = await this.auth.invoke('execute', [
-      /** to: */ space,
-      /** function_selector: */ getSelectorFromName('propose'),
-      /** calldata: */ calldata
-    ], { maxFee: 0x19999999999999 });
+    const receipt = await this.auth.invoke(
+      'execute',
+      [
+        /** to: */ space,
+        /** function_selector: */ getSelectorFromName('propose'),
+        /** calldata: */ calldata
+      ],
+      { maxFee: 0x19999999999999 }
+    );
 
     // await provider.waitForTx(receipt.transaction_hash);
-    await provider.waitForTransaction(receipt.transaction_hash)
+    await provider.waitForTransaction(receipt.transaction_hash);
     return receipt;
   }
 
@@ -52,12 +61,16 @@ export class StarkNetTx {
   ): Promise<AddTransactionResponse> {
     const params: any = [];
 
-    const receipt = await this.auth.invoke('execute', [
-      // @ts-ignore
-      /** to: */ space,
-      /** function_selector: */ getSelectorFromName('vote'),
-      /** calldata: */[voter, proposal, choice, params.length.toString()]
-    ], { maxFee: 0x19999999999999 });
+    const receipt = await this.auth.invoke(
+      'execute',
+      [
+        // @ts-ignore
+        /** to: */ space,
+        /** function_selector: */ getSelectorFromName('vote'),
+        /** calldata: */ [voter, proposal, choice, params.length.toString()]
+      ],
+      { maxFee: 0x19999999999999 }
+    );
     console.log('Receipt', receipt);
 
     // await provider.waitForTx(receipt.transaction_hash);
