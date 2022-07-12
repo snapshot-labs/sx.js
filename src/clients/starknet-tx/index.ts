@@ -3,7 +3,7 @@ import {
   AddTransactionResponse,
   Contract,
   defaultProvider as provider,
-  hash
+  hash, Abi
 } from 'starknet';
 import abi from './abi/auth.json';
 import constants from './constants.json';
@@ -14,11 +14,10 @@ const { getSelectorFromName } = hash;
 export class StarkNetTx {
   public auth: Contract;
   public account: Account;
-  constructor(_account: Account) {
-    // @ts-ignore
-    this.auth = new Contract(abi as Abi, constants.auth, provider);
-    this.account = _account;
 
+  constructor(account: Account) {
+    this.auth = new Contract(abi as Abi, constants.auth, provider);
+    this.account = account;
     this.auth.connect(this.account);
   }
 
@@ -33,7 +32,6 @@ export class StarkNetTx {
     const metadataUriFelt = strToShortStringArr(metadataUri);
     const calldata: any[] = [author, executionHash, metadataUriFelt.length.toString()];
 
-    // @ts-ignore
     metadataUriFelt.forEach((m) => calldata.push(m.toString()));
     calldata.push(blockNum);
     calldata.push(params.length.toString());
@@ -48,7 +46,6 @@ export class StarkNetTx {
       { maxFee: 0x19999999999999 }
     );
 
-    // await provider.waitForTx(receipt.transaction_hash);
     await provider.waitForTransaction(receipt.transaction_hash);
     return receipt;
   }
@@ -64,7 +61,6 @@ export class StarkNetTx {
     const receipt = await this.auth.invoke(
       'execute',
       [
-        // @ts-ignore
         /** to: */ space,
         /** function_selector: */ getSelectorFromName('vote'),
         /** calldata: */ [voter, proposal, choice, params.length.toString()]
@@ -73,7 +69,6 @@ export class StarkNetTx {
     );
     console.log('Receipt', receipt);
 
-    // await provider.waitForTx(receipt.transaction_hash);
     return receipt;
   }
 }
