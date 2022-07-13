@@ -1,0 +1,41 @@
+{
+    "alpha-goerli": {
+        "__default__": {
+            "private_key": "0x54969abf3f5325ea03fd89e8e233f2a85c736c5f44b977c789b52d4c804b1be",
+            "public_key": "0x2b8b399602ad0999e6ed5e8d819680fb2d35ef665ab0b350015023d46ca7f0a",
+            "address": "0x6bce64b0f773fff4e2d1efd81b48cf8155dd46c3462781e2ae6b0b0dd787194"
+        },
+        "earth": {
+            "private_key": "0x5f553aaa140eadb0cc0a0cd9e2621a6b731156e0758258a24861023cc5e037d",
+            "public_key": "0x73a7f098e2bb0299a412d1350fae3385e50c345d23aea96d1fa97e3ae5ad419",
+            "address": "0x1888ab35fdb3eafb71b7a90443566e7b1881ef6936eff13dd44f232cc9b9af"
+        },
+        "new_account": {
+            "private_key": "0x78a61bf2d838b1094705168bbd5b462e665a5ce094d8b1c2e5438c66eeb9f59",
+            "public_key": "0x2beffa6fa12f684fcb90ee408ed319e5f10470eaf86d6c28b68a828ed5fadf7",
+            "address": "0xc26a3cdcc570da83f3dd6afd0db9d038ee096e2c56707d6348db3b06223427"
+        },
+        "newAccount0": {
+            "private_key": "0xbb0a14d8011ebfa4e3106fe85846c4917b7d70d7f8a393c14f10dd1f3c5e8",
+            "public_key": "0x1a15e8fc25be494433adc5bed76517f5c724931da0b204aa06509ca705480fa",
+            "address": "0x32e1944c5f75f70785fdf2a2d8312d9a987c910f270bdc2c9d847b9f66ff508"
+        },
+        "newAccount2": {
+            "private_key": "0x1c0dfce4dda05b3bcc24e8088d94bcd2c40059d19f81c8d4ec55c641a2699df",
+            "public_key": "0x15b0b6f80ba5d5551133addf419f343828b9cb7512dfca80e27883022469444",
+            "address": "0x7c41f057adf4d475b0f9f6dcfd76bd24cc46a3144dfdb2f01b136273d759a42"
+        },
+        "newAccount3": {
+            "private_key": "0x6f3a04becb74fa029ced10d4a8374a44fb67d12570e8ed9f43a93fe789d36f9",
+            "public_key": "0x10b2d2e43a4adbdb70add278b2e204a5c7563f8e7bafedc4b17fe8e046a7122",
+            "address": "0x1178e2259f4841f71b7a466adfac42ca97a42fa138972a6ce89edd45b73d0f6"
+        }
+    },
+    "testnet": {
+        "OpenZeppelin": {
+            "private_key": "0xf13f208a6fe13325c7787fbb7767bf2b64849c7f234800e7bbb69884cfe8ad",
+            "public_key": "0x32171bfda3c8ec2d69e5d289955f9f023eb1c80cf79c5b686583ba831528c81",
+            "address": "0x238caac4fc63a2a1927c2c78f9b157f7fd0c403ff861290e3f91bbbb8dbc0fa"
+        }
+    }
+}
