@@ -10,6 +10,7 @@ import { Choice } from '../choice';
  * @param array2D The 2d array to flatten
  * @returns The flattened array
  */
+
 export function flatten2DArray(array2D: bigint[][]): bigint[] {
   const flatArray: bigint[] = [];
   const num_arrays = BigInt(array2D.length);

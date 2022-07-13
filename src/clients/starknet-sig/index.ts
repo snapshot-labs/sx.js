@@ -1,4 +1,4 @@
-import { AccountInterface } from 'starknet';
+import { AccountInterface, Signature, ec, typedData } from 'starknet';
 import fetch from 'cross-fetch';
 import { domain, Propose, Vote, proposeTypes, voteTypes } from './types';
 
@@ -10,13 +10,26 @@ export class StarkNetSig {
   }
 
   public async sign(signer: AccountInterface, address: string, message, types, primaryType) {
-    const data: any = { domain, types, primaryType, message };
+    const data: typedData.TypedData = { domain, types, primaryType, message };
     try {
       const sig = await signer.signMessage(data);
       return { address, sig, data };
     } catch (e) {
       return Promise.reject(e);
     }
+  }
+
+  public async verify(
+    pubKey: string,
+    address: string,
+    signature: Signature,
+    data: typedData.TypedData
+  ) {
+    const safePubKey = BigInt('0x' + pubKey).toString();
+    const msgHash = typedData.getMessageHash(data, address);
+    const pubKeyPair = ec.getKeyPairFromPublicKey(safePubKey);
+    console.log('verify', ec.verify(pubKeyPair, msgHash, signature));
+    return ec.verify(pubKeyPair, msgHash, signature);
   }
 
   public async send(envelop) {
