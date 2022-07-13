@@ -27,7 +27,7 @@ export class StarkNetTx {
     space: string,
     executionHash: string,
     metadataUri: string
-  ): Promise<any> {
+  ): Promise<AddTransactionResponse> {
     const blockNum: any = '1234567';
     const params: any = [];
     const metadataUriFelt = strToShortStringArr(metadataUri);
