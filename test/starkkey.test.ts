@@ -6,10 +6,13 @@ import { domain, voteTypes } from '../src/clients/starknet-sig/types';
 describe('', () => {
   let starkKeyPair = ec.genKeyPair();
   const privKey = starkKeyPair.getPrivate('hex');
-  starkKeyPair = ec.getKeyPair(privKey);
+  starkKeyPair = ec.getKeyPair(`0x${privKey}`);
   const pubKey = starkKeyPair.getPublic('hex');
   const address = getStarkKey(starkKeyPair);
-  const account = new Account(defaultProvider, address as string, starkKeyPair);
+  const account = new Account(defaultProvider, address, starkKeyPair);
+  // console.log('Privkey', privKey);
+  // console.log('Pubkey', pubKey);
+  // console.log('Address', address);
 
   it('starkkey.verify()', async () => {
     const message = {
