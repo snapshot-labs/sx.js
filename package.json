@@ -1,6 +1,6 @@
 {
   "name": "@orland0x/sx",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,6 @@
     "@ethersproject/providers": "^5.6.4",
     "@ethersproject/wallet": "^5.6.2",
     "cross-fetch": "^3.1.5",
-    "npm": "^8.16.0",
     "starknet": "^3.18.2"
   },
   "devDependencies": {
