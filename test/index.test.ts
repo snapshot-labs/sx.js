@@ -46,7 +46,7 @@ describe('StarkNetTx', () => {
       expect(receipt.code).toBe('TRANSACTION_RECEIVED');
     }, 300e3);
 
-    it.only('StarkNetTx.vote()', async () => {
+    it('StarkNetTx.vote()', async () => {
       const envelope = {
         address: walletAddress,
         sig: null,
