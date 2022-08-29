@@ -1,16 +1,21 @@
 export const domain = {
   name: 'snapshot-x',
   version: '1',
+  chainId: '0x534e5f474f45524c49', // SN_GOERLI
 };
 
 export const domainTypes = {
   StarkNetDomain: [
     {
       name: 'name',
-      type: 'felt',
+      type: 'string',
     },
     {
       name: 'version',
+      type: 'felt',
+    },
+    {
+      name: 'chainId',
       type: 'felt',
     },
   ],
