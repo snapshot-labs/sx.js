@@ -25,7 +25,7 @@ const { getSelectorFromName } = hash;
 
 const TEMP_CONSTANTS = {
   strategyParams: ['0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6', '0x3'],
-  block: 7529615
+  block: 7541970
 };
 
 export class StarkNetTx {
@@ -159,32 +159,22 @@ export class StarkNetTx {
   ): Promise<AddTransactionResponse> {
     const { space, authenticator } = envelope.data.message;
     const calldata = await this.getProposeCalldata(envelope, metadata);
-
-    const auth = new Contract(vanillaAbi as Abi, authenticator, provider);
-    auth.connect(account);
-
-    const fee = await auth.estimateFee.authenticate(
-      space,
-      getSelectorFromName('propose'),
-      calldata
-    );
-
     const proveCalls = await this.getProveAccountCalls(envelope, metadata);
 
-    return account.execute(
-      [
-        ...proveCalls,
-        {
-          contractAddress: authenticator,
-          entrypoint: 'authenticate',
-          calldata: [space, getSelectorFromName('propose'), calldata.length, ...calldata]
-        }
-      ],
-      undefined,
+    const calls = [
+      ...proveCalls,
       {
-        maxFee: fee.suggestedMaxFee
+        contractAddress: authenticator,
+        entrypoint: 'authenticate',
+        calldata: [space, getSelectorFromName('propose'), calldata.length, ...calldata]
       }
-    );
+    ];
+
+    const fee = await account.estimateFee(calls);
+
+    return account.execute(calls, undefined, {
+      maxFee: fee.suggestedMaxFee
+    });
   }
 
   async proposeEthSig(
@@ -197,48 +187,34 @@ export class StarkNetTx {
     const { r, s, v } = utils.encoding.getRSVFromSig(sig);
     const rawSalt = utils.splitUint256.SplitUint256.fromHex(`0x${salt.toString(16)}`);
     const calldata = await this.getProposeCalldata(envelope, metadata);
-
-    const auth = new Contract(ethSigAbi as Abi, authenticator, provider);
-    auth.connect(account);
-
-    const fee = await auth.estimateFee.authenticate(
-      r,
-      s,
-      v,
-      rawSalt,
-      space,
-      getSelectorFromName('propose'),
-      calldata
-    );
-
     const proveCalls = await this.getProveAccountCalls(envelope, metadata);
 
-    return account.execute(
-      [
-        ...proveCalls,
-        {
-          contractAddress: authenticator,
-          entrypoint: 'authenticate',
-          calldata: [
-            r.low,
-            r.high,
-            s.low,
-            s.high,
-            v,
-            rawSalt.low,
-            rawSalt.high,
-            space,
-            getSelectorFromName('propose'),
-            calldata.length,
-            ...calldata
-          ]
-        }
-      ],
-      undefined,
+    const calls = [
+      ...proveCalls,
       {
-        maxFee: fee.suggestedMaxFee
+        contractAddress: authenticator,
+        entrypoint: 'authenticate',
+        calldata: [
+          r.low,
+          r.high,
+          s.low,
+          s.high,
+          v,
+          rawSalt.low,
+          rawSalt.high,
+          space,
+          getSelectorFromName('propose'),
+          calldata.length,
+          ...calldata
+        ]
       }
-    );
+    ];
+
+    const fee = await account.estimateFee(calls);
+
+    return account.execute(calls, undefined, {
+      maxFee: fee.suggestedMaxFee
+    });
   }
 
   async voteVanilla(

@@ -161,7 +161,7 @@ describe('StarkNetTx', () => {
       // await defaultProvider.waitForTransaction(receipt.transaction_hash);
 
       expect(receipt.code).toBe('TRANSACTION_RECEIVED');
-    }, 300e3);
+    }, 420e3);
 
     it('StarkNetTx.vote()', async () => {
       const envelope = await ethSigClient.vote(wallet, walletAddress, {
@@ -178,6 +178,6 @@ describe('StarkNetTx', () => {
       // await defaultProvider.waitForTransaction(receipt.transaction_hash);
 
       expect(receipt.code).toBe('TRANSACTION_RECEIVED');
-    }, 300e3);
+    }, 420e3);
   });
 });
