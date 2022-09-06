@@ -168,7 +168,7 @@ describe('StarkNetTx', () => {
         space,
         authenticator,
         strategies: [strategy],
-        proposal: 2,
+        proposal: 5,
         choice: 1
       });
 
