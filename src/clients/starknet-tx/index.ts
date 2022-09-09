@@ -97,7 +97,7 @@ export class StarkNetTx {
 
     return utils.encoding.getProposeCalldata(
       address,
-      utils.intsSequence.IntsSequence.LEFromString(metadataURI),
+      metadataURI,
       constants.executor,
       strategies,
       strategiesParams,

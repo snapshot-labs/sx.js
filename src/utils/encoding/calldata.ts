@@ -1,5 +1,6 @@
 import { Choice } from '../choice';
 import { IntsSequence } from '../ints-sequence';
+import { strToShortStringArr } from '../strings';
 
 /**
  * Currently there is no way to pass struct types with pointers in calldata, so we must pass the 2d array as a flat array and then reconstruct the type.
@@ -37,18 +38,18 @@ export function flatten2DArray(array2D: string[][]): string[] {
  */
 export function getProposeCalldata(
   proposerAddress: string,
-  metadataUri: IntsSequence,
+  metadataUri: string,
   executorAddress: string,
   usedVotingStrategies: string[],
   usedVotingStrategyParams: string[][],
   executionParams: string[]
 ): string[] {
   const usedVotingStrategyParamsFlat = flatten2DArray(usedVotingStrategyParams);
+  const metadataUriShortStringArr = strToShortStringArr(metadataUri);
   return [
     proposerAddress,
-    `0x${metadataUri.bytesLength.toString(16)}`,
-    `0x${metadataUri.values.length.toString(16)}`,
-    ...metadataUri.values,
+    `0x${metadataUriShortStringArr.length.toString(16)}`,
+    ...metadataUriShortStringArr,
     executorAddress,
     `0x${usedVotingStrategies.length.toString(16)}`,
     ...usedVotingStrategies,
