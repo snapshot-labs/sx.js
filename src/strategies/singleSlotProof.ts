@@ -8,15 +8,19 @@ import type {
   VanillaProposeMessage,
   VanillaVoteMessage
 } from '../types';
-import { getStorageVarAddress } from '../utils/encoding';
+import { getStorageVarAddress, offsetStorageVar } from '../utils/encoding';
 
 const fossilL1HeadersStoreAddress =
   '0x6ca3d25e901ce1fff2a7dd4079a24ff63ca6bbf8ba956efc71c1467975ab78f';
 const fossilFactRegistryAddress =
   '0x363108ac1521a47b4f7d82f8ba868199bc1535216bbedfc1b071ae93cc406fd';
 
+const proposalRegistryStore = 'Voting_proposal_registry_store';
 const strategyParamsStore = 'Voting_voting_strategy_params_store';
+const timestampToEthBlockNumberStore = 'timestamp_to_eth_block_number';
 const latestL1BlockStore = '_latest_l1_block';
+
+const snapshotTimestampOffset = 3;
 
 async function fetchStrategyParams(
   address: string,
@@ -44,20 +48,35 @@ async function fetchStrategyParams(
   );
 }
 
-async function fetchBlock(call: 'propose' | 'vote') {
+async function getBlockStorage(
+  call: 'propose' | 'vote',
+  address: string,
+  envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>
+): Promise<[string, string]> {
   if (call === 'vote') {
-    // TODO: fetch real block
-    return 7541970;
+    const proposalAddress = getStorageVarAddress(
+      proposalRegistryStore,
+      (envelope as Envelope<VanillaVoteMessage>).data.message.proposal.toString(16)
+    );
+
+    const timestamp = (await defaultProvider.getStorageAt(
+      envelope.data.message.space,
+      offsetStorageVar(proposalAddress, snapshotTimestampOffset)
+    )) as string;
+
+    return [address, getStorageVarAddress(timestampToEthBlockNumberStore, timestamp)];
   }
 
-  const latestL1BlockAddress = getStorageVarAddress(latestL1BlockStore);
-  const block = parseInt(
-    (await defaultProvider.getStorageAt(
-      fossilL1HeadersStoreAddress,
-      latestL1BlockAddress
-    )) as string,
-    16
-  );
+  return [fossilL1HeadersStoreAddress, getStorageVarAddress(latestL1BlockStore)];
+}
+
+async function fetchBlock(
+  call: 'propose' | 'vote',
+  address: string,
+  envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>
+) {
+  const [contractAddress, key] = await getBlockStorage(call, address, envelope);
+  const block = parseInt((await defaultProvider.getStorageAt(contractAddress, key)) as string, 16);
 
   // 1 block offset due to
   // https://github.com/snapshot-labs/sx-core/blob/e994394a7109de5527786cb99e981e132122fad4/contracts/starknet/VotingStrategies/SingleSlotProof.cairo#L60
@@ -71,7 +90,7 @@ async function fetchProofInputs(
   clientConfig: ClientConfig
 ) {
   const [block, strategyParams] = await Promise.all([
-    fetchBlock(call),
+    fetchBlock(call, address, envelope),
     fetchStrategyParams(address, envelope)
   ]);
 
