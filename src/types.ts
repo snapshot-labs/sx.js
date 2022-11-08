@@ -1,3 +1,4 @@
+import { Provider } from '@ethersproject/providers';
 import type { Call } from 'starknet';
 import type { Choice } from './utils/choice';
 
@@ -25,6 +26,7 @@ export interface Strategy {
 
 export type ClientConfig = {
   ethUrl: string;
+  starkProvider: Provider;
 };
 
 export type EthereumSigClientConfig = ClientConfig & {
