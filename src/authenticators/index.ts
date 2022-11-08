@@ -9,7 +9,7 @@ const authenticators = {
 };
 
 export function getAuthenticator(address: string): Authenticator | null {
-  const authenticator = authenticators[utils.encoding.hexPadRight(address)];
+  const authenticator = authenticators[utils.encoding.hexPadLeft(address)];
   if (!authenticator) return null;
 
   return authenticator;
