@@ -1,4 +1,3 @@
-import { Provider, defaultProvider } from 'starknet';
 import { utils } from '..';
 import type { Call } from 'starknet';
 import type {
@@ -25,11 +24,14 @@ const snapshotTimestampOffset = 3;
 async function fetchStrategyParams(
   index: number,
   envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
-  provider: Provider = defaultProvider
+  clientConfig: ClientConfig
 ): Promise<string[]> {
   const lengthAddress = getStorageVarAddress(strategyParamsStore, index.toString(16), '0x0');
   const length = parseInt(
-    (await provider.getStorageAt(envelope.data.message.space, lengthAddress)) as string,
+    (await clientConfig.starkProvider.getStorageAt(
+      envelope.data.message.space,
+      lengthAddress
+    )) as string,
     16
   );
 
@@ -41,7 +43,10 @@ async function fetchStrategyParams(
         (i + 1).toString(16)
       );
 
-      return provider.getStorageAt(envelope.data.message.space, lengthAddress) as Promise<string>;
+      return clientConfig.starkProvider.getStorageAt(
+        envelope.data.message.space,
+        lengthAddress
+      ) as Promise<string>;
     })
   );
 }
@@ -50,7 +55,7 @@ async function getBlockStorage(
   call: 'propose' | 'vote',
   address: string,
   envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
-  provider: Provider = defaultProvider
+  clientConfig: ClientConfig
 ): Promise<[string, string]> {
   if (call === 'vote') {
     const proposalAddress = getStorageVarAddress(
@@ -58,7 +63,7 @@ async function getBlockStorage(
       (envelope as Envelope<VanillaVoteMessage>).data.message.proposal.toString(16)
     );
 
-    const timestamp = (await provider.getStorageAt(
+    const timestamp = (await clientConfig.starkProvider.getStorageAt(
       envelope.data.message.space,
       offsetStorageVar(proposalAddress, snapshotTimestampOffset)
     )) as string;
@@ -73,10 +78,13 @@ async function fetchBlock(
   call: 'propose' | 'vote',
   address: string,
   envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
-  provider: Provider = defaultProvider
+  clientConfig: ClientConfig
 ) {
-  const [contractAddress, key] = await getBlockStorage(call, address, envelope);
-  const block = parseInt((await provider.getStorageAt(contractAddress, key)) as string, 16);
+  const [contractAddress, key] = await getBlockStorage(call, address, envelope, clientConfig);
+  const block = parseInt(
+    (await clientConfig.starkProvider.getStorageAt(contractAddress, key)) as string,
+    16
+  );
 
   // 1 block offset due to
   // https://github.com/snapshot-labs/sx-core/blob/e994394a7109de5527786cb99e981e132122fad4/contracts/starknet/VotingStrategies/SingleSlotProof.cairo#L60
@@ -91,8 +99,8 @@ async function fetchProofInputs(
   clientConfig: ClientConfig
 ) {
   const [block, strategyParams] = await Promise.all([
-    fetchBlock(call, address, envelope),
-    fetchStrategyParams(index, envelope)
+    fetchBlock(call, address, envelope, clientConfig),
+    fetchStrategyParams(index, envelope, clientConfig)
   ]);
 
   const response = await fetch(clientConfig.ethUrl, {

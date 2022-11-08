@@ -1,4 +1,4 @@
-import { Provider } from '@ethersproject/providers';
+import { Provider } from 'starknet';
 import type { Call } from 'starknet';
 import type { Choice } from './utils/choice';
 
