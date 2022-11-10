@@ -15,7 +15,7 @@ describe('voting strategies', () => {
     });
 
     it('should return correct strategy from supplied addresses', () => {
-      const Strategies = {
+      const strategies = {
         '0x91469387a06fb88dd66559f4bc91e4c0c1e61e65c259b14a4d43f274fdabd922': vanillaStrategy,
         '0x0091469387a06fb88dd66559f4bc91e4c0c1e61e65c259b14a4d43f274fdabd9':
           singleSlotProofStrategy
@@ -23,14 +23,14 @@ describe('voting strategies', () => {
       expect(
         getStrategy(
           '0x91469387a06fb88dd66559f4bc91e4c0c1e61e65c259b14a4d43f274fdabd922',
-          Strategies
+          strategies
         )?.type
       ).toBe('vanilla');
 
       expect(
         getStrategy(
           '0x0091469387a06fb88dd66559f4bc91e4c0c1e61e65c259b14a4d43f274fdabd9',
-          Strategies
+          strategies
         )?.type
       ).toBe('singleSlotProof');
     });
