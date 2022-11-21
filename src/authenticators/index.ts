@@ -12,7 +12,7 @@ export function getAuthenticator(
   address: string,
   authenticators: any = defaultAuthenticators
 ): Authenticator | null {
-  const authenticator = authenticators[utils.encoding.hexPadRight(address)];
+  const authenticator = authenticators[utils.encoding.hexPadLeft(address)];
   if (!authenticator) return null;
 
   return authenticator;
