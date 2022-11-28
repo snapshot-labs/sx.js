@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint ./src ./test --ext .ts --fix",
+    "lint:nofix": "eslint ./src ./test --ext .ts",
+    "lint": "yarn lint:nofix --fix",
     "prepare": "yarn build",
     "prepublishOnly": "yarn run lint",
     "test": "jest -c test/jest.config.unit.js",
