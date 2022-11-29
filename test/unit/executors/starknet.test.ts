@@ -1,18 +1,16 @@
-import { hash } from 'starknet';
-import { StarknetExecutor } from '../../../src/executors';
+import { starknetExecutor } from '../../../src/executors';
 
-describe('StarknetExecutor', () => {
+describe('starknetExecutor', () => {
   const calls = [
     {
-      to: '0x06AbD599AB530c5b3bc603111Bdd20d77890Db330402dC870Fc9866f50eD6d2A',
-      functionSelector: hash.getSelectorFromName('transfer'),
+      contractAddress: '0x06AbD599AB530c5b3bc603111Bdd20d77890Db330402dC870Fc9866f50eD6d2A',
+      entrypoint: 'transfer',
       calldata: ['0x01']
     }
   ];
 
   it('should create execution data', () => {
-    const executor = new StarknetExecutor();
-    const data = executor.getExecutionData(calls);
+    const data = starknetExecutor.getExecutionData('1', calls);
 
     expect(data).toEqual({
       executor: '1',

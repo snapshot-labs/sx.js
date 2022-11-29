@@ -1,14 +1,9 @@
-export class VanillaExecutor {
-  executor: string;
-
-  constructor(executor: string) {
-    this.executor = executor;
-  }
-
-  getExecutionData() {
+export const vanillaExecutor = {
+  type: 'vanilla',
+  getExecutionData(executorAddress: string) {
     return {
-      executor: this.executor,
+      executor: executorAddress,
       executionParams: []
     };
   }
-}
+};

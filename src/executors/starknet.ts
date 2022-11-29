@@ -1,10 +1,12 @@
-import { createStarknetExecutionParams, Call } from '../utils/encoding/starknet-execution-params';
+import { createStarknetExecutionParams } from '../utils/encoding/starknet-execution-params';
+import type { Call } from 'starknet';
 
-export class StarknetExecutor {
-  getExecutionData(calls: Call[]) {
+export const starknetExecutor = {
+  type: 'starknet',
+  getExecutionData(executorAddress: string, calls: Call[]) {
     return {
-      executor: '1',
+      executor: executorAddress,
       executionParams: createStarknetExecutionParams(calls)
     };
   }
-}
+};

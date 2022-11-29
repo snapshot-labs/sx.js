@@ -1,5 +1,5 @@
 import { StarkNetTx, EthereumSig } from '../../src/clients';
-import { EthRelayerExecutor } from '../../src/executors';
+import { getExecutionData } from '../../src/executors';
 import { Account, defaultProvider, ec } from 'starknet';
 import { Wallet } from '@ethersproject/wallet';
 import { Choice } from '../../src/utils/choice';
@@ -171,8 +171,7 @@ describe('StarkNetTx', () => {
     const strategy = 0;
 
     const executorAddress = '0x790a2f60ac5a1743ebfad2a00b06d1c40866dc92eead76a7ede6c805bc29a4b';
-    const executorDestination = '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca';
-    const executionTxs = [
+    const transactions = [
       {
         to: '0x2842c82E20ab600F443646e1BC8550B44a513D82',
         value: '0x0',
@@ -181,11 +180,9 @@ describe('StarkNetTx', () => {
         nonce: 0
       }
     ];
-    const chainId = 5;
 
     it('StarkNetTx.propose()', async () => {
-      const executor = new EthRelayerExecutor(executorAddress);
-      const executionData = executor.getExecutionData(executorDestination, executionTxs, chainId);
+      const executionData = getExecutionData(executorAddress, { transactions });
 
       const envelope = {
         address: walletAddress,
