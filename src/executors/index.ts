@@ -1,12 +1,11 @@
 import createStarknetExecutor from './starknet';
 import createVanillaExecutor from './vanilla';
 import createEthRelayerExecutor from './ethRelayer';
-import { defaultNetwork } from '../networks';
 import type { ExecutionInput, NetworkConfig } from '../types';
 
 export function getExecutionData(
   executorAddress: string,
-  networkConfig: NetworkConfig = defaultNetwork,
+  networkConfig: NetworkConfig,
   input?: ExecutionInput
 ) {
   const executor = networkConfig.executors[executorAddress];
