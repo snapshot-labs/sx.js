@@ -42,5 +42,5 @@ describe('SpaceManager', () => {
     console.log('Receipt', receipt);
 
     expect(receipt.transaction_hash).toBeDefined();
-  });
+  }, 60e3);
 });

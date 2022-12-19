@@ -29,7 +29,7 @@ describe('Zodiac', () => {
     console.log('Receipt', receipt);
 
     expect(receipt).toBeDefined();
-  });
+  }, 60e3);
 
   it('should executeProposalTx', async () => {
     const proposalIndex = 0;
@@ -38,5 +38,5 @@ describe('Zodiac', () => {
     console.log('Receipt', receipt);
 
     expect(receipt).toBeDefined();
-  });
+  }, 60e3);
 });
