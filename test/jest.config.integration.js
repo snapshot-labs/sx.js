@@ -2,5 +2,6 @@ const baseConfig = require('./jest.config.base');
 
 module.exports = {
   ...baseConfig,
-  roots: ['<rootDir>/integration']
+  // TODO: EVM uses local node currently
+  roots: ['<rootDir>/integration/starknet']
 };
