@@ -11,8 +11,8 @@
     "prepare": "yarn build",
     "prepublishOnly": "yarn run lint",
     "test": "jest -c test/jest.config.unit.js",
-    "test:integration": "jest -c test/jest.config.integration.js",
-    "test:integration:evm": "jest -c test/jest.config.integration.js test/integration/evm/index.test.ts"
+    "test:integration": "jest -c test/jest.config.integration.js test/integration/starknet",
+    "test:integration:evm": "jest -c test/jest.config.integration.js test/integration/evm"
   },
   "eslintConfig": {
     "extends": "@snapshot-labs"
