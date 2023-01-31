@@ -15,7 +15,7 @@ describe('SpaceManager', () => {
       chainId: constants.StarknetChainId.TESTNET2
     }
   });
-  const account = new Account(starkProvider, address, ec.getKeyPair(privKey));
+  const account = new Account(starkProvider, address, privKey);
   const spaceManager = new SpaceManager({
     starkProvider,
     account
