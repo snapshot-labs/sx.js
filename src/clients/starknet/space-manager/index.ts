@@ -6,20 +6,6 @@ import { flatten2DArray } from '../../../utils/encoding/calldata';
 import type { Account } from 'starknet';
 import type { ClientOpts, ClientConfig, ExecutionInput } from '../../../types';
 
-type DeploySpaceParams = {
-  controller: string;
-  votingDelay: number;
-  minVotingDuration: number;
-  maxVotingDuration: number;
-  proposalThreshold: bigint;
-  qorum: bigint;
-  authenticators: string[];
-  votingStrategies: string[];
-  votingStrategiesParams: string[][];
-  executionStrategies: string[];
-  metadataUri: string;
-};
-
 export class SpaceManager {
   config: Omit<ClientConfig, 'ethUrl'> & {
     account: Account;
@@ -47,7 +33,19 @@ export class SpaceManager {
     });
   }
 
-  async deploySpace(params: DeploySpaceParams) {
+  async deploySpace(params: {
+    controller: string;
+    votingDelay: number;
+    minVotingDuration: number;
+    maxVotingDuration: number;
+    proposalThreshold: bigint;
+    qorum: bigint;
+    authenticators: string[];
+    votingStrategies: string[];
+    votingStrategiesParams: string[][];
+    executionStrategies: string[];
+    metadataUri: string;
+  }) {
     const quorum = SplitUint256.fromUint(params.qorum);
     const proposalThreshold = SplitUint256.fromUint(params.proposalThreshold);
     const metadataUriArr = strToShortStringArr(params.metadataUri);
