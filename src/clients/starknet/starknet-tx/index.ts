@@ -1,11 +1,7 @@
 import { Account, hash } from 'starknet';
 import { IntsSequence } from '../../../utils/ints-sequence';
 import { getVoteCalldata, getProposeCalldata } from '../../../utils/encoding';
-import {
-  getStrategies,
-  getStrategiesParams,
-  getExtraProposeCalls
-} from '../../../utils/strategies';
+import { getStrategies, getStrategiesParams, getExtraCalls } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators';
 import { defaultNetwork } from '../../../networks';
 import type {
@@ -90,7 +86,8 @@ export class StarkNetTx {
 
     const calldata = await this.getProposeCalldata(strategiesAddresses, envelope);
     const call = authenticator.createCall(envelope, getSelectorFromName('propose'), calldata);
-    const extraCalls = await getExtraProposeCalls(
+    const extraCalls = await getExtraCalls(
+      'propose',
       strategiesAddresses,
       envelope.address,
       envelope.data.message,
@@ -117,6 +114,13 @@ export class StarkNetTx {
     const strategiesAddresses = await getStrategies(envelope.data.message, this.config);
     const calldata = await this.getVoteCalldata(strategiesAddresses, envelope);
     const call = authenticator.createCall(envelope, getSelectorFromName('vote'), calldata);
+    const extraCalls = await getExtraCalls(
+      'vote',
+      strategiesAddresses,
+      envelope.address,
+      envelope.data.message,
+      this.config
+    );
 
     const fee = await account.estimateFee(call);
     return account.execute(call, undefined, {

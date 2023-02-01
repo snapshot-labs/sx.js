@@ -20,7 +20,8 @@ export interface Strategy {
     envelope: Envelope<Message>,
     clientConfig: ClientConfig
   ): Promise<string[]>;
-  getExtraProposeCalls(
+  getExtraCalls(
+    call: 'propose' | 'vote',
     address: string,
     index: number,
     envelope: Envelope<Message>,

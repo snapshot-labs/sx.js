@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`singleSlotProofStrategy should return empty extra propose calls if already proven 1`] = `[]`;
+
 exports[`singleSlotProofStrategy should return extra propose calls 1`] = `
 [
   {

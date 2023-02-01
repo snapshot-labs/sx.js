@@ -51,10 +51,11 @@ export async function getStrategiesParams(
   );
 }
 
-export async function getExtraProposeCalls(
+export async function getExtraCalls(
+  call: 'propose' | 'vote',
   strategies: StrategiesAddresses,
   address: string,
-  data: Propose,
+  data: Propose | Vote,
   config: ClientConfig
 ) {
   const extraCalls = await Promise.all(
@@ -62,7 +63,8 @@ export async function getExtraProposeCalls(
       const strategy = getStrategy(strategyData.address, config.networkConfig);
       if (!strategy) throw new Error('Invalid strategy');
 
-      return strategy.getExtraProposeCalls(
+      return strategy.getExtraCalls(
+        call,
         address,
         strategyData.index,
         {

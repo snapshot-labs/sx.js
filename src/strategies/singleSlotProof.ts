@@ -9,6 +9,7 @@ import type {
   VanillaProposeMessage,
   VanillaVoteMessage
 } from '../types';
+import type { IntsSequence } from '../utils/ints-sequence';
 
 const proposalRegistryStore = 'Voting_proposal_registry_store';
 const strategyParamsStore = 'Voting_voting_strategy_params_store';
@@ -128,6 +129,22 @@ export default function createSingleSlotProofStrategy(
     return getProofInputs(block, data.result);
   }
 
+  async function getAccountStorageHash(
+    address: IntsSequence,
+    blockNumber: number,
+    clientConfig: ClientConfig
+  ) {
+    const storageAccount = `0x${address.values.map(v => v.replace('0x', '')).join('')}`;
+
+    const storageAddress = getStorageVarAddress(
+      '_verified_account_storage_hash',
+      storageAccount,
+      blockNumber.toString(16)
+    );
+
+    return clientConfig.starkProvider.getStorageAt(fossilFactRegistryAddress, storageAddress);
+  }
+
   return {
     type: 'singleSlotProof',
     async getParams(
@@ -141,13 +158,21 @@ export default function createSingleSlotProofStrategy(
 
       return proofInputs.storageProofs[0];
     },
-    async getExtraProposeCalls(
+    async getExtraCalls(
+      call: 'propose' | 'vote',
       address: string,
       index: number,
       envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
       clientConfig: ClientConfig
     ): Promise<Call[]> {
-      const proofInputs = await fetchProofInputs('propose', address, index, envelope, clientConfig);
+      const proofInputs = await fetchProofInputs(call, address, index, envelope, clientConfig);
+      const storageHash = await getAccountStorageHash(
+        proofInputs.ethAddress,
+        proofInputs.blockNumber,
+        clientConfig
+      );
+
+      if (storageHash !== '0x0') return [];
 
       return [
         {

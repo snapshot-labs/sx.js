@@ -22,7 +22,8 @@ export default function createVanillaStrategy(): Strategy {
     ): Promise<string[]> {
       return [];
     },
-    async getExtraProposeCalls(
+    async getExtraCalls(
+      call: 'propose' | 'vote',
       address: string,
       index: number,
       envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
