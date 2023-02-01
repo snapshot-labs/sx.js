@@ -1,4 +1,4 @@
-import { Account, Provider, ec, constants } from 'starknet';
+import { Account, Provider, constants } from 'starknet';
 import { parseEther } from '@ethersproject/units';
 import { SpaceManager } from '../../../src/clients';
 
