@@ -1,8 +1,9 @@
-import { Contract, ContractFactory } from '@ethersproject/contracts';
+import { Contract } from '@ethersproject/contracts';
 import { Interface } from '@ethersproject/abi';
+import randomBytes from 'randombytes';
 import VanillaAuthenticatorAbi from './abis/VanillaAuthenticator.json';
 import SpaceAbi from './abis/Space.json';
-import SpaceBytecode from './abis/bytecode/Space.json';
+import SpaceFactoryAbi from './abis/SpaceFactory.json';
 import type { Signer } from '@ethersproject/abstract-signer';
 
 type Choice = 0 | 1 | 2;
@@ -20,6 +21,7 @@ type IndexedConfig = {
 export class SnapshotEVMClient {
   async deploy({
     signer,
+    spaceFactory,
     owner,
     votingDelay,
     minVotingDuration,
@@ -31,6 +33,7 @@ export class SnapshotEVMClient {
     executionStrategies
   }: {
     signer: Signer;
+    spaceFactory: string;
     owner: string;
     votingDelay: number;
     minVotingDuration: number;
@@ -40,10 +43,12 @@ export class SnapshotEVMClient {
     authenticators: string[];
     votingStrategies: AddressConfig[];
     executionStrategies: string[];
-  }): Promise<Contract> {
-    const factory = new ContractFactory(SpaceAbi, SpaceBytecode.bytecode, signer);
+  }): Promise<string> {
+    const spaceFactoryContract = new Contract(spaceFactory, SpaceFactoryAbi, signer);
 
-    return factory.deploy(
+    const salt = `0x${randomBytes(32).toString('hex')}`;
+
+    const response = await spaceFactoryContract.createSpace(
       owner,
       votingDelay,
       minVotingDuration,
@@ -52,8 +57,18 @@ export class SnapshotEVMClient {
       quorum,
       votingStrategies,
       authenticators,
-      executionStrategies
+      executionStrategies,
+      salt
     );
+
+    const receipt = await response.wait();
+
+    const event = receipt.events.find(event => event.event === 'SpaceCreated');
+    if (!event) throw new Error('SpaceCreated event was not fired');
+
+    const [spaceAddress] = event.decode(event.data);
+
+    return spaceAddress;
   }
 
   async propose({
