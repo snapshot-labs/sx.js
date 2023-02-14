@@ -30,7 +30,7 @@ describe('SnapshotEVMClient', () => {
 
     const owner = await signer.getAddress();
 
-    spaceAddress = await client.deploy({
+    const res = await client.deploy({
       signer,
       spaceFactory,
       owner,
@@ -48,6 +48,8 @@ describe('SnapshotEVMClient', () => {
       ],
       executionStrategies: [executionStrategy]
     });
+
+    spaceAddress = res.spaceAddress;
   });
 
   it('should propose via authenticator', async () => {

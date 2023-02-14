@@ -43,12 +43,11 @@ export class SnapshotEVMClient {
     authenticators: string[];
     votingStrategies: AddressConfig[];
     executionStrategies: string[];
-  }): Promise<string> {
+  }): Promise<{ txId: string; spaceAddress: string }> {
     const spaceFactoryContract = new Contract(spaceFactory, SpaceFactoryAbi, signer);
 
     const salt = `0x${randomBytes(32).toString('hex')}`;
-
-    const response = await spaceFactoryContract.createSpace(
+    const args = [
       owner,
       votingDelay,
       minVotingDuration,
@@ -59,16 +58,14 @@ export class SnapshotEVMClient {
       authenticators,
       executionStrategies,
       salt
-    );
+    ];
 
-    const receipt = await response.wait();
+    const [spaceAddress, response] = await Promise.all([
+      spaceFactoryContract.getSpaceAddress(...args),
+      spaceFactoryContract.createSpace(...args)
+    ]);
 
-    const event = receipt.events.find(event => event.event === 'SpaceCreated');
-    if (!event) throw new Error('SpaceCreated event was not fired');
-
-    const [spaceAddress] = event.decode(event.data);
-
-    return spaceAddress;
+    return { spaceAddress, txId: response.hash };
   }
 
   async propose({
