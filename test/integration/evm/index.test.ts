@@ -2,13 +2,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
 import { EthereumTx } from '../../../src/clients/evm/ethereum-tx';
 import { EthereumSig } from '../../../src/clients/evm/ethereum-sig';
-import { deployDependency } from './utils';
-import SpaceFactoryContract from './fixtures/SpaceFactory.json';
-import VanillaAuthenciatorContract from './fixtures/VanillaAuthenticator.json';
-import EthTxAuthenticatorContract from './fixtures/EthTxAuthenticator.json';
-import EthSigAuthenticatorContract from './fixtures/EthSigAuthenticator.json';
-import VanillaVotingStrategyContract from './fixtures/VanillaVotingStrategy.json';
-import VanillaExecutionStrategyContract from './fixtures/VanillaExecutionStrategy.json';
+import { setup, TestConfig } from './utils';
 
 describe('EthereumTx', () => {
   const PROPOSAL_ID = 1;
@@ -19,68 +13,36 @@ describe('EthereumTx', () => {
     provider
   );
 
-  let spaceFactory = '';
   let client: EthereumTx;
-  let vanillaAuthenticator = '';
-  let ethTxAuthenticator = '';
-  let ethSigAuthenticator = '';
-  let votingStrategy = '';
-  let executionStrategy = '';
+  let testConfig: TestConfig;
   let spaceAddress = '';
   beforeAll(async () => {
-    spaceFactory = await deployDependency(signer, SpaceFactoryContract);
-    vanillaAuthenticator = await deployDependency(signer, VanillaAuthenciatorContract);
-    ethTxAuthenticator = await deployDependency(signer, EthTxAuthenticatorContract);
-    ethSigAuthenticator = await deployDependency(signer, EthSigAuthenticatorContract, 'SOC', '1');
-    votingStrategy = await deployDependency(signer, VanillaVotingStrategyContract);
-    executionStrategy = await deployDependency(signer, VanillaExecutionStrategyContract);
-
-    client = new EthereumTx({
-      networkConfig: {
-        spaceFactory: '0x00',
-        authenticators: {
-          [vanillaAuthenticator]: {
-            type: 'vanilla'
-          },
-          [ethTxAuthenticator]: {
-            type: 'ethTx'
-          },
-          [ethSigAuthenticator]: {
-            type: 'ethSig'
-          }
-        },
-        strategies: {
-          [votingStrategy]: {
-            type: 'vanilla'
-          }
-        },
-        executors: {
-          [executionStrategy]: {
-            type: 'vanilla'
-          }
-        }
-      }
-    });
+    testConfig = await setup(signer);
+    client = new EthereumTx({ networkConfig: testConfig.networkConfig });
 
     const owner = await signer.getAddress();
 
     const res = await client.deploy({
       signer,
-      spaceFactory,
+      spaceFactory: testConfig.spaceFactory,
       owner,
       votingDelay: 0,
       minVotingDuration: 0,
       maxVotingDuration: 86400,
       proposalThreshold: 0,
       quorum: 1,
-      authenticators: [vanillaAuthenticator, ethTxAuthenticator, ethSigAuthenticator],
+      authenticators: [
+        testConfig.vanillaAuthenticator,
+        testConfig.ethTxAuthenticator,
+        testConfig.ethSigAuthenticator
+      ],
       votingStrategies: [
         {
-          addy: votingStrategy,
+          addy: testConfig.votingStrategy,
           params: '0x00'
         }
       ],
-      executionStrategies: [executionStrategy]
+      executionStrategies: [testConfig.executionStrategy]
     });
 
     spaceAddress = res.spaceAddress;
@@ -91,9 +53,9 @@ describe('EthereumTx', () => {
       const envelope = {
         data: {
           space: spaceAddress,
-          authenticator: vanillaAuthenticator,
+          authenticator: testConfig.vanillaAuthenticator,
           strategies: [0],
-          executor: executionStrategy,
+          executor: testConfig.executionStrategy,
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
           executionParams: []
         }
@@ -110,7 +72,7 @@ describe('EthereumTx', () => {
       const envelope = {
         data: {
           space: spaceAddress,
-          authenticator: vanillaAuthenticator,
+          authenticator: testConfig.vanillaAuthenticator,
           strategies: [0],
           executionParams: [],
           proposal: 1,
@@ -131,9 +93,9 @@ describe('EthereumTx', () => {
       const envelope = {
         data: {
           space: spaceAddress,
-          authenticator: ethTxAuthenticator,
+          authenticator: testConfig.ethTxAuthenticator,
           strategies: [0],
-          executor: executionStrategy,
+          executor: testConfig.executionStrategy,
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
           executionParams: []
         }
@@ -150,7 +112,7 @@ describe('EthereumTx', () => {
       const envelope = {
         data: {
           space: spaceAddress,
-          authenticator: ethTxAuthenticator,
+          authenticator: testConfig.ethTxAuthenticator,
           strategies: [0],
           executionParams: [],
           proposal: 2,
@@ -174,9 +136,9 @@ describe('EthereumTx', () => {
         signer,
         data: {
           space: spaceAddress,
-          authenticator: ethSigAuthenticator,
+          authenticator: testConfig.ethSigAuthenticator,
           strategies: [0],
-          executor: executionStrategy,
+          executor: testConfig.executionStrategy,
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
           executionParams: []
         }
@@ -194,7 +156,7 @@ describe('EthereumTx', () => {
         signer,
         data: {
           space: spaceAddress,
-          authenticator: ethSigAuthenticator,
+          authenticator: testConfig.ethSigAuthenticator,
           strategies: [0],
           proposal: 3,
           choice: 0
