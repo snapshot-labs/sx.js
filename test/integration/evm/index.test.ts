@@ -13,23 +13,26 @@ describe('EthereumTx', () => {
     provider
   );
 
-  let client: EthereumTx;
+  let ethTxClient: EthereumTx;
+  let ethSigClient: EthereumSig;
   let testConfig: TestConfig;
   let spaceAddress = '';
   beforeAll(async () => {
     testConfig = await setup(signer);
-    client = new EthereumTx({ networkConfig: testConfig.networkConfig });
+
+    ethTxClient = new EthereumTx({ networkConfig: testConfig.networkConfig });
+    ethSigClient = new EthereumSig({ networkConfig: testConfig.networkConfig });
 
     const owner = await signer.getAddress();
 
-    const res = await client.deploy({
+    const res = await ethTxClient.deploy({
       signer,
       spaceFactory: testConfig.spaceFactory,
       owner,
       votingDelay: 0,
       minVotingDuration: 0,
       maxVotingDuration: 86400,
-      proposalThreshold: 0,
+      proposalThreshold: 1,
       quorum: 1,
       authenticators: [
         testConfig.vanillaAuthenticator,
@@ -38,8 +41,12 @@ describe('EthereumTx', () => {
       ],
       votingStrategies: [
         {
-          addy: testConfig.votingStrategy,
+          addy: testConfig.vanillaVotingStrategy,
           params: '0x00'
+        },
+        {
+          addy: testConfig.compVotingStrategy,
+          params: testConfig.compToken
         }
       ],
       executionStrategies: [testConfig.executionStrategy]
@@ -54,14 +61,14 @@ describe('EthereumTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.vanillaAuthenticator,
-          strategies: [0],
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
           executor: testConfig.executionStrategy,
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
           executionParams: []
         }
       };
 
-      const res = await client.propose({
+      const res = await ethTxClient.propose({
         signer,
         envelope
       });
@@ -73,14 +80,14 @@ describe('EthereumTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.vanillaAuthenticator,
-          strategies: [0],
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
           executionParams: [],
           proposal: 1,
           choice: 0
         }
       };
 
-      const res = await client.vote({
+      const res = await ethTxClient.vote({
         signer,
         envelope
       });
@@ -94,14 +101,14 @@ describe('EthereumTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.ethTxAuthenticator,
-          strategies: [0],
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
           executor: testConfig.executionStrategy,
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
           executionParams: []
         }
       };
 
-      const res = await client.propose({
+      const res = await ethTxClient.propose({
         signer,
         envelope
       });
@@ -113,14 +120,14 @@ describe('EthereumTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.ethTxAuthenticator,
-          strategies: [0],
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
           executionParams: [],
           proposal: 2,
           choice: 0
         }
       };
 
-      const res = await client.vote({
+      const res = await ethTxClient.vote({
         signer,
         envelope
       });
@@ -129,22 +136,20 @@ describe('EthereumTx', () => {
   });
 
   describe('ethSig authenticator', () => {
-    const ethSigClient = new EthereumSig();
-
     it('should propose via authenticator', async () => {
       const envelope = await ethSigClient.propose({
         signer,
         data: {
           space: spaceAddress,
           authenticator: testConfig.ethSigAuthenticator,
-          strategies: [0],
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
           executor: testConfig.executionStrategy,
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
           executionParams: []
         }
       });
 
-      const res = await client.propose({
+      const res = await ethTxClient.propose({
         signer,
         envelope
       });
@@ -157,13 +162,53 @@ describe('EthereumTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.ethSigAuthenticator,
-          strategies: [0],
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
           proposal: 3,
           choice: 0
         }
       });
 
-      const res = await client.vote({
+      const res = await ethTxClient.vote({
+        signer,
+        envelope
+      });
+      expect(res.hash).toBeDefined();
+    });
+  });
+
+  describe('compVotingStrategy + vanilla authenticator', () => {
+    it('should propose via authenticator', async () => {
+      const envelope = {
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [{ index: 1, address: testConfig.compVotingStrategy }],
+          executor: testConfig.executionStrategy,
+          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
+          executionParams: []
+        }
+      };
+
+      const res = await ethTxClient.propose({
+        signer,
+        envelope
+      });
+      expect(res.hash).toBeDefined();
+    });
+
+    it('should vote via authenticator', async () => {
+      const envelope = {
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [{ index: 1, address: testConfig.compVotingStrategy }],
+          executionParams: [],
+          proposal: 4,
+          choice: 0
+        }
+      };
+
+      const res = await ethTxClient.vote({
         signer,
         envelope
       });
@@ -172,7 +217,7 @@ describe('EthereumTx', () => {
   });
 
   it.skip('should finalize', async () => {
-    const res = await client.finalizeProposal({
+    const res = await ethTxClient.finalizeProposal({
       signer,
       space: spaceAddress,
       proposal: PROPOSAL_ID,
@@ -182,7 +227,7 @@ describe('EthereumTx', () => {
   });
 
   it('should cancel', async () => {
-    const res = await client.cancelProposal({
+    const res = await ethTxClient.cancelProposal({
       signer,
       space: spaceAddress,
       proposal: PROPOSAL_ID,
@@ -192,12 +237,16 @@ describe('EthereumTx', () => {
   });
 
   it('should get proposal', async () => {
-    const res = await client.getProposal({ signer, space: spaceAddress, proposal: PROPOSAL_ID });
+    const res = await ethTxClient.getProposal({
+      signer,
+      space: spaceAddress,
+      proposal: PROPOSAL_ID
+    });
     expect(res.startTimestamp).toBeGreaterThan(0);
   });
 
   it('should get proposal status', async () => {
-    const res = await client.getProposalStatus({
+    const res = await ethTxClient.getProposalStatus({
       signer,
       space: spaceAddress,
       proposal: PROPOSAL_ID
@@ -206,7 +255,7 @@ describe('EthereumTx', () => {
   });
 
   it('should set max voting duration', async () => {
-    const res = await client.setMaxVotingDuration({
+    const res = await ethTxClient.setMaxVotingDuration({
       signer,
       space: spaceAddress,
       maxVotingDuration: 80000
@@ -215,7 +264,7 @@ describe('EthereumTx', () => {
   });
 
   it('should set min voting duration', async () => {
-    const res = await client.setMinVotingDuration({
+    const res = await ethTxClient.setMinVotingDuration({
       signer,
       space: spaceAddress,
       minVotingDuration: 5000
@@ -224,7 +273,7 @@ describe('EthereumTx', () => {
   });
 
   it('should set metadata uri', async () => {
-    const res = await client.setMetadataUri({
+    const res = await ethTxClient.setMetadataUri({
       signer,
       space: spaceAddress,
       metadataUri: 'https://snapshot.org'
@@ -233,12 +282,16 @@ describe('EthereumTx', () => {
   });
 
   it('should set proposal threshold', async () => {
-    const res = await client.setProposalThreshold({ signer, space: spaceAddress, threshold: 0 });
+    const res = await ethTxClient.setProposalThreshold({
+      signer,
+      space: spaceAddress,
+      threshold: 0
+    });
     expect(res.hash).toBeDefined();
   });
 
   it('should set voting delay', async () => {
-    const res = await client.setVotingDelay({ signer, space: spaceAddress, votingDelay: 10 });
+    const res = await ethTxClient.setVotingDelay({ signer, space: spaceAddress, votingDelay: 10 });
     expect(res.hash).toBeDefined();
   });
 });

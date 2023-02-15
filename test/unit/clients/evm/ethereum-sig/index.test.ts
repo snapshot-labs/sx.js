@@ -30,7 +30,7 @@ describe('EthereumSig', () => {
       data: {
         space,
         authenticator,
-        strategies: [strategy],
+        strategies: [{ index: 0, address: '0xc441215878B3869b2468BA239911BA6B506619F7' }],
         executor,
         metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
         executionParams: []
@@ -46,7 +46,7 @@ describe('EthereumSig', () => {
       data: {
         space,
         authenticator,
-        strategies: [strategy],
+        strategies: [{ index: 0, address: '0xc441215878B3869b2468BA239911BA6B506619F7' }],
         proposal: 3,
         choice: Choice.FOR
       }

@@ -1,5 +1,7 @@
-import { ContractFactory, ContractInterface } from '@ethersproject/contracts';
+import { Contract, ContractFactory, ContractInterface } from '@ethersproject/contracts';
 import SpaceFactoryContract from './fixtures/SpaceFactory.json';
+import CompTokenContract from './fixtures/CompToken.json';
+import CompVotingStrategy from './fixtures/CompVotingStrategy.json';
 import VanillaAuthenciatorContract from './fixtures/VanillaAuthenticator.json';
 import EthTxAuthenticatorContract from './fixtures/EthTxAuthenticator.json';
 import EthSigAuthenticatorContract from './fixtures/EthSigAuthenticator.json';
@@ -9,11 +11,13 @@ import type { Signer } from '@ethersproject/abstract-signer';
 import type { NetworkConfig } from '../../../src/types';
 
 export type TestConfig = {
+  compToken: string;
   spaceFactory: string;
   vanillaAuthenticator: string;
   ethTxAuthenticator: string;
   ethSigAuthenticator: string;
-  votingStrategy: string;
+  vanillaVotingStrategy: string;
+  compVotingStrategy: string;
   executionStrategy: string;
   networkConfig: NetworkConfig;
 };
@@ -38,6 +42,9 @@ export async function deployDependency(
 }
 
 export async function setup(signer: Signer): Promise<TestConfig> {
+  const user = await signer.getAddress();
+
+  const compToken = await deployDependency(signer, CompTokenContract);
   const spaceFactory = await deployDependency(signer, SpaceFactoryContract);
   const vanillaAuthenticator = await deployDependency(signer, VanillaAuthenciatorContract);
   const ethTxAuthenticator = await deployDependency(signer, EthTxAuthenticatorContract);
@@ -47,15 +54,22 @@ export async function setup(signer: Signer): Promise<TestConfig> {
     'SOC',
     '1'
   );
-  const votingStrategy = await deployDependency(signer, VanillaVotingStrategyContract);
+  const vanillaVotingStrategy = await deployDependency(signer, VanillaVotingStrategyContract);
+  const compVotingStrategy = await deployDependency(signer, CompVotingStrategy);
   const executionStrategy = await deployDependency(signer, VanillaExecutionStrategyContract);
 
+  const compTokenContract = new Contract(compToken, CompTokenContract.abi, signer);
+  await compTokenContract.mint(user, 1);
+  await compTokenContract.delegate(user);
+
   return {
+    compToken: compToken,
     spaceFactory,
     vanillaAuthenticator,
     ethTxAuthenticator,
     ethSigAuthenticator,
-    votingStrategy,
+    vanillaVotingStrategy,
+    compVotingStrategy,
     executionStrategy,
     networkConfig: {
       spaceFactory: '0x00',
@@ -71,8 +85,11 @@ export async function setup(signer: Signer): Promise<TestConfig> {
         }
       },
       strategies: {
-        [votingStrategy]: {
+        [vanillaVotingStrategy]: {
           type: 'vanilla'
+        },
+        [compVotingStrategy]: {
+          type: 'comp'
         }
       },
       executors: {
