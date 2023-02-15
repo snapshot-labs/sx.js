@@ -6,7 +6,6 @@ import { Choice } from '../../../../../src/utils/choice';
 describe('EthereumSig', () => {
   const space = '0x95DC6f73301356c9909921e21b735601C42fc1a8';
   const authenticator = '0xc4fb316710643f7ffbb566e5586862076198dadb';
-  const strategy = 0;
   const executor = '0x81519c29621ba131ea398c15b17391f53e8b9a94';
 
   const provider = new JsonRpcProvider('http://127.0.0.1:8545');
