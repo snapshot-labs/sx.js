@@ -1,6 +1,6 @@
 import type { Call } from 'starknet';
-import { getProofInputs } from '../../utils/storage-proofs/index';
-import { getStorageVarAddress, offsetStorageVar, getSlotKey } from '../../utils/encoding/index';
+import { getProofInputs } from '../../utils/storage-proofs';
+import { getStorageVarAddress, offsetStorageVar, getSlotKey } from '../../utils/encoding';
 import type {
   SingleSlotProofStrategyConfig,
   ClientConfig,

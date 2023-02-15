@@ -1,6 +1,6 @@
 import createVanillaStrategy from './vanilla';
 import createSingleSlotProofStrategy from './singleSlotProof';
-import { hexPadLeft } from '../../utils/encoding/index';
+import { hexPadLeft } from '../../utils/encoding';
 import type { Strategy, NetworkConfig } from '../../types';
 
 export function getStrategy(address: string, networkConfig: NetworkConfig): Strategy | null {
