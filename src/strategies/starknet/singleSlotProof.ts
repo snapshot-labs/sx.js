@@ -204,11 +204,17 @@ export default function createSingleSlotProofStrategy(
       const formattedTimestamp = `0x${timestamp.toString(16)}`;
 
       const key = getStorageVarAddress(timestampToEthBlockNumberStore, formattedTimestamp);
-      const storedBlock = (await clientConfig.starkProvider.getStorageAt(
-        strategyAddress,
-        key
-      )) as string;
-      const block = parseInt(storedBlock, 16) - 1;
+      let storedBlock = await clientConfig.starkProvider.getStorageAt(strategyAddress, key);
+
+      // proposer might not have used SSP strategy, use latest L1 block
+      if (storedBlock === '0x0') {
+        storedBlock = await clientConfig.starkProvider.getStorageAt(
+          fossilL1HeadersStoreAddress,
+          getStorageVarAddress(latestL1BlockStore)
+        );
+      }
+
+      const block = parseInt(storedBlock as string, 16) - 1;
 
       try {
         const strategyContract = new Contract(
