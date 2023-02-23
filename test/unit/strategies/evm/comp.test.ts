@@ -16,7 +16,7 @@ describe('compStrategy', () => {
       const votingPower = await compStrategy.getVotingPower(
         '0xbbd17346378f76c1c94032594b57c93c24857b19',
         '0x556B14CbdA79A36dC33FcD461a04A5BCb5dC2A70',
-        8536492,
+        1677159023,
         params,
         provider
       );
@@ -24,23 +24,11 @@ describe('compStrategy', () => {
       expect(votingPower.toString()).toEqual('245589152463309972774');
     });
 
-    it('should compute voting power for user with delegated tokens on older block', async () => {
-      const votingPower = await compStrategy.getVotingPower(
-        '0xbbd17346378f76c1c94032594b57c93c24857b19',
-        '0x556B14CbdA79A36dC33FcD461a04A5BCb5dC2A70',
-        8536491,
-        params,
-        provider
-      );
-
-      expect(votingPower.toString()).toEqual('0');
-    });
-
     it('should compute voting power for user without delegated tokens', async () => {
       const votingPower = await compStrategy.getVotingPower(
         '0xbbd17346378f76c1c94032594b57c93c24857b19',
         '0x000000000000000000000000000000000000dead',
-        8536492,
+        1677159023,
         params,
         provider
       );

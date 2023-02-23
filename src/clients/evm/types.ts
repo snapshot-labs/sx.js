@@ -56,7 +56,7 @@ export type Strategy = {
   getVotingPower(
     strategyAddress: string,
     voterAddress: string,
-    block: number,
+    timestamp: number,
     params: string,
     provider: Provider
   ): Promise<bigint>;

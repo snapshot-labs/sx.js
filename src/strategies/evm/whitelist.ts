@@ -10,7 +10,7 @@ export default function createWhitelistStrategy(): Strategy {
     async getVotingPower(
       strategyAddress: string,
       voterAddress: string,
-      block: number,
+      timestamp: number,
       params: string
     ): Promise<bigint> {
       const abiCoder = new AbiCoder();
