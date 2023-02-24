@@ -30,7 +30,7 @@ export default function createVanillaStrategy(): Strategy {
       return [];
     },
     async getVotingPower(): Promise<bigint> {
-      return 0n;
+      return 1n;
     }
   };
 }
