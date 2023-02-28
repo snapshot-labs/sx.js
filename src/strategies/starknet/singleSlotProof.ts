@@ -216,21 +216,21 @@ export default function createSingleSlotProofStrategy(
 
       const block = parseInt(storedBlock as string, 16) - 1;
 
+      const strategyContract = new Contract(
+        SingleSlotProofAbi,
+        strategyAddress,
+        clientConfig.starkProvider
+      );
+
+      const proofInputs = await fetchProofInputs(
+        params[0],
+        voterAddress,
+        params[1],
+        block,
+        clientConfig
+      );
+
       try {
-        const strategyContract = new Contract(
-          SingleSlotProofAbi,
-          strategyAddress,
-          clientConfig.starkProvider
-        );
-
-        const proofInputs = await fetchProofInputs(
-          params[0],
-          voterAddress,
-          params[1],
-          block,
-          clientConfig
-        );
-
         const { voting_power } = await strategyContract.getVotingPower(
           formattedTimestamp,
           { value: voterAddress },
