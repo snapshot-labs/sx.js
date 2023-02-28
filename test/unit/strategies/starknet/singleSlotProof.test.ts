@@ -106,7 +106,7 @@ describe('singleSlotProofStrategy', () => {
       expect(votingPower.toString()).toEqual('1050000000000000000');
     }, 15_000);
 
-    it('should compute voting power for user with delegated tokens', async () => {
+    it('should compute voting power for user with no delegated tokens', async () => {
       const votingPower = await singleSlotProofStrategy.getVotingPower(
         '0xd1b81feff3095ca9517fdfc7427e742ce96f7ca8f3b2664a21b2fba552493b',
         '0x000000000000000000000000000000000000dead',
