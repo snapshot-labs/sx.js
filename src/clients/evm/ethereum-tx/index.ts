@@ -60,7 +60,7 @@ export class EthereumTx {
       proposalThreshold,
       metadataUri
     ];
-    const strategies = [votingStrategies, authenticators, executionStrategies];
+    const strategies = [votingStrategies, [], authenticators, executionStrategies];
 
     const functionData = spaceInterface.encodeDeploy([...baseArgs.slice(0, -1), ...strategies]);
     const initCode = SpaceBytecode + functionData.slice(2);
@@ -127,7 +127,8 @@ export class EthereumTx {
       envelope.data.strategies.map((strategyConfig, i) => ({
         index: strategyConfig.index,
         params: strategiesParams[i]
-      }))
+      })),
+      envelope.data.metadataUri
     ]);
 
     const selector = functionData.slice(0, 10);
