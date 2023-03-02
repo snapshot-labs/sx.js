@@ -95,6 +95,7 @@ export async function setup(signer: Signer): Promise<TestConfig> {
   });
 
   const networkConfig = {
+    eip712ChainId: 31337,
     spaceFactory,
     authenticators: {
       [vanillaAuthenticator]: {
