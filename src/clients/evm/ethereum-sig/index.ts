@@ -16,7 +16,7 @@ import type {
 import type { NetworkConfig, ClientOpts } from '../../../types';
 
 type EthereumSigClientOpts = Pick<ClientOpts, 'networkConfig'> & {
-  manaUrl: string;
+  manaUrl?: string;
 };
 
 export class EthereumSig {
