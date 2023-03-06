@@ -24,13 +24,10 @@ export default function createCompStrategy(): Strategy {
         provider
       );
 
-      let votingPower;
       const storedBlock = await votingStrategyContract.timestampToBlockNumber(timestamp);
-      if (storedBlock.toNumber() > 1) {
-        votingPower = await compContract.getPriorVotes(voterAddress, storedBlock.toNumber());
-      } else {
-        votingPower = await compContract.getCurrentVotes(voterAddress);
-      }
+      const blockTag = storedBlock.toNumber() > 1 ? storedBlock.toNumber : undefined;
+
+      const votingPower = await compContract.getCurrentVotes(voterAddress, { blockTag });
 
       return BigInt(votingPower.toString());
     }
