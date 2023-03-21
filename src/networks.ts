@@ -4,6 +4,9 @@ export const evmGoerli: EvmNetworkConfig = {
   eip712ChainId: 5,
   proxyFactory: '',
   masterSpace: '',
+  executionStrategiesImplementations: {
+    SimpleQuorumAvatar: ''
+  },
   authenticators: {
     '0xdd66652e93293c32aa3288509d9a46c785e3f786': {
       type: 'vanilla'

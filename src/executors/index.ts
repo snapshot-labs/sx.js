@@ -2,9 +2,7 @@ import createStarknetExecutor from './starknet';
 import createVanillaExecutor from './vanilla';
 import createEthRelayerExecutor from './ethRelayer';
 import createAvatarExecutor from './avatar';
-import type { NetworkConfig, ExecutionInput } from '../types';
-
-export type ExecutorType = 'SimpleQuorumVanilla' | 'SimpleQuorumAvatar';
+import type { ExecutorType, NetworkConfig, ExecutionInput } from '../types';
 
 export function getEvmExecutionData(
   type: ExecutorType,
