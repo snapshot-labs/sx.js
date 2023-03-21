@@ -9,6 +9,7 @@ import VanillaAuthenciatorContract from './fixtures/VanillaAuthenticator.json';
 import EthTxAuthenticatorContract from './fixtures/EthTxAuthenticator.json';
 import EthSigAuthenticatorContract from './fixtures/EthSigAuthenticator.json';
 import VanillaProposalValidationStrategyContract from './fixtures/VanillaProposalValidationStrategy.json';
+import VotingPowerProposalValidationStrategyContract from './fixtures/VotingPowerProposalValidationStrategy.json';
 import VanillaVotingStrategyContract from './fixtures/VanillaVotingStrategy.json';
 import CompVotingStrategy from './fixtures/CompVotingStrategy.json';
 import WhitelistVotingStrategy from './fixtures/WhitelistVotingStrategy.json';
@@ -26,6 +27,7 @@ export type TestConfig = {
   ethTxAuthenticator: string;
   ethSigAuthenticator: string;
   vanillaProposalValidationStrategy: string;
+  votingPowerProposalValidationStrategy: string;
   vanillaVotingStrategy: string;
   compVotingStrategy: string;
   whitelistVotingStrategy: string;
@@ -73,6 +75,10 @@ export async function setup(signer: Signer): Promise<TestConfig> {
   const vanillaProposalValidationStrategy = await deployDependency(
     signer,
     VanillaProposalValidationStrategyContract
+  );
+  const votingPowerProposalValidationStrategy = await deployDependency(
+    signer,
+    VotingPowerProposalValidationStrategyContract
   );
   const vanillaVotingStrategy = await deployDependency(signer, VanillaVotingStrategyContract);
   const compVotingStrategy = await deployDependency(signer, CompVotingStrategy);
@@ -155,6 +161,10 @@ export async function setup(signer: Signer): Promise<TestConfig> {
   ];
 
   const abiCoder = new AbiCoder();
+  const whitelistVotingStrategyParams = abiCoder.encode(
+    ['tuple(address addy, uint256 vp)[]'],
+    [whitelist]
+  );
 
   const res = await ethTxClient.deploySpace({
     signer,
@@ -163,8 +173,27 @@ export async function setup(signer: Signer): Promise<TestConfig> {
     minVotingDuration: 0,
     maxVotingDuration: 86400,
     proposalValidationStrategy: {
-      addy: vanillaProposalValidationStrategy,
-      params: '0x00'
+      addy: votingPowerProposalValidationStrategy,
+      params: abiCoder.encode(
+        ['uint256', 'tuple(address addy, bytes params)[]'],
+        [
+          1,
+          [
+            {
+              addy: vanillaVotingStrategy,
+              params: '0x00'
+            },
+            {
+              addy: compVotingStrategy,
+              params: compToken
+            },
+            {
+              addy: whitelistVotingStrategy,
+              params: whitelistVotingStrategyParams
+            }
+          ]
+        ]
+      )
     },
     metadataUri: 'metadataUri',
     authenticators: [vanillaAuthenticator, ethTxAuthenticator, ethSigAuthenticator],
@@ -179,7 +208,7 @@ export async function setup(signer: Signer): Promise<TestConfig> {
       },
       {
         addy: whitelistVotingStrategy,
-        params: abiCoder.encode(['tuple(address addy, uint256 vp)[]'], [whitelist])
+        params: whitelistVotingStrategyParams
       }
     ],
     votingStrategiesMetadata: ['0x00', `0x${COMP_TOKEN_DECIMALS.toString(16)}`, '0x00']
@@ -196,6 +225,7 @@ export async function setup(signer: Signer): Promise<TestConfig> {
     ethTxAuthenticator,
     ethSigAuthenticator,
     vanillaProposalValidationStrategy,
+    votingPowerProposalValidationStrategy,
     vanillaVotingStrategy,
     compVotingStrategy,
     whitelistVotingStrategy,
