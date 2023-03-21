@@ -83,7 +83,7 @@ export type NetworkConfig = {
   };
 };
 
-export type EvmNetworkConfig = Omit<NetworkConfig, 'spaceFactory'> & {
+export type EvmNetworkConfig = Omit<NetworkConfig, 'spaceFactory' | 'executors'> & {
   proxyFactory: string;
   masterSpace: string;
 };
