@@ -1,5 +1,6 @@
 import randomBytes from 'randombytes';
 import { AbiCoder } from '@ethersproject/abi';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract, ContractFactory, ContractInterface } from '@ethersproject/contracts';
 import { EthereumTx } from '../../../src/clients/evm/ethereum-tx';
 import ProxyFactoryContract from './fixtures/ProxyFactory.json';
@@ -63,7 +64,7 @@ export async function deployDependency(
   return contract.address;
 }
 
-export async function setup(signer: Signer): Promise<TestConfig> {
+export async function setup(provider: JsonRpcProvider, signer: Signer): Promise<TestConfig> {
   const precomputedSpaceSalt = `0x${randomBytes(32).toString('hex')}`;
 
   const controller = await signer.getAddress();
@@ -79,7 +80,7 @@ export async function setup(signer: Signer): Promise<TestConfig> {
     signer,
     EthSigAuthenticatorContract,
     'snapshot-x',
-    '0.1.0'
+    '1.0.0'
   );
   const vanillaProposalValidationStrategy = await deployDependency(
     signer,
@@ -89,13 +90,16 @@ export async function setup(signer: Signer): Promise<TestConfig> {
     signer,
     VotingPowerProposalValidationStrategyContract
   );
+
   const vanillaVotingStrategy = await deployDependency(signer, VanillaVotingStrategyContract);
   const compVotingStrategy = await deployDependency(signer, CompVotingStrategyContract);
   const ozVotesVotingStrategy = await deployDependency(signer, OzVotesVotingStrategyContract);
   const whitelistVotingStrategy = await deployDependency(signer, WhitelistVotingStrategyContract);
+
   const vanillaExecutionStrategy = await deployDependency(
     signer,
     VanillaExecutionStrategyContract,
+    controller,
     1
   );
   const masterAvatarExecutionStrategy = await deployDependency(
@@ -108,12 +112,7 @@ export async function setup(signer: Signer): Promise<TestConfig> {
   );
   const masterTimelockExecutionStrategy = await deployDependency(
     signer,
-    TimelockExecutionStrategyContract,
-    controller,
-    controller,
-    [],
-    0,
-    1
+    TimelockExecutionStrategyContract
   );
 
   const networkConfig = {
@@ -152,34 +151,6 @@ export async function setup(signer: Signer): Promise<TestConfig> {
   } as const;
 
   const ethTxClient = new EthereumTx({ networkConfig });
-  const spaceAddress = await ethTxClient.predictSpaceAddress({
-    signer,
-    salt: precomputedSpaceSalt
-  });
-
-  const { address: avatarExecutionStrategy } = await ethTxClient.deployAvatarExecution({
-    signer,
-    params: {
-      controller,
-      target: avatar,
-      spaces: [spaceAddress],
-      quorum: 1n
-    }
-  });
-
-  const { address: timelockExecutionStrategy } = await ethTxClient.deployTimelockExecution({
-    signer,
-    params: {
-      controller,
-      vetoGuardian: controller,
-      spaces: [spaceAddress],
-      timelockDelay: 0n,
-      quorum: 1n
-    }
-  });
-
-  const avatarContract = new Contract(avatar, AvatarContract.abi, signer);
-  await avatarContract.enableModule(avatarExecutionStrategy);
 
   const compTokenContract = new Contract(compToken, CompTokenContract.abi, signer);
   await compTokenContract.mint(controller, 2n * 10n ** COMP_TOKEN_DECIMALS);
@@ -192,16 +163,6 @@ export async function setup(signer: Signer): Promise<TestConfig> {
   );
   await erc20VotesTokenContract.mint(controller, 2n * 10n ** COMP_TOKEN_DECIMALS);
   await erc20VotesTokenContract.delegate(controller);
-
-  await signer.sendTransaction({
-    to: avatar,
-    value: '21'
-  });
-
-  await signer.sendTransaction({
-    to: timelockExecutionStrategy,
-    value: '21'
-  });
 
   const whitelist = [
     {
@@ -274,8 +235,42 @@ export async function setup(signer: Signer): Promise<TestConfig> {
       ],
       votingStrategiesMetadata: ['0x00', `0x${COMP_TOKEN_DECIMALS.toString(16)}`, '0x00', '0x00']
     },
-    salt: precomputedSpaceSalt
+    saltNonce: precomputedSpaceSalt
   });
+
+  const { address: avatarExecutionStrategy } = await ethTxClient.deployAvatarExecution({
+    signer,
+    params: {
+      controller,
+      target: avatar,
+      spaces: [res.address],
+      quorum: 1n
+    }
+  });
+
+  const { address: timelockExecutionStrategy } = await ethTxClient.deployTimelockExecution({
+    signer,
+    params: {
+      controller,
+      vetoGuardian: controller,
+      spaces: [res.address],
+      timelockDelay: 0n,
+      quorum: 1n
+    }
+  });
+
+  await signer.sendTransaction({
+    to: avatar,
+    value: '21'
+  });
+
+  await signer.sendTransaction({
+    to: timelockExecutionStrategy,
+    value: '21'
+  });
+
+  const avatarContract = new Contract(avatar, AvatarContract.abi, signer);
+  await avatarContract.enableModule(avatarExecutionStrategy);
 
   return {
     controller,

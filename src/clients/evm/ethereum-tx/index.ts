@@ -1,5 +1,7 @@
 import { Contract } from '@ethersproject/contracts';
 import { AbiCoder, Interface } from '@ethersproject/abi';
+import { keccak256 } from '@ethersproject/keccak256';
+import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
 import randomBytes from 'randombytes';
 import { getAuthenticator } from '../../../authenticators/evm';
 import { getStrategiesParams } from '../../../strategies/evm';
@@ -11,6 +13,7 @@ import TimelockExecutionStrategyAbi from './abis/TimelockExecutionStrategy.json'
 import type { Signer } from '@ethersproject/abstract-signer';
 import type { Propose, UpdateProposal, Vote, Envelope, AddressConfig } from '../types';
 import type { EvmNetworkConfig } from '../../../types';
+import { assert } from 'console';
 
 type SpaceParams = {
   controller: string;
@@ -74,13 +77,13 @@ export class EthereumTx {
   async deployAvatarExecution({
     signer,
     params: { controller, target, spaces, quorum },
-    salt
+    saltNonce
   }: {
     signer: Signer;
     params: AvatarExecutionStrategyParams;
-    salt?: string;
+    saltNonce?: string;
   }): Promise<{ txId: string; address: string }> {
-    salt = salt || `0x${randomBytes(32).toString('hex')}`;
+    saltNonce = saltNonce || `0x${randomBytes(32).toString('hex')}`;
 
     const implementationAddress =
       this.networkConfig.executionStrategiesImplementations['SimpleQuorumAvatar'];
@@ -103,11 +106,17 @@ export class EthereumTx {
     );
     const functionData = avatarExecutionStrategyInterface.encodeFunctionData('setUp', [initParams]);
 
+    const sender = await signer.getAddress();
+    const salt = await this.getSalt({
+      sender,
+      initializer: functionData,
+      saltNonce
+    });
     const address = await proxyFactoryContract.predictProxyAddress(implementationAddress, salt);
     const response = await proxyFactoryContract.deployProxy(
       implementationAddress,
       functionData,
-      salt
+      saltNonce
     );
 
     return { address, txId: response.hash };
@@ -116,13 +125,13 @@ export class EthereumTx {
   async deployTimelockExecution({
     signer,
     params: { controller, vetoGuardian, spaces, timelockDelay, quorum },
-    salt
+    saltNonce
   }: {
     signer: Signer;
     params: TimelockExecutionStrategyParams;
-    salt?: string;
+    saltNonce?: string;
   }): Promise<{ txId: string; address: string }> {
-    salt = salt || `0x${randomBytes(32).toString('hex')}`;
+    saltNonce = saltNonce || `0x${randomBytes(32).toString('hex')}`;
 
     const implementationAddress =
       this.networkConfig.executionStrategiesImplementations['SimpleQuorumTimelock'];
@@ -147,11 +156,17 @@ export class EthereumTx {
       initParams
     ]);
 
+    const sender = await signer.getAddress();
+    const salt = await this.getSalt({
+      sender,
+      initializer: functionData,
+      saltNonce
+    });
     const address = await proxyFactoryContract.predictProxyAddress(implementationAddress, salt);
     const response = await proxyFactoryContract.deployProxy(
       implementationAddress,
       functionData,
-      salt
+      saltNonce
     );
 
     return { address, txId: response.hash };
@@ -172,13 +187,13 @@ export class EthereumTx {
       votingStrategies,
       votingStrategiesMetadata
     },
-    salt
+    saltNonce
   }: {
     signer: Signer;
     params: SpaceParams;
-    salt?: string;
+    saltNonce?: string;
   }): Promise<{ txId: string; address: string }> {
-    salt = salt || `0x${randomBytes(32).toString('hex')}`;
+    saltNonce = saltNonce || `0x${randomBytes(32).toString('hex')}`;
 
     const spaceInterface = new Interface(SpaceAbi);
     const proxyFactoryContract = new Contract(
@@ -188,19 +203,27 @@ export class EthereumTx {
     );
 
     const functionData = spaceInterface.encodeFunctionData('initialize', [
-      controller,
-      votingDelay,
-      minVotingDuration,
-      maxVotingDuration,
-      proposalValidationStrategy,
-      proposalValidationStrategyMetadataUri,
-      daoUri,
-      metadataUri,
-      votingStrategies,
-      votingStrategiesMetadata,
-      authenticators
+      [
+        controller,
+        votingDelay,
+        minVotingDuration,
+        maxVotingDuration,
+        proposalValidationStrategy,
+        proposalValidationStrategyMetadataUri,
+        daoUri,
+        metadataUri,
+        votingStrategies,
+        votingStrategiesMetadata,
+        authenticators
+      ]
     ]);
 
+    const sender = await signer.getAddress();
+    const salt = await this.getSalt({
+      sender,
+      initializer: functionData,
+      saltNonce
+    });
     const address = await proxyFactoryContract.predictProxyAddress(
       this.networkConfig.masterSpace,
       salt
@@ -208,10 +231,25 @@ export class EthereumTx {
     const response = await proxyFactoryContract.deployProxy(
       this.networkConfig.masterSpace,
       functionData,
-      salt
+      saltNonce
     );
 
     return { address, txId: response.hash };
+  }
+
+  async getSalt({
+    sender,
+    initializer,
+    saltNonce
+  }: {
+    sender: string;
+    initializer: string;
+    saltNonce: string;
+  }) {
+    return solidityKeccak256(
+      ['address', 'bytes32', 'uint256'],
+      [sender, keccak256(initializer), saltNonce]
+    );
   }
 
   async predictSpaceAddress({ signer, salt }: { signer: Signer; salt: string }) {
