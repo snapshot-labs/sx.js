@@ -79,6 +79,26 @@ export const evmLineaGoerli: EvmNetworkConfig = {
   }
 };
 
+export const goerli1: NetworkConfig = {
+  eip712ChainId: 5,
+  spaceFactory: '0x00e1e511e496a72791ab3d591ba7d571a32de4261d84e4d183f26b6325970e20',
+  authenticators: {
+    '0x02c38c9a8f20e1c4c974503e1cac5a06658161df4a8be3b24762168c99c58dbd': {
+      type: 'vanilla'
+    }
+  },
+  strategies: {
+    '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a': {
+      type: 'vanilla'
+    }
+  },
+  executors: {
+    '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe': {
+      type: 'vanilla'
+    }
+  }
+};
+
 export const goerli2: NetworkConfig = {
   eip712ChainId: 5,
   spaceFactory: '0x00e1e511e496a72791ab3d591ba7d571a32de4261d84e4d183f26b6325970e20',
@@ -121,4 +141,4 @@ export const goerli2: NetworkConfig = {
   }
 };
 
-export const defaultNetwork = goerli2;
+export const defaultNetwork = goerli1;

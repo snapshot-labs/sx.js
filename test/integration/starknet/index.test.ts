@@ -1,9 +1,7 @@
-import { StarkNetTx, EthereumSig } from '../../../src/clients';
-import { getExecutionData } from '../../../src/executors';
+import { StarkNetTx } from '../../../src/clients';
 import { Account, Provider, constants } from 'starknet';
 import { Wallet } from '@ethersproject/wallet';
-import { Choice } from '../../../src/utils/choice';
-import { defaultNetwork } from '../../../src/networks';
+import { Choice } from '../../../src/types';
 
 describe('StarkNetTx', () => {
   expect(process.env.STARKNET_ADDRESS).toBeDefined();
@@ -12,12 +10,11 @@ describe('StarkNetTx', () => {
   const ethUrl = process.env.GOERLI_NODE_URL as string;
   const address = process.env.STARKNET_ADDRESS as string;
   const privKey = process.env.STARKNET_PK as string;
-  const manaUrl = '';
 
   const starkProvider = new Provider({
     sequencer: {
-      baseUrl: 'https://alpha4-2.starknet.io',
-      chainId: constants.StarknetChainId.SN_GOERLI2
+      baseUrl: 'https://alpha4.starknet.io',
+      chainId: constants.StarknetChainId.SN_GOERLI
     }
   });
 
@@ -25,12 +22,16 @@ describe('StarkNetTx', () => {
   const walletAddress = wallet.address;
   const account = new Account(starkProvider, address, privKey);
 
+  // TODO: read from contract
+  const nextProposalId = 26;
+
   describe('vanilla authenticator', () => {
     const client = new StarkNetTx({ starkProvider, ethUrl });
-    const space = '0x7e6e9047eb910f84f7e3b86cea7b1d7779c109c970a39b54379c1f4fa395b28';
-    const authenticator = '0x5e1f273ca9a11f78bfb291cbe1b49294cf3c76dd48951e7ab7db6d9fb1e7d62';
+    const space = '0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8';
+    const authenticator = '0x02c38c9a8f20e1c4c974503e1cac5a06658161df4a8be3b24762168c99c58dbd';
     const strategy = 0;
-    const executor = '0x4ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d';
+    const strategyAddress = '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a';
+    const executor = '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe';
 
     it('StarkNetTx.propose()', async () => {
       const envelope = {
@@ -40,10 +41,12 @@ describe('StarkNetTx', () => {
           message: {
             space,
             authenticator,
-            strategies: [strategy],
-            executor,
-            metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
-            executionParams: []
+            strategies: [],
+            executionStrategy: {
+              addr: executor,
+              params: '0x00'
+            },
+            metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
           }
         }
       };
@@ -51,7 +54,7 @@ describe('StarkNetTx', () => {
       const receipt = await client.propose(account, envelope);
       console.log('Receipt', receipt);
 
-      // await defaultProvider.waitForTransaction(receipt.transaction_hash);
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
 
       expect(receipt.transaction_hash).toBeDefined();
     }, 60e3);
@@ -64,9 +67,14 @@ describe('StarkNetTx', () => {
           message: {
             space,
             authenticator,
-            strategies: [strategy],
-            proposal: 1,
-            choice: Choice.FOR
+            strategies: [
+              {
+                index: strategy,
+                address: strategyAddress
+              }
+            ],
+            proposal: nextProposalId,
+            choice: Choice.For
           }
         }
       };
@@ -74,145 +82,7 @@ describe('StarkNetTx', () => {
       const receipt = await client.vote(account, envelope);
       console.log('Receipt', receipt);
 
-      // await defaultProvider.waitForTransaction(receipt.transaction_hash);
-
-      expect(receipt.transaction_hash).toBeDefined();
-    }, 60e3);
-  });
-
-  describe('ethSig authenticator', () => {
-    const client = new StarkNetTx({ starkProvider, ethUrl });
-    const ethSigClient = new EthereumSig({ starkProvider, ethUrl, manaUrl });
-    const space = '0x7e6e9047eb910f84f7e3b86cea7b1d7779c109c970a39b54379c1f4fa395b28';
-    const authenticator = '0x64cce9272197eba6353f5bbf060e097e516b411e66e83a9cf5910a08697df14';
-    const strategy = 0;
-    const executor = '0x4ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d';
-
-    it('StarkNetTx.propose()', async () => {
-      const envelope = await ethSigClient.propose(wallet, walletAddress, {
-        space,
-        authenticator,
-        strategies: [strategy],
-        executor,
-        metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
-        executionParams: []
-      });
-
-      const receipt = await client.propose(account, envelope);
-      console.log('Receipt', receipt);
-
-      // await defaultProvider.waitForTransaction(receipt.transaction_hash);
-
-      expect(receipt.transaction_hash).toBeDefined();
-    }, 60e3);
-
-    it('StarkNetTx.vote()', async () => {
-      const envelope = await ethSigClient.vote(wallet, walletAddress, {
-        space,
-        authenticator,
-        strategies: [strategy],
-        proposal: 2,
-        choice: Choice.FOR
-      });
-
-      const receipt = await client.vote(account, envelope);
-      console.log('Receipt', receipt);
-
-      // await defaultProvider.waitForTransaction(receipt.transaction_hash);
-
-      expect(receipt.transaction_hash).toBeDefined();
-    }, 60e3);
-  });
-
-  describe('ethSig authenticator + single slot proof', () => {
-    expect(process.env.GOERLI_NODE_URL).toBeDefined();
-    expect(process.env.ETH_PK).toBeDefined();
-
-    const wallet = new Wallet(process.env.ETH_PK as string);
-    const walletAddress = wallet.address;
-
-    const client = new StarkNetTx({ starkProvider, ethUrl });
-    const ethSigClient = new EthereumSig({ starkProvider, ethUrl, manaUrl });
-    const space = '0x7e6e9047eb910f84f7e3b86cea7b1d7779c109c970a39b54379c1f4fa395b28';
-    const authenticator = '0x64cce9272197eba6353f5bbf060e097e516b411e66e83a9cf5910a08697df14';
-    const strategy = 1;
-    const executor = '0x4ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d';
-
-    it('StarkNetTx.propose()', async () => {
-      const envelope = await ethSigClient.propose(wallet, walletAddress, {
-        space,
-        authenticator,
-        strategies: [strategy],
-        executor,
-        metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
-        executionParams: []
-      });
-
-      const receipt = await client.propose(account, envelope);
-      console.log('Receipt', receipt);
-
-      // await defaultProvider.waitForTransaction(receipt.transaction_hash);
-
-      expect(receipt.transaction_hash).toBeDefined();
-    }, 60e3);
-
-    it('StarkNetTx.vote()', async () => {
-      const envelope = await ethSigClient.vote(wallet, walletAddress, {
-        space,
-        authenticator,
-        strategies: [strategy],
-        proposal: 3,
-        choice: Choice.FOR
-      });
-
-      const receipt = await client.vote(account, envelope);
-      console.log('Receipt', receipt);
-
-      // await defaultProvider.waitForTransaction(receipt.transaction_hash);
-
-      expect(receipt.transaction_hash).toBeDefined();
-    }, 60e3);
-  });
-
-  describe('zodiac execution', () => {
-    const client = new StarkNetTx({ starkProvider, ethUrl });
-    const space = '0x7e6e9047eb910f84f7e3b86cea7b1d7779c109c970a39b54379c1f4fa395b28';
-    const authenticator = '0x5e1f273ca9a11f78bfb291cbe1b49294cf3c76dd48951e7ab7db6d9fb1e7d62';
-    const strategy = 0;
-
-    const executorAddress = '0x21dda40770f4317582251cffd5a0202d6b223dc167e5c8db25dc887d11eba81';
-    const transactions = [
-      {
-        to: '0x2842c82E20ab600F443646e1BC8550B44a513D82',
-        value: '0x0',
-        data: '0x',
-        operation: 0,
-        nonce: 0,
-        salt: 1n
-      }
-    ];
-
-    it('StarkNetTx.propose()', async () => {
-      const executionData = getExecutionData(executorAddress, defaultNetwork, { transactions });
-
-      const envelope = {
-        address: walletAddress,
-        sig: null,
-        data: {
-          message: {
-            space,
-            authenticator,
-            strategies: [strategy],
-            metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
-            ...executionData
-          }
-        }
-      };
-
-      const receipt = await client.propose(account, envelope);
-      console.log('Receipt', receipt);
-
-      // await defaultProvider.waitForTransaction(receipt.transaction_hash);
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
 
       expect(receipt.transaction_hash).toBeDefined();
     }, 60e3);

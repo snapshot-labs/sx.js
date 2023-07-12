@@ -1,10 +1,10 @@
-import { Signature, ec, typedData } from 'starknet';
+import { ec, typedData } from 'starknet';
 
 export function verify(
   pubKey: string,
   address: string,
   data: typedData.TypedData,
-  signature: Signature
+  signature: ReturnType<typeof ec.starkCurve.sign>
 ) {
   const msgHash = typedData.getMessageHash(data, address);
   return ec.starkCurve.verify(signature.toDERHex(), msgHash, pubKey);

@@ -18,8 +18,8 @@ export default function createVanillaStrategy(): Strategy {
       index: number,
       envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
       clientConfig: ClientConfig
-    ): Promise<string[]> {
-      return [];
+    ): Promise<string> {
+      return '0x0';
     },
     async getExtraProposeCalls(
       address: string,

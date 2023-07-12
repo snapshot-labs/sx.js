@@ -1,10 +1,15 @@
 import type { Provider } from 'starknet';
 import type { Call } from 'starknet';
-import type { Choice } from '../utils/choice';
 import type { MetaTransaction } from '../utils/encoding';
 import type { NetworkConfig } from './networkConfig';
 
 export * from './networkConfig';
+
+export enum Choice {
+  Against = 0,
+  For = 1,
+  Abstain = 2
+}
 
 export type Authenticator = {
   type: string;
@@ -19,7 +24,7 @@ export interface Strategy {
     index: number,
     envelope: Envelope<Message>,
     clientConfig: ClientConfig
-  ): Promise<string[]>;
+  ): Promise<string>;
   getExtraProposeCalls(
     address: string,
     index: number,
@@ -55,33 +60,65 @@ export type EthereumSigClientConfig = ClientConfig & {
   manaUrl: string;
 };
 
-export interface Propose {
+// TODO: normalize with EVM
+export type AddressConfig = {
+  addr: string;
+  params: string;
+};
+
+export type IndexedConfig = {
+  index: number;
+  params: string;
+};
+
+export type StrategyConfig = {
+  index: number;
+  address: string;
+};
+
+export type Propose = {
+  space: string;
+  authenticator: string;
+  strategies: StrategyConfig[];
+  executionStrategy: AddressConfig;
+  metadataUri: string;
+};
+
+export type UpdateProposal = {
+  space: string;
+  proposal: number;
+  authenticator: string;
+  executionStrategy: AddressConfig;
+  metadataUri: string;
+};
+
+export type Vote = {
+  space: string;
+  authenticator: string;
+  strategies: StrategyConfig[];
+  proposal: number;
+  choice: Choice;
+};
+
+export type VanillaProposeMessage = Propose;
+export type VanillaVoteMessage = Vote;
+export type EthSigProposeMessage = {
   space: string;
   authenticator: string;
   strategies: number[];
   executor: string;
   executionParams: string[];
   metadataUri: string;
-}
-
-export interface Vote {
-  space: string;
-  authenticator: string;
-  strategies: number[];
-  proposal: number;
-  choice: Choice;
-}
-
-export type VanillaProposeMessage = Propose;
-export type VanillaVoteMessage = Vote;
-export type EthSigProposeMessage = Propose & {
   author: string;
   executionHash: string;
   strategiesHash: string;
   strategiesParamsHash: string;
   salt: number;
 };
-export type EthSigVoteMessage = Vote & {
+export type EthSigVoteMessage = {
+  space: string;
+  authenticator: string;
+  strategies: number[];
   voter: string;
   strategiesHash: string;
   strategiesParamsHash: string;
@@ -91,6 +128,7 @@ export type EthSigVoteMessage = Vote & {
 export type Message =
   | VanillaProposeMessage
   | VanillaVoteMessage
+  | UpdateProposal
   | EthSigProposeMessage
   | EthSigVoteMessage;
 
