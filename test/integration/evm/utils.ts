@@ -151,6 +151,31 @@ export async function setup(provider: JsonRpcProvider, signer: Signer): Promise<
   } as const;
 
   const ethTxClient = new EthereumTx({ networkConfig });
+  const spaceAddress = await ethTxClient.predictSpaceAddress({
+    signer,
+    saltNonce: precomputedSpaceSalt
+  });
+
+  const { address: avatarExecutionStrategy } = await ethTxClient.deployAvatarExecution({
+    signer,
+    params: {
+      controller,
+      target: avatar,
+      spaces: [spaceAddress],
+      quorum: 1n
+    }
+  });
+
+  const { address: timelockExecutionStrategy } = await ethTxClient.deployTimelockExecution({
+    signer,
+    params: {
+      controller,
+      vetoGuardian: controller,
+      spaces: [spaceAddress],
+      timelockDelay: 0n,
+      quorum: 1n
+    }
+  });
 
   const compTokenContract = new Contract(compToken, CompTokenContract.abi, signer);
   await compTokenContract.mint(controller, 2n * 10n ** COMP_TOKEN_DECIMALS);
@@ -163,6 +188,19 @@ export async function setup(provider: JsonRpcProvider, signer: Signer): Promise<
   );
   await erc20VotesTokenContract.mint(controller, 2n * 10n ** COMP_TOKEN_DECIMALS);
   await erc20VotesTokenContract.delegate(controller);
+
+  await signer.sendTransaction({
+    to: avatar,
+    value: '21'
+  });
+
+  await signer.sendTransaction({
+    to: timelockExecutionStrategy,
+    value: '21'
+  });
+
+  const avatarContract = new Contract(avatar, AvatarContract.abi, signer);
+  await avatarContract.enableModule(avatarExecutionStrategy);
 
   const whitelist = [
     {
@@ -238,45 +276,11 @@ export async function setup(provider: JsonRpcProvider, signer: Signer): Promise<
     saltNonce: precomputedSpaceSalt
   });
 
-  const { address: avatarExecutionStrategy } = await ethTxClient.deployAvatarExecution({
-    signer,
-    params: {
-      controller,
-      target: avatar,
-      spaces: [res.address],
-      quorum: 1n
-    }
-  });
-
-  const { address: timelockExecutionStrategy } = await ethTxClient.deployTimelockExecution({
-    signer,
-    params: {
-      controller,
-      vetoGuardian: controller,
-      spaces: [res.address],
-      timelockDelay: 0n,
-      quorum: 1n
-    }
-  });
-
-  await signer.sendTransaction({
-    to: avatar,
-    value: '21'
-  });
-
-  await signer.sendTransaction({
-    to: timelockExecutionStrategy,
-    value: '21'
-  });
-
-  const avatarContract = new Contract(avatar, AvatarContract.abi, signer);
-  await avatarContract.enableModule(avatarExecutionStrategy);
-
   return {
     controller,
     compToken: compToken,
     proxyFactory,
-    spaceAddress: res.address,
+    spaceAddress,
     vanillaAuthenticator,
     ethTxAuthenticator,
     ethSigAuthenticator,

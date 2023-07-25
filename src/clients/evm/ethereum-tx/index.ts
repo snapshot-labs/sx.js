@@ -109,7 +109,6 @@ export class EthereumTx {
     const sender = await signer.getAddress();
     const salt = await this.getSalt({
       sender,
-      initializer: functionData,
       saltNonce
     });
     const address = await proxyFactoryContract.predictProxyAddress(implementationAddress, salt);
@@ -159,7 +158,6 @@ export class EthereumTx {
     const sender = await signer.getAddress();
     const salt = await this.getSalt({
       sender,
-      initializer: functionData,
       saltNonce
     });
     const address = await proxyFactoryContract.predictProxyAddress(implementationAddress, salt);
@@ -221,7 +219,6 @@ export class EthereumTx {
     const sender = await signer.getAddress();
     const salt = await this.getSalt({
       sender,
-      initializer: functionData,
       saltNonce
     });
     const address = await proxyFactoryContract.predictProxyAddress(
@@ -237,27 +234,22 @@ export class EthereumTx {
     return { address, txId: response.hash };
   }
 
-  async getSalt({
-    sender,
-    initializer,
-    saltNonce
-  }: {
-    sender: string;
-    initializer: string;
-    saltNonce: string;
-  }) {
-    return solidityKeccak256(
-      ['address', 'bytes32', 'uint256'],
-      [sender, keccak256(initializer), saltNonce]
-    );
+  async getSalt({ sender, saltNonce }: { sender: string; saltNonce: string }) {
+    return solidityKeccak256(['address', 'uint256'], [sender, saltNonce]);
   }
 
-  async predictSpaceAddress({ signer, salt }: { signer: Signer; salt: string }) {
+  async predictSpaceAddress({ signer, saltNonce }: { signer: Signer; saltNonce: string }) {
     const proxyFactoryContract = new Contract(
       this.networkConfig.proxyFactory,
       ProxyFactoryAbi,
       signer
     );
+
+    const sender = await signer.getAddress();
+    const salt = await this.getSalt({
+      sender,
+      saltNonce
+    });
 
     return proxyFactoryContract.predictProxyAddress(this.networkConfig.masterSpace, salt);
   }

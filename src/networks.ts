@@ -2,7 +2,7 @@ import type { NetworkConfig, EvmNetworkConfig } from './types';
 
 export const evmGoerli: EvmNetworkConfig = {
   eip712ChainId: 5,
-  proxyFactory: '0x421ae9237ad736c639c051aaf90a471f4b09a836',
+  proxyFactory: '0x4b4f7f64be813ccc66aefc3bfce2baa01188631c',
   masterSpace: '0xd9c46d5420434355d0e5ca3e3ccb20ce7a533964',
   executionStrategiesImplementations: {
     SimpleQuorumAvatar: '0x3813f3d97aa2f80e3af625605a31206e067fb2e5',
