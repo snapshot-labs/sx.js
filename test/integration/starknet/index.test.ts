@@ -23,7 +23,7 @@ describe('StarkNetTx', () => {
   const account = new Account(starkProvider, address, privKey);
 
   // TODO: read from contract
-  const nextProposalId = 26;
+  const nextProposalId = 28;
 
   describe('vanilla authenticator', () => {
     const client = new StarkNetTx({ starkProvider, ethUrl });

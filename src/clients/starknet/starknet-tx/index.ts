@@ -1,8 +1,7 @@
-import { Account, hash, CallData, ValidateType } from 'starknet';
+import { Account, hash } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
-import SpaceAbi from './abi/space.json';
 import { Vote, Propose, Envelope, ClientOpts, ClientConfig, UpdateProposal } from '../../../types';
 
 const { getSelectorFromName } = hash;
@@ -34,23 +33,14 @@ export class StarkNetTx {
       this.config
     );
 
-    const args = [
-      envelope.address,
-      {
+    const call = authenticator.createProposeCall(envelope, getSelectorFromName('propose'), {
+      author: envelope.address,
+      executionStrategy: {
         address: envelope.data.message.executionStrategy.addr,
         params: envelope.data.message.executionStrategy.params
       },
-      strategiesParams // TODO: should be encoded somehow, waiting for contract to be implemented
-    ];
-
-    const callData = new CallData(SpaceAbi);
-    callData.validate(ValidateType.INVOKE, 'propose', args);
-
-    const call = authenticator.createCall(
-      envelope,
-      getSelectorFromName('propose'),
-      callData.compile('propose', args)
-    );
+      strategiesParams
+    });
 
     const calls = [call];
 
@@ -69,22 +59,17 @@ export class StarkNetTx {
       throw new Error('Invalid authenticator');
     }
 
-    const args = [
-      envelope.address,
-      envelope.data.message.proposal,
-      {
-        address: envelope.data.message.executionStrategy.addr,
-        params: envelope.data.message.executionStrategy.params
-      }
-    ];
-
-    const callData = new CallData(SpaceAbi);
-    callData.validate(ValidateType.INVOKE, 'update_proposal', args);
-
-    const call = authenticator.createCall(
+    const call = authenticator.createUpdateProposalCall(
       envelope,
       getSelectorFromName('update_proposal'),
-      callData.compile('update_proposal`', args)
+      {
+        author: envelope.address,
+        proposalId: envelope.data.message.proposal,
+        executionStrategy: {
+          address: envelope.data.message.executionStrategy.addr,
+          params: envelope.data.message.executionStrategy.params
+        }
+      }
     );
 
     const calls = [call];
@@ -112,24 +97,15 @@ export class StarkNetTx {
       this.config
     );
 
-    const args = [
-      envelope.address,
-      envelope.data.message.proposal,
-      envelope.data.message.choice,
-      envelope.data.message.strategies.map((strategyConfig, i) => ({
+    const call = authenticator.createVoteCall(envelope, getSelectorFromName('vote'), {
+      voter: envelope.address,
+      proposalId: envelope.data.message.proposal,
+      choice: envelope.data.message.choice,
+      votingStrategies: envelope.data.message.strategies.map((strategyConfig, i) => ({
         index: strategyConfig.index,
         params: strategiesParams[i]
       }))
-    ];
-
-    const calldata = new CallData(SpaceAbi);
-    calldata.validate(ValidateType.INVOKE, 'vote', args);
-
-    const call = authenticator.createCall(
-      envelope,
-      getSelectorFromName('vote'),
-      calldata.compile('vote', args)
-    );
+    });
 
     const fee = await account.estimateFee(call);
     return account.execute(call, undefined, {

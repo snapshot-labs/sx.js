@@ -11,9 +11,48 @@ export enum Choice {
   Abstain = 2
 }
 
+export type ProposeCallArgs = {
+  author: string;
+  executionStrategy: {
+    address: string;
+    params: string;
+  };
+  strategiesParams: string[];
+};
+
+export type VoteCallArgs = {
+  voter: string;
+  proposalId: number;
+  choice: number;
+  votingStrategies: IndexedConfig[];
+};
+
+export type UpdateProposalCallArgs = {
+  author: string;
+  proposalId: number;
+  executionStrategy: {
+    address: string;
+    params: string;
+  };
+};
+
 export type Authenticator = {
   type: string;
-  createCall(envelope: Envelope<Message>, selector: string, calldata: string[]): Call;
+  createProposeCall(
+    envelope: Envelope<VanillaProposeMessage | EthSigProposeMessage>,
+    selector: string,
+    args: ProposeCallArgs
+  ): Call;
+  createVoteCall(
+    envelope: Envelope<VanillaVoteMessage | EthSigVoteMessage>,
+    selector: string,
+    args: VoteCallArgs
+  ): Call;
+  createUpdateProposalCall(
+    envelope: Envelope<UpdateProposal>,
+    selector: string,
+    args: UpdateProposalCallArgs
+  ): Call;
 };
 
 export interface Strategy {
