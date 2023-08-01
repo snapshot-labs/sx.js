@@ -1,4 +1,5 @@
 import createVanillaAuthenticator from './vanilla';
+import createEthTxAuthenticator from './ethTx';
 import { hexPadLeft } from '../../utils/encoding';
 import type { Authenticator, NetworkConfig } from '../../types';
 
@@ -11,6 +12,10 @@ export function getAuthenticator(
 
   if (authenticator.type === 'vanilla') {
     return createVanillaAuthenticator();
+  }
+
+  if (authenticator.type === 'ethTx') {
+    return createEthTxAuthenticator();
   }
 
   return null;

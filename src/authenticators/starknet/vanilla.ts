@@ -1,4 +1,4 @@
-import { Call, CallData, ValidateType } from 'starknet';
+import { Call, CallData, ValidateType, hash } from 'starknet';
 import SpaceAbi from '../../clients/starknet/starknet-tx/abi/space.json';
 import {
   Authenticator,
@@ -18,7 +18,6 @@ export default function createVanillaAuthenticator(): Authenticator {
     type: 'vanilla',
     createProposeCall(
       envelope: Envelope<VanillaProposeMessage | EthSigProposeMessage>,
-      selector: string,
       args: ProposeCallArgs
     ): Call {
       const { space, authenticator } = envelope.data.message;
@@ -33,12 +32,11 @@ export default function createVanillaAuthenticator(): Authenticator {
       return {
         contractAddress: authenticator,
         entrypoint: 'authenticate',
-        calldata: [space, selector, calldata.length, ...calldata]
+        calldata: [space, hash.getSelectorFromName('propose'), calldata.length, ...calldata]
       };
     },
     createVoteCall(
       envelope: Envelope<VanillaVoteMessage | EthSigVoteMessage>,
-      selector: string,
       args: VoteCallArgs
     ): Call {
       const { space, authenticator } = envelope.data.message;
@@ -53,12 +51,11 @@ export default function createVanillaAuthenticator(): Authenticator {
       return {
         contractAddress: authenticator,
         entrypoint: 'authenticate',
-        calldata: [space, selector, calldata.length, ...calldata]
+        calldata: [space, hash.getSelectorFromName('vote'), calldata.length, ...calldata]
       };
     },
     createUpdateProposalCall(
       envelope: Envelope<UpdateProposal>,
-      selector: string,
       args: UpdateProposalCallArgs
     ): Call {
       const { space, authenticator } = envelope.data.message;
@@ -73,7 +70,7 @@ export default function createVanillaAuthenticator(): Authenticator {
       return {
         contractAddress: authenticator,
         entrypoint: 'authenticate',
-        calldata: [space, selector, calldata.length, ...calldata]
+        calldata: [space, hash.getSelectorFromName('update_proposal'), calldata.length, ...calldata]
       };
     }
   };

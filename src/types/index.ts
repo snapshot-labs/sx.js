@@ -40,19 +40,13 @@ export type Authenticator = {
   type: string;
   createProposeCall(
     envelope: Envelope<VanillaProposeMessage | EthSigProposeMessage>,
-    selector: string,
     args: ProposeCallArgs
   ): Call;
   createVoteCall(
     envelope: Envelope<VanillaVoteMessage | EthSigVoteMessage>,
-    selector: string,
     args: VoteCallArgs
   ): Call;
-  createUpdateProposalCall(
-    envelope: Envelope<UpdateProposal>,
-    selector: string,
-    args: UpdateProposalCallArgs
-  ): Call;
+  createUpdateProposalCall(envelope: Envelope<UpdateProposal>, args: UpdateProposalCallArgs): Call;
 };
 
 export interface Strategy {

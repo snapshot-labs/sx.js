@@ -1,10 +1,8 @@
-import { Account, hash } from 'starknet';
+import { Account } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
 import { Vote, Propose, Envelope, ClientOpts, ClientConfig, UpdateProposal } from '../../../types';
-
-const { getSelectorFromName } = hash;
 
 export class StarkNetTx {
   config: ClientConfig;
@@ -33,7 +31,7 @@ export class StarkNetTx {
       this.config
     );
 
-    const call = authenticator.createProposeCall(envelope, getSelectorFromName('propose'), {
+    const call = authenticator.createProposeCall(envelope, {
       author: envelope.address,
       executionStrategy: {
         address: envelope.data.message.executionStrategy.addr,
@@ -59,18 +57,14 @@ export class StarkNetTx {
       throw new Error('Invalid authenticator');
     }
 
-    const call = authenticator.createUpdateProposalCall(
-      envelope,
-      getSelectorFromName('update_proposal'),
-      {
-        author: envelope.address,
-        proposalId: envelope.data.message.proposal,
-        executionStrategy: {
-          address: envelope.data.message.executionStrategy.addr,
-          params: envelope.data.message.executionStrategy.params
-        }
+    const call = authenticator.createUpdateProposalCall(envelope, {
+      author: envelope.address,
+      proposalId: envelope.data.message.proposal,
+      executionStrategy: {
+        address: envelope.data.message.executionStrategy.addr,
+        params: envelope.data.message.executionStrategy.params
       }
-    );
+    });
 
     const calls = [call];
 
@@ -97,7 +91,7 @@ export class StarkNetTx {
       this.config
     );
 
-    const call = authenticator.createVoteCall(envelope, getSelectorFromName('vote'), {
+    const call = authenticator.createVoteCall(envelope, {
       voter: envelope.address,
       proposalId: envelope.data.message.proposal,
       choice: envelope.data.message.choice,

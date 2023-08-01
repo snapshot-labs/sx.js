@@ -10,6 +10,13 @@ describe('authenticators', () => {
           defaultNetwork
         )?.type
       ).toBe('vanilla');
+
+      expect(
+        getAuthenticator(
+          '0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a',
+          defaultNetwork
+        )?.type
+      ).toBe('ethTx');
     });
   });
 });
