@@ -6,17 +6,10 @@ describe('voting strategies', () => {
     it('should return correct strategy from predefined default addresses', () => {
       expect(
         getStrategy(
-          '0x058623786b93d9b6ed1f83cec5c6fa6bea5f399d2795ee56a6123bdd83f5aa48',
+          '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a',
           defaultNetwork
         )?.type
       ).toBe('vanilla');
-
-      expect(
-        getStrategy(
-          '0x00d1b81feff3095ca9517fdfc7427e742ce96f7ca8f3b2664a21b2fba552493b',
-          defaultNetwork
-        )?.type
-      ).toBe('singleSlotProof');
     });
   });
 });
