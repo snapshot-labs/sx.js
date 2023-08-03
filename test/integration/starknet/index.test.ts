@@ -38,16 +38,14 @@ describe('StarkNetTx', () => {
       const envelope = {
         address: walletAddress,
         data: {
-          message: {
-            space,
-            authenticator,
-            strategies: [],
-            executionStrategy: {
-              addr: executor,
-              params: '0x00'
-            },
-            metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
-          }
+          space,
+          authenticator,
+          strategies: [],
+          executionStrategy: {
+            addr: executor,
+            params: '0x00'
+          },
+          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
         }
       };
 
@@ -63,18 +61,16 @@ describe('StarkNetTx', () => {
       const envelope = {
         address: walletAddress,
         data: {
-          message: {
-            space,
-            authenticator,
-            strategies: [
-              {
-                index: strategy,
-                address: strategyAddress
-              }
-            ],
-            proposal: 33,
-            choice: Choice.For
-          }
+          space,
+          authenticator,
+          strategies: [
+            {
+              index: strategy,
+              address: strategyAddress
+            }
+          ],
+          proposal: 33,
+          choice: Choice.For
         }
       };
 
@@ -101,16 +97,14 @@ describe('StarkNetTx', () => {
       const envelope = {
         address: walletAddress,
         data: {
-          message: {
-            space,
-            authenticator,
-            strategies: [],
-            executionStrategy: {
-              addr: executor,
-              params: '0x101'
-            },
-            metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
-          }
+          space,
+          authenticator,
+          strategies: [],
+          executionStrategy: {
+            addr: executor,
+            params: '0x101'
+          },
+          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
         }
       };
 
@@ -135,18 +129,16 @@ describe('StarkNetTx', () => {
       const envelope = {
         address: walletAddress,
         data: {
-          message: {
-            space,
-            authenticator,
-            strategies: [
-              {
-                index: strategy,
-                address: strategyAddress
-              }
-            ],
-            proposal: 34,
-            choice: Choice.For
-          }
+          space,
+          authenticator,
+          strategies: [
+            {
+              index: strategy,
+              address: strategyAddress
+            }
+          ],
+          proposal: 34,
+          choice: Choice.For
         }
       };
 

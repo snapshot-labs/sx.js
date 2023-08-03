@@ -17,7 +17,7 @@ export default function createEthTxAuthenticator(): Authenticator {
   return {
     type: 'ethTx',
     createProposeCall(envelope: Envelope<Propose>, args: ProposeCallArgs): Call {
-      const { space, authenticator } = envelope.data.message;
+      const { space, authenticator } = envelope.data;
 
       const compiled = callData.compile('authenticate_propose', [
         space,
@@ -36,7 +36,7 @@ export default function createEthTxAuthenticator(): Authenticator {
       };
     },
     createVoteCall(envelope: Envelope<Vote>, args: VoteCallArgs): Call {
-      const { space, authenticator } = envelope.data.message;
+      const { space, authenticator } = envelope.data;
 
       const compiled = callData.compile('authenticate_vote', [
         space,
@@ -59,7 +59,7 @@ export default function createEthTxAuthenticator(): Authenticator {
       envelope: Envelope<UpdateProposal>,
       args: UpdateProposalCallArgs
     ): Call {
-      const { space, authenticator } = envelope.data.message;
+      const { space, authenticator } = envelope.data;
 
       const compiled = callData.compile('authenticate_update_proposal', [
         space,

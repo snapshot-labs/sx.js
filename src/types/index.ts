@@ -132,9 +132,7 @@ export type Message = Propose | Vote | UpdateProposal;
 export type Envelope<T extends Message> = {
   address: string;
   sig?: string;
-  data: {
-    message: T;
-  };
+  data: T;
 };
 
 export type StrategiesAddresses = { index: number; address: string }[];

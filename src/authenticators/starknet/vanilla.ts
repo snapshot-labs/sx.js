@@ -15,7 +15,7 @@ export default function createVanillaAuthenticator(): Authenticator {
   return {
     type: 'vanilla',
     createProposeCall(envelope: Envelope<Propose>, args: ProposeCallArgs): Call {
-      const { space, authenticator } = envelope.data.message;
+      const { space, authenticator } = envelope.data;
 
       const argsList = [args.author, args.executionStrategy, args.strategiesParams];
 
@@ -31,7 +31,7 @@ export default function createVanillaAuthenticator(): Authenticator {
       };
     },
     createVoteCall(envelope: Envelope<Vote>, args: VoteCallArgs): Call {
-      const { space, authenticator } = envelope.data.message;
+      const { space, authenticator } = envelope.data;
 
       const argsList = [args.voter, args.proposalId, args.choice, args.votingStrategies];
 
@@ -50,7 +50,7 @@ export default function createVanillaAuthenticator(): Authenticator {
       envelope: Envelope<UpdateProposal>,
       args: UpdateProposalCallArgs
     ): Call {
-      const { space, authenticator } = envelope.data.message;
+      const { space, authenticator } = envelope.data;
 
       const argsList = [args.author, args.proposalId, args.executionStrategy];
 

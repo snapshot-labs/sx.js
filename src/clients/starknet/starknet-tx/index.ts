@@ -15,27 +15,24 @@ export class StarkNetTx {
   }
 
   async propose(account: Account, envelope: Envelope<Propose>) {
-    const authenticator = getAuthenticator(
-      envelope.data.message.authenticator,
-      this.config.networkConfig
-    );
+    const authenticator = getAuthenticator(envelope.data.authenticator, this.config.networkConfig);
     if (!authenticator) {
       throw new Error('Invalid authenticator');
     }
 
     const strategiesParams = await getStrategiesParams(
       'propose',
-      envelope.data.message.strategies,
+      envelope.data.strategies,
       envelope.address,
-      envelope.data.message,
+      envelope.data,
       this.config
     );
 
     const call = authenticator.createProposeCall(envelope, {
       author: envelope.address,
       executionStrategy: {
-        address: envelope.data.message.executionStrategy.addr,
-        params: envelope.data.message.executionStrategy.params
+        address: envelope.data.executionStrategy.addr,
+        params: envelope.data.executionStrategy.params
       },
       strategiesParams
     });
@@ -49,20 +46,17 @@ export class StarkNetTx {
   }
 
   async updateProposal(account: Account, envelope: Envelope<UpdateProposal>) {
-    const authenticator = getAuthenticator(
-      envelope.data.message.authenticator,
-      this.config.networkConfig
-    );
+    const authenticator = getAuthenticator(envelope.data.authenticator, this.config.networkConfig);
     if (!authenticator) {
       throw new Error('Invalid authenticator');
     }
 
     const call = authenticator.createUpdateProposalCall(envelope, {
       author: envelope.address,
-      proposalId: envelope.data.message.proposal,
+      proposalId: envelope.data.proposal,
       executionStrategy: {
-        address: envelope.data.message.executionStrategy.addr,
-        params: envelope.data.message.executionStrategy.params
+        address: envelope.data.executionStrategy.addr,
+        params: envelope.data.executionStrategy.params
       }
     });
 
@@ -75,27 +69,24 @@ export class StarkNetTx {
   }
 
   async vote(account: Account, envelope: Envelope<Vote>) {
-    const authenticator = getAuthenticator(
-      envelope.data.message.authenticator,
-      this.config.networkConfig
-    );
+    const authenticator = getAuthenticator(envelope.data.authenticator, this.config.networkConfig);
     if (!authenticator) {
       throw new Error('Invalid authenticator');
     }
 
     const strategiesParams = await getStrategiesParams(
       'vote',
-      envelope.data.message.strategies,
+      envelope.data.strategies,
       envelope.address,
-      envelope.data.message,
+      envelope.data,
       this.config
     );
 
     const call = authenticator.createVoteCall(envelope, {
       voter: envelope.address,
-      proposalId: envelope.data.message.proposal,
-      choice: envelope.data.message.choice,
-      votingStrategies: envelope.data.message.strategies.map((strategyConfig, i) => ({
+      proposalId: envelope.data.proposal,
+      choice: envelope.data.choice,
+      votingStrategies: envelope.data.strategies.map((strategyConfig, i) => ({
         index: strategyConfig.index,
         params: strategiesParams[i]
       }))

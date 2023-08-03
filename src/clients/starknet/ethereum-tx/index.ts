@@ -192,7 +192,7 @@ export class EthereumTx {
   async estimateProposeFee(envelope: Envelope<Propose>) {
     const hash = await this.getProposeHash(envelope);
 
-    return this.getMessageFee(envelope.data.message.authenticator, [
+    return this.getMessageFee(envelope.data.authenticator, [
       envelope.address.toLocaleLowerCase(),
       hash
     ]);
@@ -201,7 +201,7 @@ export class EthereumTx {
   async estimateVoteFee(envelope: Envelope<Vote>) {
     const hash = await this.getVoteHash(envelope);
 
-    return this.getMessageFee(envelope.data.message.authenticator, [
+    return this.getMessageFee(envelope.data.authenticator, [
       envelope.address.toLocaleLowerCase(),
       hash
     ]);
@@ -210,7 +210,7 @@ export class EthereumTx {
   async estimateUpdateProposalFee(envelope: Envelope<UpdateProposal>) {
     const hash = await this.getUpdateProposalHash(envelope);
 
-    return this.getMessageFee(envelope.data.message.authenticator, [
+    return this.getMessageFee(envelope.data.authenticator, [
       envelope.address.toLocaleLowerCase(),
       hash
     ]);
@@ -219,20 +219,20 @@ export class EthereumTx {
   async getProposeHash(envelope: Envelope<Propose>) {
     const strategiesParams = await getStrategiesParams(
       'propose',
-      envelope.data.message.strategies,
+      envelope.data.strategies,
       envelope.address,
-      envelope.data.message,
+      envelope.data,
       this.config
     );
 
     const callData = new CallData(ENCODE_ABI);
     const compiled = callData.compile('propose', [
-      envelope.data.message.space,
+      envelope.data.space,
       PROPOSE_SELECTOR,
       envelope.address,
       {
-        address: envelope.data.message.executionStrategy.addr,
-        params: [envelope.data.message.executionStrategy.params]
+        address: envelope.data.executionStrategy.addr,
+        params: [envelope.data.executionStrategy.params]
       },
       strategiesParams
     ]);
@@ -243,20 +243,20 @@ export class EthereumTx {
   async getVoteHash(envelope: Envelope<Vote>) {
     const strategiesParams = await getStrategiesParams(
       'propose',
-      envelope.data.message.strategies,
+      envelope.data.strategies,
       envelope.address,
-      envelope.data.message,
+      envelope.data,
       this.config
     );
 
     const callData = new CallData(ENCODE_ABI);
     const compiled = callData.compile('vote', [
-      envelope.data.message.space,
+      envelope.data.space,
       VOTE_SELECTOR,
       envelope.address,
-      envelope.data.message.proposal,
-      envelope.data.message.choice,
-      envelope.data.message.strategies.map((strategy, index) => ({
+      envelope.data.proposal,
+      envelope.data.choice,
+      envelope.data.strategies.map((strategy, index) => ({
         index: strategy.index,
         params: [strategiesParams[index]]
       }))
@@ -268,13 +268,13 @@ export class EthereumTx {
   async getUpdateProposalHash(envelope: Envelope<UpdateProposal>) {
     const callData = new CallData(ENCODE_ABI);
     const compiled = callData.compile('update_proposal', [
-      envelope.data.message.space,
+      envelope.data.space,
       UPDATE_PROPOSAL_SELECTOR,
       envelope.address,
-      envelope.data.message.proposal,
+      envelope.data.proposal,
       {
-        address: envelope.data.message.executionStrategy.addr,
-        params: [envelope.data.message.executionStrategy.params]
+        address: envelope.data.executionStrategy.addr,
+        params: [envelope.data.executionStrategy.params]
       }
     ]);
 
@@ -287,7 +287,7 @@ export class EthereumTx {
     const hash = await this.getProposeHash(envelope);
     const { overall_fee } = await this.estimateProposeFee(envelope);
 
-    return spaceContract.commit(envelope.data.message.authenticator, hash, { value: overall_fee });
+    return spaceContract.commit(envelope.data.authenticator, hash, { value: overall_fee });
   }
 
   async initializeVote(signer: Signer, envelope: Envelope<Vote>) {
@@ -296,7 +296,7 @@ export class EthereumTx {
     const hash = await this.getVoteHash(envelope);
     const { overall_fee } = await this.estimateVoteFee(envelope);
 
-    return spaceContract.commit(envelope.data.message.authenticator, hash, { value: overall_fee });
+    return spaceContract.commit(envelope.data.authenticator, hash, { value: overall_fee });
   }
 
   async initializeUpdateProposal(signer: Signer, envelope: Envelope<UpdateProposal>) {
@@ -305,6 +305,6 @@ export class EthereumTx {
     const hash = await this.getUpdateProposalHash(envelope);
     const { overall_fee } = await this.estimateUpdateProposalFee(envelope);
 
-    return spaceContract.commit(envelope.data.message.authenticator, hash, { value: overall_fee });
+    return spaceContract.commit(envelope.data.authenticator, hash, { value: overall_fee });
   }
 }

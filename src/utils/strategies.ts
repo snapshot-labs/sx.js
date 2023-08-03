@@ -41,9 +41,7 @@ export async function getStrategiesParams(
         {
           address,
           sig: '',
-          data: {
-            message: data
-          }
+          data
         },
         config
       );
@@ -68,9 +66,7 @@ export async function getExtraProposeCalls(
         {
           address,
           sig: '',
-          data: {
-            message: data
-          }
+          data
         },
         config
       );
