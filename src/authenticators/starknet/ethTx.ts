@@ -3,14 +3,12 @@ import EthTxAuthenticatorAbi from './abis/EthTxAuthenticator.json';
 import {
   Authenticator,
   Envelope,
-  VanillaProposeMessage,
-  EthSigProposeMessage,
-  VanillaVoteMessage,
+  Propose,
+  Vote,
+  UpdateProposal,
   ProposeCallArgs,
   VoteCallArgs,
-  UpdateProposalCallArgs,
-  EthSigVoteMessage,
-  UpdateProposal
+  UpdateProposalCallArgs
 } from '../../types';
 
 const callData = new CallData(EthTxAuthenticatorAbi);
@@ -18,10 +16,7 @@ const callData = new CallData(EthTxAuthenticatorAbi);
 export default function createEthTxAuthenticator(): Authenticator {
   return {
     type: 'ethTx',
-    createProposeCall(
-      envelope: Envelope<VanillaProposeMessage | EthSigProposeMessage>,
-      args: ProposeCallArgs
-    ): Call {
+    createProposeCall(envelope: Envelope<Propose>, args: ProposeCallArgs): Call {
       const { space, authenticator } = envelope.data.message;
 
       const compiled = callData.compile('authenticate_propose', [
@@ -40,10 +35,7 @@ export default function createEthTxAuthenticator(): Authenticator {
         calldata: compiled
       };
     },
-    createVoteCall(
-      envelope: Envelope<VanillaVoteMessage | EthSigVoteMessage>,
-      args: VoteCallArgs
-    ): Call {
+    createVoteCall(envelope: Envelope<Vote>, args: VoteCallArgs): Call {
       const { space, authenticator } = envelope.data.message;
 
       const compiled = callData.compile('authenticate_vote', [

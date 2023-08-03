@@ -38,14 +38,8 @@ export type UpdateProposalCallArgs = {
 
 export type Authenticator = {
   type: string;
-  createProposeCall(
-    envelope: Envelope<VanillaProposeMessage | EthSigProposeMessage>,
-    args: ProposeCallArgs
-  ): Call;
-  createVoteCall(
-    envelope: Envelope<VanillaVoteMessage | EthSigVoteMessage>,
-    args: VoteCallArgs
-  ): Call;
+  createProposeCall(envelope: Envelope<Propose>, args: ProposeCallArgs): Call;
+  createVoteCall(envelope: Envelope<Vote>, args: VoteCallArgs): Call;
   createUpdateProposalCall(envelope: Envelope<UpdateProposal>, args: UpdateProposalCallArgs): Call;
 };
 
@@ -133,41 +127,11 @@ export type Vote = {
   choice: Choice;
 };
 
-export type VanillaProposeMessage = Propose;
-export type VanillaVoteMessage = Vote;
-export type EthSigProposeMessage = {
-  space: string;
-  authenticator: string;
-  strategies: number[];
-  executor: string;
-  executionParams: string[];
-  metadataUri: string;
-  author: string;
-  executionHash: string;
-  strategiesHash: string;
-  strategiesParamsHash: string;
-  salt: number;
-};
-export type EthSigVoteMessage = {
-  space: string;
-  authenticator: string;
-  strategies: number[];
-  voter: string;
-  strategiesHash: string;
-  strategiesParamsHash: string;
-  salt: number;
-};
-
-export type Message =
-  | VanillaProposeMessage
-  | VanillaVoteMessage
-  | UpdateProposal
-  | EthSigProposeMessage
-  | EthSigVoteMessage;
+export type Message = Propose | Vote | UpdateProposal;
 
 export type Envelope<T extends Message> = {
   address: string;
-  sig: T extends EthSigProposeMessage | EthSigVoteMessage ? string : null;
+  sig?: string;
   data: {
     message: T;
   };

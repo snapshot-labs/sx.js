@@ -37,7 +37,6 @@ describe('StarkNetTx', () => {
     it('StarkNetTx.propose()', async () => {
       const envelope = {
         address: walletAddress,
-        sig: null,
         data: {
           message: {
             space,
@@ -63,7 +62,6 @@ describe('StarkNetTx', () => {
     it('StarkNetTx.vote()', async () => {
       const envelope = {
         address: walletAddress,
-        sig: null,
         data: {
           message: {
             space,
@@ -102,7 +100,6 @@ describe('StarkNetTx', () => {
     describe('propose', () => {
       const envelope = {
         address: walletAddress,
-        sig: null,
         data: {
           message: {
             space,
@@ -137,7 +134,6 @@ describe('StarkNetTx', () => {
     describe('vote', () => {
       const envelope = {
         address: walletAddress,
-        sig: null,
         data: {
           message: {
             space,

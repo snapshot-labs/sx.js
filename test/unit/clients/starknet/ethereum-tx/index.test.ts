@@ -18,7 +18,6 @@ describe('EthereumTx', () => {
   it('should return propose hash', async () => {
     const envelope = {
       address: '0x556B14CbdA79A36dC33FcD461a04A5BCb5dC2A70',
-      sig: null,
       data: {
         message: {
           space: '0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8',
@@ -40,7 +39,6 @@ describe('EthereumTx', () => {
   it('should return vote hash', async () => {
     const envelope = {
       address: '0x556B14CbdA79A36dC33FcD461a04A5BCb5dC2A70',
-      sig: null,
       data: {
         message: {
           space: '0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8',
@@ -51,7 +49,7 @@ describe('EthereumTx', () => {
               address: '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a'
             }
           ],
-          proposal: 33,
+          proposal: 32,
           choice: 1
         }
       }
@@ -64,7 +62,6 @@ describe('EthereumTx', () => {
   it('should return update proposal hash', async () => {
     const envelope = {
       address: '0x556B14CbdA79A36dC33FcD461a04A5BCb5dC2A70',
-      sig: null,
       data: {
         message: {
           space: '0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8',

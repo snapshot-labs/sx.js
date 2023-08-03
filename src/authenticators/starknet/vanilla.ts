@@ -3,23 +3,18 @@ import SpaceAbi from '../../clients/starknet/starknet-tx/abi/space.json';
 import {
   Authenticator,
   Envelope,
-  VanillaProposeMessage,
-  EthSigProposeMessage,
-  VanillaVoteMessage,
+  Propose,
+  Vote,
+  UpdateProposal,
   ProposeCallArgs,
   VoteCallArgs,
-  UpdateProposalCallArgs,
-  EthSigVoteMessage,
-  UpdateProposal
+  UpdateProposalCallArgs
 } from '../../types';
 
 export default function createVanillaAuthenticator(): Authenticator {
   return {
     type: 'vanilla',
-    createProposeCall(
-      envelope: Envelope<VanillaProposeMessage | EthSigProposeMessage>,
-      args: ProposeCallArgs
-    ): Call {
+    createProposeCall(envelope: Envelope<Propose>, args: ProposeCallArgs): Call {
       const { space, authenticator } = envelope.data.message;
 
       const argsList = [args.author, args.executionStrategy, args.strategiesParams];
@@ -35,10 +30,7 @@ export default function createVanillaAuthenticator(): Authenticator {
         calldata: [space, hash.getSelectorFromName('propose'), calldata.length, ...calldata]
       };
     },
-    createVoteCall(
-      envelope: Envelope<VanillaVoteMessage | EthSigVoteMessage>,
-      args: VoteCallArgs
-    ): Call {
+    createVoteCall(envelope: Envelope<Vote>, args: VoteCallArgs): Call {
       const { space, authenticator } = envelope.data.message;
 
       const argsList = [args.voter, args.proposalId, args.choice, args.votingStrategies];

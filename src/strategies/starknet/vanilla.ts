@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type { Call } from 'starknet';
-import type {
-  ClientConfig,
-  Envelope,
-  Strategy,
-  VanillaProposeMessage,
-  VanillaVoteMessage
-} from '../../types';
+import type { ClientConfig, Envelope, Strategy, Propose, Vote } from '../../types';
 
 export default function createVanillaStrategy(): Strategy {
   return {
@@ -16,7 +10,7 @@ export default function createVanillaStrategy(): Strategy {
       call: 'propose' | 'vote',
       address: string,
       index: number,
-      envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
+      envelope: Envelope<Propose | Vote>,
       clientConfig: ClientConfig
     ): Promise<string> {
       return '0x0';
@@ -24,7 +18,7 @@ export default function createVanillaStrategy(): Strategy {
     async getExtraProposeCalls(
       address: string,
       index: number,
-      envelope: Envelope<VanillaProposeMessage | VanillaVoteMessage>,
+      envelope: Envelope<Propose | Vote>,
       clientConfig: ClientConfig
     ): Promise<Call[]> {
       return [];
