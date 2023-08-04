@@ -15,6 +15,7 @@ import sxVanillaProposalValidationStrategySierra from './fixtures/sx_VanillaProp
 import sxVanillaVotingStrategyCasm from './fixtures/sx_VanillaVotingStrategy.casm.json';
 import sxVanillaVotingStrategySierra from './fixtures/sx_VanillaVotingStrategy.sierra.json';
 import { NetworkConfig } from '../../../src/types';
+import { StarkNetTx } from '../../../src/clients';
 
 const L1_COMMIT = '0x8bf85537c80becba711447f66a9a4452e3575e29';
 
@@ -100,33 +101,59 @@ export async function setup(account: Account): Promise<TestConfig> {
   const masterSpaceClassHash = masterSpaceResult.declare.class_hash;
   const factoryAddress = factoryResult.deploy.contract_address;
 
-  const res = await account.execute({
-    contractAddress: factoryAddress,
-    entrypoint: 'deploy',
-    calldata: CallData.compile({
-      class_hash: masterSpaceClassHash,
-      contract_address_salt: 0,
-      calldata: CallData.compile({
-        owner: account.address,
-        max_voting_duration: 86400,
-        min_voting_duration: 0,
-        voting_delay: 0,
-        proposal_validation_strategy: {
-          address: vanillaProposalValidationStrategy,
-          params: []
-        },
-        voting_strategies: [
-          {
-            address: vanillaVotingStrategy,
-            params: []
-          }
-        ],
-        authenticators: [vanillaAuthenticator, ethTxAuthenticator]
-      })
-    })
+  const networkConfig: NetworkConfig = {
+    eip712ChainId: 5,
+    spaceFactory: factoryAddress,
+    masterSpace: masterSpaceClassHash as string,
+    authenticators: {
+      [hexPadLeft(vanillaAuthenticator)]: {
+        type: 'vanilla'
+      },
+      [hexPadLeft(ethTxAuthenticator)]: {
+        type: 'ethTx'
+      }
+    },
+    strategies: {
+      [hexPadLeft(vanillaVotingStrategy)]: {
+        type: 'vanilla'
+      }
+    },
+    executors: {
+      [hexPadLeft(vanillaExecutionStrategy)]: {
+        type: 'vanilla'
+      }
+    }
+  };
+
+  const client = new StarkNetTx({
+    starkProvider: account,
+    ethUrl: 'https://rpc.brovider.xyz/5',
+    networkConfig
   });
 
-  const receipt = await account.getTransactionReceipt(res.transaction_hash);
+  const txId = await client.deploySpace({
+    account,
+    params: {
+      controller: account.address,
+      votingDelay: 0,
+      minVotingDuration: 0,
+      maxVotingDuration: 86400,
+      proposalValidationStrategy: {
+        addr: vanillaProposalValidationStrategy,
+        params: '0x0'
+      },
+      metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
+      authenticators: [vanillaAuthenticator, ethTxAuthenticator],
+      votingStrategies: [
+        {
+          addr: vanillaVotingStrategy,
+          params: '0x0'
+        }
+      ]
+    }
+  });
+
+  const receipt = await account.getTransactionReceipt(txId);
   const spaceAddress = (receipt as any).events[0].from_address; // hacky right now, find better way to read it, returned value is not what we expect
 
   return {
@@ -138,28 +165,7 @@ export async function setup(account: Account): Promise<TestConfig> {
     vanillaExecutionStrategy,
     vanillaProposalValidationStrategy,
     vanillaVotingStrategy,
-    networkConfig: {
-      eip712ChainId: 5,
-      spaceFactory: factoryAddress,
-      authenticators: {
-        [hexPadLeft(vanillaAuthenticator)]: {
-          type: 'vanilla'
-        },
-        [hexPadLeft(ethTxAuthenticator)]: {
-          type: 'ethTx'
-        }
-      },
-      strategies: {
-        [hexPadLeft(vanillaVotingStrategy)]: {
-          type: 'vanilla'
-        }
-      },
-      executors: {
-        [hexPadLeft(vanillaExecutionStrategy)]: {
-          type: 'vanilla'
-        }
-      }
-    }
+    networkConfig
   };
 }
 

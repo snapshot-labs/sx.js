@@ -1,8 +1,27 @@
-import { Account } from 'starknet';
+import { Account, CallData } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
-import { Vote, Propose, Envelope, ClientOpts, ClientConfig, UpdateProposal } from '../../../types';
+import {
+  Vote,
+  Propose,
+  Envelope,
+  ClientOpts,
+  ClientConfig,
+  UpdateProposal,
+  AddressConfig
+} from '../../../types';
+
+type SpaceParams = {
+  controller: string;
+  votingDelay: number;
+  minVotingDuration: number;
+  maxVotingDuration: number;
+  proposalValidationStrategy: AddressConfig;
+  metadataUri: string;
+  authenticators: string[];
+  votingStrategies: AddressConfig[];
+};
 
 export class StarkNetTx {
   config: ClientConfig;
@@ -12,6 +31,50 @@ export class StarkNetTx {
       networkConfig: defaultNetwork,
       ...opts
     };
+  }
+
+  async deploySpace({
+    account,
+    params: {
+      controller,
+      votingDelay,
+      minVotingDuration,
+      maxVotingDuration,
+      proposalValidationStrategy,
+      authenticators,
+      votingStrategies
+    }
+  }: {
+    account: Account;
+    params: SpaceParams;
+    salt?: string;
+  }): Promise<string> {
+    const res = await account.execute({
+      contractAddress: this.config.networkConfig.spaceFactory,
+      entrypoint: 'deploy',
+      calldata: CallData.compile({
+        class_hash: this.config.networkConfig.masterSpace,
+        contract_address_salt: 0,
+        calldata: CallData.compile({
+          owner: controller,
+          max_voting_duration: maxVotingDuration,
+          min_voting_duration: minVotingDuration,
+          voting_delay: votingDelay,
+          proposal_validation_strategy: {
+            address: proposalValidationStrategy.addr,
+            params: [proposalValidationStrategy.params]
+          },
+          voting_strategies: votingStrategies.map(strategy => ({
+            address: strategy.addr,
+            params: [strategy.params]
+          })),
+
+          authenticators: authenticators
+        })
+      })
+    });
+
+    return res.transaction_hash;
   }
 
   async propose(account: Account, envelope: Envelope<Propose>) {

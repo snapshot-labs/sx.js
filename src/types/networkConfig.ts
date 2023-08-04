@@ -59,6 +59,7 @@ export type AvatarExecutionConfig = {
 export type NetworkConfig = {
   eip712ChainId: number;
   spaceFactory: string;
+  masterSpace: string;
   authenticators: {
     [key: string]:
       | VanillaAuthenticatorConfig
@@ -87,7 +88,6 @@ export type NetworkConfig = {
 
 export type EvmNetworkConfig = Omit<NetworkConfig, 'spaceFactory' | 'executors'> & {
   proxyFactory: string;
-  masterSpace: string;
   executionStrategiesImplementations: {
     [key in ExecutorType]?: string;
   };
