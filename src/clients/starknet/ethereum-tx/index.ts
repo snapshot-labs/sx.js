@@ -167,17 +167,19 @@ const UPDATE_PROPOSAL_SELECTOR =
   '0x1f93122f646d968b0ce8c1a4986533f8b4ed3f099122381a4f77478a480c2c3';
 
 export class EthereumTx {
-  config: ClientConfig;
+  // TODO: handle sequencerUrl in network config
+  config: ClientConfig & { sequencerUrl: string };
 
-  constructor(opts: ClientOpts) {
+  constructor(opts: ClientOpts & { sequencerUrl?: string }) {
     this.config = {
       networkConfig: defaultNetwork,
+      sequencerUrl: opts.sequencerUrl || constants.BaseUrl.SN_GOERLI,
       ...opts
     };
   }
 
   async getMessageFee(l2Address: string, payload: string[]): Promise<{ overall_fee: number }> {
-    const sequencerProvider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI });
+    const sequencerProvider = new SequencerProvider({ baseUrl: this.config.sequencerUrl });
 
     const fees = await sequencerProvider.estimateMessageFee({
       from_address: STARKNET_COMMIT_ADDRESS,

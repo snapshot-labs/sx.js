@@ -1,48 +1,59 @@
-import { EthereumTx, StarkNetTx } from '../../../src/clients';
-import { Account, Provider, constants } from 'starknet';
+import { Account, Provider } from 'starknet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
+import { EthereumTx, StarkNetTx } from '../../../src/clients';
 import { Choice } from '../../../src/types';
+import { postMessageToL2, setup, TestConfig } from './utils';
 
 describe('StarkNetTx', () => {
-  expect(process.env.ETH_PK).toBeDefined();
-  expect(process.env.STARKNET_ADDRESS).toBeDefined();
-  expect(process.env.STARKNET_PK).toBeDefined();
-
-  const ethUrl = process.env.GOERLI_NODE_URL as string;
-  const ethPrivKey = process.env.ETH_PK as string;
-  const address = process.env.STARKNET_ADDRESS as string;
-  const privKey = process.env.STARKNET_PK as string;
+  const ethUrl = 'https://rpc.brovider.xyz/5';
+  const address = '0x7db41c74cfbc2eb3f9166998c9c57154cfdf743083ee29fd3a3a164ce42c681';
+  const privateKey = '0xd38597b88d0ae55d45f8d8f4b3aa77cd';
+  const ethPrivateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 
   const starkProvider = new Provider({
     sequencer: {
-      baseUrl: 'https://alpha4.starknet.io',
-      chainId: constants.StarknetChainId.SN_GOERLI
+      baseUrl: 'http://127.0.0.1:5050'
     }
   });
 
   const ethProvider = new JsonRpcProvider('https://rpc.brovider.xyz/5');
-  const wallet = new Wallet(ethPrivKey, ethProvider);
+  const wallet = new Wallet(ethPrivateKey, ethProvider);
   const walletAddress = wallet.address;
-  const account = new Account(starkProvider, address, privKey);
+  const account = new Account(starkProvider, address, privateKey);
+
+  let client: StarkNetTx;
+  let ethTxClient: EthereumTx;
+  let testConfig: TestConfig;
+  let spaceAddress = '';
+
+  beforeAll(async () => {
+    testConfig = await setup(account);
+    spaceAddress = testConfig.spaceAddress;
+
+    client = new StarkNetTx({
+      starkProvider,
+      ethUrl,
+      networkConfig: testConfig.networkConfig
+    });
+    ethTxClient = new EthereumTx({
+      starkProvider,
+      ethUrl,
+      networkConfig: testConfig.networkConfig,
+      sequencerUrl: 'http://127.0.0.1:5050'
+    });
+  }, 180_000);
 
   describe('vanilla authenticator', () => {
-    const client = new StarkNetTx({ starkProvider, ethUrl });
-    const space = '0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8';
-    const authenticator = '0x02c38c9a8f20e1c4c974503e1cac5a06658161df4a8be3b24762168c99c58dbd';
-    const strategy = 0;
-    const strategyAddress = '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a';
-    const executor = '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe';
-
     it('StarkNetTx.propose()', async () => {
       const envelope = {
         address: walletAddress,
         data: {
-          space,
-          authenticator,
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
           strategies: [],
           executionStrategy: {
-            addr: executor,
+            addr: testConfig.vanillaExecutionStrategy,
             params: '0x00'
           },
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
@@ -61,15 +72,15 @@ describe('StarkNetTx', () => {
       const envelope = {
         address: walletAddress,
         data: {
-          space,
-          authenticator,
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
           strategies: [
             {
-              index: strategy,
-              address: strategyAddress
+              index: 0,
+              address: testConfig.vanillaVotingStrategy
             }
           ],
-          proposal: 33,
+          proposal: 1,
           choice: Choice.For
         }
       };
@@ -83,80 +94,73 @@ describe('StarkNetTx', () => {
     }, 60e3);
   });
 
-  describe.only('ethTx authenticator', () => {
-    const ethTxClient = new EthereumTx({ starkProvider, ethUrl });
-
-    const client = new StarkNetTx({ starkProvider, ethUrl });
-    const space = '0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8';
-    const authenticator = '0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a';
-    const strategy = 0;
-    const strategyAddress = '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a';
-    const executor = '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe';
-
-    describe('propose', () => {
+  describe('ethTx authenticator', () => {
+    it('StarkNetTx.propose()', async () => {
       const envelope = {
         address: walletAddress,
         data: {
-          space,
-          authenticator,
+          space: spaceAddress,
+          authenticator: testConfig.ethTxAuthenticator,
           strategies: [],
           executionStrategy: {
-            addr: executor,
+            addr: testConfig.vanillaExecutionStrategy,
             params: '0x101'
           },
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
         }
       };
 
-      it('EthereumTx.initializePropose', async () => {
-        const res = await ethTxClient.initializePropose(wallet, envelope);
+      const payload = await ethTxClient.getProposeHash(envelope);
+      const fee = await ethTxClient.estimateProposeFee(envelope);
 
-        console.log('Receipt', res);
-        expect(res.hash).toBeDefined();
-      });
+      await postMessageToL2(
+        testConfig.ethTxAuthenticator,
+        'commit',
+        [walletAddress, payload],
+        fee.overall_fee
+      );
 
-      it.only('StarkNetTx.propose()', async () => {
-        const receipt = await client.propose(account, envelope);
-        console.log('Receipt', receipt);
+      const receipt = await client.propose(account, envelope);
+      console.log('Receipt', receipt);
 
-        await starkProvider.waitForTransaction(receipt.transaction_hash);
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-        expect(receipt.transaction_hash).toBeDefined();
-      }, 60e3);
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
 
-    describe('vote', () => {
+    it('StarkNetTx.vote()', async () => {
       const envelope = {
         address: walletAddress,
         data: {
-          space,
-          authenticator,
+          space: spaceAddress,
+          authenticator: testConfig.ethTxAuthenticator,
           strategies: [
             {
-              index: strategy,
-              address: strategyAddress
+              index: 0,
+              address: testConfig.vanillaVotingStrategy
             }
           ],
-          proposal: 34,
+          proposal: 2,
           choice: Choice.For
         }
       };
 
-      it('EthereumTx.initializeVote', async () => {
-        const res = await ethTxClient.initializeVote(wallet, envelope);
+      const payload = await ethTxClient.getVoteHash(envelope);
+      const fee = await ethTxClient.estimateVoteFee(envelope);
 
-        console.log('Receipt', res);
-        expect(res.hash).toBeDefined();
-      });
+      await postMessageToL2(
+        testConfig.ethTxAuthenticator,
+        'commit',
+        [walletAddress, payload],
+        fee.overall_fee
+      );
 
-      it.only('StarkNetTx.vote()', async () => {
-        const receipt = await client.vote(account, envelope);
-        console.log('Receipt', receipt);
+      const receipt = await client.vote(account, envelope);
+      console.log('Receipt', receipt);
 
-        await starkProvider.waitForTransaction(receipt.transaction_hash);
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-        expect(receipt.transaction_hash).toBeDefined();
-      }, 60e3);
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
   });
 });
