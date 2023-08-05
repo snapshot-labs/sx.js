@@ -76,7 +76,11 @@ export async function setup(account: Account): Promise<TestConfig> {
     account,
     sxEthTxAuthenticatorSierra,
     sxEthTxAuthenticatorCasm,
-    [L1_COMMIT]
+    CallData.compile({
+      starknet_commit_address: {
+        address: L1_COMMIT
+      }
+    })
   );
 
   const vanillaExecutionStrategy = await deployDependency(

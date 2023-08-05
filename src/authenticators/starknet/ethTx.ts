@@ -21,7 +21,9 @@ export default function createEthTxAuthenticator(): Authenticator {
 
       const compiled = callData.compile('authenticate_propose', [
         space,
-        args.author,
+        {
+          address: args.author
+        },
         {
           address: args.executionStrategy.address,
           params: [args.executionStrategy.params]
@@ -40,7 +42,9 @@ export default function createEthTxAuthenticator(): Authenticator {
 
       const compiled = callData.compile('authenticate_vote', [
         space,
-        args.voter,
+        {
+          address: args.voter
+        },
         args.proposalId,
         args.choice,
         args.votingStrategies.map(strategy => ({
@@ -63,7 +67,9 @@ export default function createEthTxAuthenticator(): Authenticator {
 
       const compiled = callData.compile('authenticate_update_proposal', [
         space,
-        args.author,
+        {
+          address: args.author
+        },
         args.proposalId,
         {
           address: args.executionStrategy.address,

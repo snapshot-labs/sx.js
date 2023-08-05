@@ -9,6 +9,16 @@ import { Signer } from '@ethersproject/abstract-signer';
 
 const ENCODE_ABI = [
   {
+    type: 'struct',
+    name: 'core::starknet::eth_address::EthAddress',
+    members: [
+      {
+        name: 'address',
+        type: 'core::felt252'
+      }
+    ]
+  },
+  {
     name: 'sx::utils::types::Strategy',
     type: 'struct',
     members: [
@@ -82,7 +92,7 @@ const ENCODE_ABI = [
       },
       {
         name: 'author',
-        type: 'core::starknet::contract_address::ContractAddress'
+        type: 'core::starknet::eth_address::EthAddress'
       },
       {
         name: 'execution_strategy',
@@ -110,7 +120,7 @@ const ENCODE_ABI = [
       },
       {
         name: 'voter',
-        type: 'core::starknet::contract_address::ContractAddress'
+        type: 'core::starknet::eth_address::EthAddress'
       },
       {
         name: 'proposal_id',
@@ -142,7 +152,7 @@ const ENCODE_ABI = [
       },
       {
         name: 'author',
-        type: 'core::starknet::contract_address::ContractAddress'
+        type: 'core::starknet::eth_address::EthAddress'
       },
       {
         name: 'proposal_id',
@@ -231,7 +241,7 @@ export class EthereumTx {
     const compiled = callData.compile('propose', [
       envelope.data.space,
       PROPOSE_SELECTOR,
-      envelope.address,
+      { address: envelope.address },
       {
         address: envelope.data.executionStrategy.addr,
         params: [envelope.data.executionStrategy.params]
@@ -255,7 +265,7 @@ export class EthereumTx {
     const compiled = callData.compile('vote', [
       envelope.data.space,
       VOTE_SELECTOR,
-      envelope.address,
+      { address: envelope.address },
       envelope.data.proposal,
       envelope.data.choice,
       envelope.data.strategies.map((strategy, index) => ({
@@ -272,7 +282,7 @@ export class EthereumTx {
     const compiled = callData.compile('update_proposal', [
       envelope.data.space,
       UPDATE_PROPOSAL_SELECTOR,
-      envelope.address,
+      { address: envelope.address },
       envelope.data.proposal,
       {
         address: envelope.data.executionStrategy.addr,

@@ -1,5 +1,4 @@
-import { Call, CallData, ValidateType, hash } from 'starknet';
-import SpaceAbi from '../../clients/starknet/starknet-tx/abi/space.json';
+import { Call, CallData, hash, uint256 } from 'starknet';
 import {
   Authenticator,
   Envelope,
@@ -17,12 +16,13 @@ export default function createVanillaAuthenticator(): Authenticator {
     createProposeCall(envelope: Envelope<Propose>, args: ProposeCallArgs): Call {
       const { space, authenticator } = envelope.data;
 
-      const argsList = [args.author, args.executionStrategy, args.strategiesParams];
-
-      const callData = new CallData(SpaceAbi);
-      callData.validate(ValidateType.INVOKE, 'propose', argsList);
-
-      const calldata = callData.compile('propose', argsList);
+      // NOTE: not using Abi as starknet.js doesn't support enums yet
+      const calldata = CallData.compile({
+        enum_index: 1, // Ethereum
+        author: args.author,
+        executionStrategy: args.executionStrategy,
+        strategiesParams: args.strategiesParams
+      });
 
       return {
         contractAddress: authenticator,
@@ -33,12 +33,14 @@ export default function createVanillaAuthenticator(): Authenticator {
     createVoteCall(envelope: Envelope<Vote>, args: VoteCallArgs): Call {
       const { space, authenticator } = envelope.data;
 
-      const argsList = [args.voter, args.proposalId, args.choice, args.votingStrategies];
-
-      const callData = new CallData(SpaceAbi);
-      callData.validate(ValidateType.INVOKE, 'vote', argsList);
-
-      const calldata = callData.compile('vote', argsList);
+      // NOTE: not using Abi as starknet.js doesn't support enums yet
+      const calldata = CallData.compile({
+        enum_index: 1, // Ethereum
+        voter: args.voter,
+        proposal_id: uint256.bnToUint256(args.proposalId),
+        choice: args.choice,
+        voting_strategies: args.votingStrategies
+      });
 
       return {
         contractAddress: authenticator,
@@ -52,12 +54,13 @@ export default function createVanillaAuthenticator(): Authenticator {
     ): Call {
       const { space, authenticator } = envelope.data;
 
-      const argsList = [args.author, args.proposalId, args.executionStrategy];
-
-      const callData = new CallData(SpaceAbi);
-      callData.validate(ValidateType.INVOKE, 'update_proposal', argsList);
-
-      const calldata = callData.compile('update_proposal', argsList);
+      // NOTE: not using Abi as starknet.js doesn't support enums yet
+      const calldata = CallData.compile({
+        enum_index: 1, // Ethereum
+        author: args.author,
+        proposal_id: uint256.bnToUint256(args.proposalId),
+        execution_strategy: args.executionStrategy
+      });
 
       return {
         contractAddress: authenticator,

@@ -1,12 +1,22 @@
 [
   {
-    "name": "EthTxAuthenticator",
     "type": "impl",
+    "name": "EthTxAuthenticator",
     "interface_name": "sx::authenticators::eth_tx::IEthTxAuthenticator"
   },
   {
-    "name": "sx::utils::types::Strategy",
     "type": "struct",
+    "name": "core::starknet::eth_address::EthAddress",
+    "members": [
+      {
+        "name": "address",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "sx::types::strategy::Strategy",
     "members": [
       {
         "name": "address",
@@ -19,8 +29,8 @@
     ]
   },
   {
-    "name": "core::integer::u256",
     "type": "struct",
+    "name": "core::integer::u256",
     "members": [
       {
         "name": "low",
@@ -33,8 +43,8 @@
     ]
   },
   {
-    "name": "sx::utils::types::Choice",
     "type": "enum",
+    "name": "sx::types::choice::Choice",
     "variants": [
       {
         "name": "Against",
@@ -51,8 +61,8 @@
     ]
   },
   {
-    "name": "sx::utils::types::IndexedStrategy",
     "type": "struct",
+    "name": "sx::types::indexed_strategy::IndexedStrategy",
     "members": [
       {
         "name": "index",
@@ -65,12 +75,12 @@
     ]
   },
   {
-    "name": "sx::authenticators::eth_tx::IEthTxAuthenticator",
     "type": "interface",
+    "name": "sx::authenticators::eth_tx::IEthTxAuthenticator",
     "items": [
       {
-        "name": "authenticate_propose",
         "type": "function",
+        "name": "authenticate_propose",
         "inputs": [
           {
             "name": "target",
@@ -78,11 +88,11 @@
           },
           {
             "name": "author",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "type": "core::starknet::eth_address::EthAddress"
           },
           {
             "name": "execution_strategy",
-            "type": "sx::utils::types::Strategy"
+            "type": "sx::types::strategy::Strategy"
           },
           {
             "name": "user_proposal_validation_params",
@@ -93,8 +103,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "authenticate_vote",
         "type": "function",
+        "name": "authenticate_vote",
         "inputs": [
           {
             "name": "target",
@@ -102,7 +112,7 @@
           },
           {
             "name": "voter",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "type": "core::starknet::eth_address::EthAddress"
           },
           {
             "name": "proposal_id",
@@ -110,19 +120,19 @@
           },
           {
             "name": "choice",
-            "type": "sx::utils::types::Choice"
+            "type": "sx::types::choice::Choice"
           },
           {
             "name": "user_voting_strategies",
-            "type": "core::array::Array::<sx::utils::types::IndexedStrategy>"
+            "type": "core::array::Array::<sx::types::indexed_strategy::IndexedStrategy>"
           }
         ],
         "outputs": [],
         "state_mutability": "external"
       },
       {
-        "name": "authenticate_update_proposal",
         "type": "function",
+        "name": "authenticate_update_proposal",
         "inputs": [
           {
             "name": "target",
@@ -130,7 +140,7 @@
           },
           {
             "name": "author",
-            "type": "core::starknet::contract_address::ContractAddress"
+            "type": "core::starknet::eth_address::EthAddress"
           },
           {
             "name": "proposal_id",
@@ -138,7 +148,7 @@
           },
           {
             "name": "execution_strategy",
-            "type": "sx::utils::types::Strategy"
+            "type": "sx::types::strategy::Strategy"
           }
         ],
         "outputs": [],
@@ -147,18 +157,18 @@
     ]
   },
   {
-    "name": "constructor",
     "type": "constructor",
+    "name": "constructor",
     "inputs": [
       {
         "name": "starknet_commit_address",
-        "type": "core::felt252"
+        "type": "core::starknet::eth_address::EthAddress"
       }
     ]
   },
   {
-    "name": "commit",
     "type": "l1_handler",
+    "name": "commit",
     "inputs": [
       {
         "name": "from_address",
@@ -177,9 +187,9 @@
     "state_mutability": "external"
   },
   {
-    "kind": "enum",
-    "name": "sx::authenticators::eth_tx::EthTxAuthenticator::Event",
     "type": "event",
+    "name": "sx::authenticators::eth_tx::EthTxAuthenticator::Event",
+    "kind": "enum",
     "variants": []
   }
 ]

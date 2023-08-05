@@ -7,8 +7,8 @@ import { postMessageToL2, setup, TestConfig } from './utils';
 
 describe('StarkNetTx', () => {
   const ethUrl = 'https://rpc.brovider.xyz/5';
-  const address = '0x7db41c74cfbc2eb3f9166998c9c57154cfdf743083ee29fd3a3a164ce42c681';
-  const privateKey = '0xd38597b88d0ae55d45f8d8f4b3aa77cd';
+  const address = '0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4';
+  const privateKey = '0xcd613e30d8f16adf91b7584a2265b1f5';
   const ethPrivateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 
   const starkProvider = new Provider({
