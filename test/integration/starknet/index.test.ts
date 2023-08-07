@@ -47,7 +47,9 @@ describe('StarkNetTx', () => {
   describe('vanilla authenticator', () => {
     it('StarkNetTx.propose()', async () => {
       const envelope = {
-        address: walletAddress,
+        signatureData: {
+          address: walletAddress
+        },
         data: {
           space: spaceAddress,
           authenticator: testConfig.vanillaAuthenticator,
@@ -70,7 +72,9 @@ describe('StarkNetTx', () => {
 
     it('StarkNetTx.vote()', async () => {
       const envelope = {
-        address: walletAddress,
+        signatureData: {
+          address: walletAddress
+        },
         data: {
           space: spaceAddress,
           authenticator: testConfig.vanillaAuthenticator,
@@ -96,22 +100,19 @@ describe('StarkNetTx', () => {
 
   describe('ethTx authenticator', () => {
     it('StarkNetTx.propose()', async () => {
-      const envelope = {
-        address: walletAddress,
-        data: {
-          space: spaceAddress,
-          authenticator: testConfig.ethTxAuthenticator,
-          strategies: [],
-          executionStrategy: {
-            addr: testConfig.vanillaExecutionStrategy,
-            params: '0x101'
-          },
-          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
-        }
+      const data = {
+        space: spaceAddress,
+        authenticator: testConfig.ethTxAuthenticator,
+        strategies: [],
+        executionStrategy: {
+          addr: testConfig.vanillaExecutionStrategy,
+          params: '0x101'
+        },
+        metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
       };
 
-      const payload = await ethTxClient.getProposeHash(envelope);
-      const fee = await ethTxClient.estimateProposeFee(envelope);
+      const payload = await ethTxClient.getProposeHash(wallet, data);
+      const fee = await ethTxClient.estimateProposeFee(wallet, data);
 
       await postMessageToL2(
         testConfig.ethTxAuthenticator,
@@ -120,7 +121,12 @@ describe('StarkNetTx', () => {
         fee.overall_fee
       );
 
-      const receipt = await client.propose(account, envelope);
+      const receipt = await client.propose(account, {
+        signatureData: {
+          address: walletAddress
+        },
+        data
+      });
       console.log('Receipt', receipt);
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
@@ -129,24 +135,21 @@ describe('StarkNetTx', () => {
     }, 60e3);
 
     it('StarkNetTx.vote()', async () => {
-      const envelope = {
-        address: walletAddress,
-        data: {
-          space: spaceAddress,
-          authenticator: testConfig.ethTxAuthenticator,
-          strategies: [
-            {
-              index: 0,
-              address: testConfig.vanillaVotingStrategy
-            }
-          ],
-          proposal: 2,
-          choice: Choice.For
-        }
+      const data = {
+        space: spaceAddress,
+        authenticator: testConfig.ethTxAuthenticator,
+        strategies: [
+          {
+            index: 0,
+            address: testConfig.vanillaVotingStrategy
+          }
+        ],
+        proposal: 2,
+        choice: Choice.For
       };
 
-      const payload = await ethTxClient.getVoteHash(envelope);
-      const fee = await ethTxClient.estimateVoteFee(envelope);
+      const payload = await ethTxClient.getVoteHash(wallet, data);
+      const fee = await ethTxClient.estimateVoteFee(wallet, data);
 
       await postMessageToL2(
         testConfig.ethTxAuthenticator,
@@ -155,7 +158,12 @@ describe('StarkNetTx', () => {
         fee.overall_fee
       );
 
-      const receipt = await client.vote(account, envelope);
+      const receipt = await client.vote(account, {
+        signatureData: {
+          address: walletAddress
+        },
+        data
+      });
       console.log('Receipt', receipt);
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);

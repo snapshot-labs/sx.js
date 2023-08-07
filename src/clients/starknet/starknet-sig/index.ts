@@ -11,7 +11,8 @@ import {
   Vote,
   StarknetEIP712ProposeMessage,
   StarknetEIP712UpdateProposalMessage,
-  StarknetEIP712VoteMessage
+  StarknetEIP712VoteMessage,
+  SignatureData
 } from '../../../types';
 import { defaultNetwork } from '../../..';
 
@@ -40,23 +41,27 @@ export class StarknetSig {
     message: T,
     types: any,
     primaryType: string
-  ): Promise<[bigint, bigint]> {
+  ): Promise<SignatureData> {
     const domain = {
       ...baseDomain,
       chainId: this.config.networkConfig.starknetEip712ChainId,
       verifyingContract
     };
 
-    const proposeData: typedData.TypedData = {
+    const data: typedData.TypedData = {
       types,
       primaryType,
       domain,
       message
     };
 
-    const signature = (await signer.signMessage(proposeData)) as any;
+    const signature = (await signer.signMessage(data)) as any;
 
-    return [signature.r, signature.s];
+    return {
+      address: signer.address,
+      signature: [signature.r, signature.s],
+      message
+    };
   }
 
   public async propose({
@@ -87,11 +92,16 @@ export class StarknetSig {
       salt: this.generateSalt()
     };
 
-    const sig = await this.sign(signer, data.authenticator, message, proposeTypes, 'Propose');
+    const signatureData = await this.sign(
+      signer,
+      data.authenticator,
+      message,
+      proposeTypes,
+      'Propose'
+    );
 
     return {
-      address,
-      sig,
+      signatureData,
       data
     };
   }
@@ -116,7 +126,7 @@ export class StarknetSig {
       salt: this.generateSalt()
     };
 
-    const sig = await this.sign(
+    const signatureData = await this.sign(
       signer,
       data.authenticator,
       message,
@@ -125,8 +135,7 @@ export class StarknetSig {
     );
 
     return {
-      address,
-      sig,
+      signatureData,
       data
     };
   }
@@ -153,11 +162,10 @@ export class StarknetSig {
       }))
     };
 
-    const sig = await this.sign(signer, data.authenticator, message, voteTypes, 'Vote');
+    const signatureData = await this.sign(signer, data.authenticator, message, voteTypes, 'Vote');
 
     return {
-      address,
-      sig,
+      signatureData,
       data
     };
   }

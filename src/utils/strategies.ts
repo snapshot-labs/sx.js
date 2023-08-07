@@ -39,7 +39,6 @@ export async function getStrategiesParams(
         strategyData.address,
         strategyData.index,
         {
-          address,
           data
         },
         config
@@ -63,7 +62,6 @@ export async function getExtraProposeCalls(
         address,
         strategyData.index,
         {
-          address,
           data
         },
         config

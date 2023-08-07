@@ -78,6 +78,8 @@ export class StarkNetTx {
   }
 
   async propose(account: Account, envelope: Envelope<Propose>) {
+    const authorAddress = envelope.signatureData?.address || account.address;
+
     const authenticator = getAuthenticator(envelope.data.authenticator, this.config.networkConfig);
     if (!authenticator) {
       throw new Error('Invalid authenticator');
@@ -86,13 +88,13 @@ export class StarkNetTx {
     const strategiesParams = await getStrategiesParams(
       'propose',
       envelope.data.strategies,
-      envelope.address,
+      authorAddress,
       envelope.data,
       this.config
     );
 
     const call = authenticator.createProposeCall(envelope, {
-      author: envelope.address,
+      author: authorAddress,
       executionStrategy: {
         address: envelope.data.executionStrategy.addr,
         params: envelope.data.executionStrategy.params
@@ -109,13 +111,15 @@ export class StarkNetTx {
   }
 
   async updateProposal(account: Account, envelope: Envelope<UpdateProposal>) {
+    const authorAddress = envelope.signatureData?.address || account.address;
+
     const authenticator = getAuthenticator(envelope.data.authenticator, this.config.networkConfig);
     if (!authenticator) {
       throw new Error('Invalid authenticator');
     }
 
     const call = authenticator.createUpdateProposalCall(envelope, {
-      author: envelope.address,
+      author: authorAddress,
       proposalId: envelope.data.proposal,
       executionStrategy: {
         address: envelope.data.executionStrategy.addr,
@@ -132,6 +136,8 @@ export class StarkNetTx {
   }
 
   async vote(account: Account, envelope: Envelope<Vote>) {
+    const voterAddress = envelope.signatureData?.address || account.address;
+
     const authenticator = getAuthenticator(envelope.data.authenticator, this.config.networkConfig);
     if (!authenticator) {
       throw new Error('Invalid authenticator');
@@ -140,13 +146,13 @@ export class StarkNetTx {
     const strategiesParams = await getStrategiesParams(
       'vote',
       envelope.data.strategies,
-      envelope.address,
+      voterAddress,
       envelope.data,
       this.config
     );
 
     const call = authenticator.createVoteCall(envelope, {
-      voter: envelope.address,
+      voter: voterAddress,
       proposalId: envelope.data.proposal,
       choice: envelope.data.choice,
       votingStrategies: envelope.data.strategies.map((strategyConfig, i) => ({
