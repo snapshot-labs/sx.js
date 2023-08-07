@@ -81,6 +81,7 @@ export const evmLineaGoerli: EvmNetworkConfig = {
 
 export const goerli1: NetworkConfig = {
   eip712ChainId: 5,
+  starknetEip712ChainId: '0x534e5f474f45524c49',
   spaceFactory: '',
   masterSpace: '',
   authenticators: {
@@ -105,6 +106,7 @@ export const goerli1: NetworkConfig = {
 
 export const goerli2: NetworkConfig = {
   eip712ChainId: 5,
+  starknetEip712ChainId: '0x534e5f474f45524c4932',
   spaceFactory: '0x00e1e511e496a72791ab3d591ba7d571a32de4261d84e4d183f26b6325970e20',
   masterSpace: '',
   authenticators: {

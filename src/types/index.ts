@@ -1,4 +1,4 @@
-import type { Provider } from 'starknet';
+import type { BigNumberish, Provider } from 'starknet';
 import type { Call } from 'starknet';
 import type { MetaTransaction } from '../utils/encoding';
 import type { NetworkConfig } from './networkConfig';
@@ -131,8 +131,38 @@ export type Message = Propose | Vote | UpdateProposal;
 
 export type Envelope<T extends Message> = {
   address: string;
-  sig?: string;
+  sig?: [bigint, bigint];
   data: T;
+};
+
+export type StarknetEIP712ProposeMessage = {
+  space: string;
+  author: string;
+  executionStrategy: {
+    address: string;
+    params: string[];
+  };
+  userProposalValidationParams: string[];
+  salt: string;
+};
+
+export type StarknetEIP712UpdateProposalMessage = {
+  space: string;
+  author: string;
+  proposalId: { low: BigNumberish; high: BigNumberish };
+  executionStrategy: {
+    address: string;
+    params: string[];
+  };
+  salt: string;
+};
+
+export type StarknetEIP712VoteMessage = {
+  space: string;
+  voter: string;
+  proposalId: { low: BigNumberish; high: BigNumberish };
+  choice: string;
+  userVotingStrategies: { index: number; params: string[] }[];
 };
 
 export type StrategiesAddresses = { index: number; address: string }[];

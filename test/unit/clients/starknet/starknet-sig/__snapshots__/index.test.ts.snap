@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StarknetSig should create propose envelope 1`] = `
+{
+  "address": "0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4",
+  "data": {
+    "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+    "executionStrategy": {
+      "addr": "0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe",
+      "params": "0x101",
+    },
+    "metadataUri": "ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca",
+    "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+    "strategies": [],
+  },
+  "sig": [
+    1780754710810985315152257586799164375683480882209626570396675824316339541295n,
+    761231716945276978100410088761627873359612007631765995302112986177508830638n,
+  ],
+}
+`;
+
+exports[`StarknetSig should create update proposal envelope 1`] = `
+{
+  "address": "0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4",
+  "data": {
+    "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+    "executionStrategy": {
+      "addr": "0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe",
+      "params": "0x101",
+    },
+    "metadataUri": "ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca",
+    "proposal": 1,
+    "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+  },
+  "sig": [
+    2228765207736841430106592131166693743326272265427410030406266990412548094453n,
+    1619805758020742317480559985618279148420434342528036457073932654159406995297n,
+  ],
+}
+`;
+
+exports[`StarknetSig should create vote envelope 1`] = `
+{
+  "address": "0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4",
+  "data": {
+    "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+    "choice": 1,
+    "proposal": 1,
+    "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+    "strategies": [
+      {
+        "address": "0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a",
+        "index": 0,
+      },
+    ],
+  },
+  "sig": [
+    1331254511615837720981255403461152445221865622533088620765784504912904279739n,
+    415377228419315564560722011270101939722225507281477409754479339208082492636n,
+  ],
+}
+`;

@@ -12,6 +12,10 @@ export type EthSigAuthenticatorConfig = {
   type: 'ethSig';
 };
 
+export type StarkSigAuthenticatorConfig = {
+  type: 'starkSig';
+};
+
 export type VanillaStrategyConfig = {
   type: 'vanilla';
 };
@@ -58,6 +62,7 @@ export type AvatarExecutionConfig = {
 
 export type NetworkConfig = {
   eip712ChainId: number;
+  starknetEip712ChainId: string;
   spaceFactory: string;
   masterSpace: string;
   authenticators: {
@@ -65,6 +70,7 @@ export type NetworkConfig = {
       | VanillaAuthenticatorConfig
       | EthTxAuthenticatorConfig
       | EthSigAuthenticatorConfig
+      | StarkSigAuthenticatorConfig
       | undefined;
   };
   strategies: {
@@ -86,7 +92,10 @@ export type NetworkConfig = {
   };
 };
 
-export type EvmNetworkConfig = Omit<NetworkConfig, 'spaceFactory' | 'executors'> & {
+export type EvmNetworkConfig = Omit<
+  NetworkConfig,
+  'starknetEip712ChainId' | 'spaceFactory' | 'executors'
+> & {
   proxyFactory: string;
   executionStrategiesImplementations: {
     [key in ExecutorType]?: string;
