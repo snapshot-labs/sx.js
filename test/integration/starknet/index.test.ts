@@ -225,4 +225,64 @@ describe('StarkNetTx', () => {
       expect(receipt.transaction_hash).toBeDefined();
     }, 60e3);
   });
+
+  it('should cancel proposal', async () => {
+    const res = await client.cancelProposal({
+      signer: account,
+      space: spaceAddress,
+      proposal: 3
+    });
+
+    expect(res.transaction_hash).toBeDefined();
+  });
+
+  it('should set min voting duration', async () => {
+    const res = await client.setMinVotingDuration({
+      signer: account,
+      space: spaceAddress,
+      minVotingDuration: 1
+    });
+
+    expect(res.transaction_hash).toBeDefined();
+  });
+
+  it('should set max voting duration', async () => {
+    const res = await client.setMaxVotingDuration({
+      signer: account,
+      space: spaceAddress,
+      maxVotingDuration: 1
+    });
+
+    expect(res.transaction_hash).toBeDefined();
+  });
+
+  it('should set voting delay', async () => {
+    const res = await client.setVotingDelay({
+      signer: account,
+      space: spaceAddress,
+      votingDelay: 1
+    });
+
+    expect(res.transaction_hash).toBeDefined();
+  });
+
+  it('should set metadataUri', async () => {
+    const res = await client.setMetadataUri({
+      signer: account,
+      space: spaceAddress,
+      metadataUri: ''
+    });
+
+    expect(res.transaction_hash).toBeDefined();
+  });
+
+  it('should transfer ownership', async () => {
+    const res = await client.transferOwnership({
+      signer: account,
+      space: spaceAddress,
+      owner: '0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4'
+    });
+
+    expect(res.transaction_hash).toBeDefined();
+  });
 });

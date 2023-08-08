@@ -1,7 +1,8 @@
-import { Account, CallData } from 'starknet';
+import { Account, CallData, ValidateType, shortString, uint256 } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
+import SpaceAbi from './abis/Space.json';
 import {
   Vote,
   Propose,
@@ -23,6 +24,23 @@ type SpaceParams = {
   votingStrategies: AddressConfig[];
 };
 
+type UpdateSettingsInput = {
+  minVotingDuration?: number;
+  maxVotingDuration?: number;
+  votingDelay?: number;
+  metadataUri?: string;
+  daoUri?: string;
+  proposalValidationStrategy?: AddressConfig;
+  proposalValidationStrategyMetadataUri?: string;
+  authenticatorsToAdd?: string[];
+  authenticatorsToRemove?: string[];
+  votingStrategiesToAdd?: AddressConfig[];
+  votingStrategiesToRemove?: number[];
+  votingStrategyMetadataUrisToAdd?: string[];
+};
+
+const NO_UPDATE_U32 = '0xf2cda9b1';
+const NO_UPDATE_ADDRESS = '0xf2cda9b13ed04e585461605c0d6e804933ca828111bd94d4e6a96c75e8b048';
 export class StarkNetTx {
   config: ClientConfig;
 
@@ -164,6 +182,161 @@ export class StarkNetTx {
     const fee = await account.estimateFee(call);
     return account.execute(call, undefined, {
       maxFee: fee.suggestedMaxFee
+    });
+  }
+
+  async updateSettings({
+    signer,
+    space,
+    settings
+  }: {
+    signer: Account;
+    space: string;
+    settings: UpdateSettingsInput;
+  }) {
+    const encodeString = (str: string) => {
+      return str.split('').map(c => `0x${c.charCodeAt(0).toString(16)})`);
+    };
+
+    const settingsData = [
+      {
+        min_voting_duration: settings.minVotingDuration || NO_UPDATE_U32,
+        max_voting_duration: settings.maxVotingDuration || NO_UPDATE_U32,
+        voting_delay: settings.votingDelay || NO_UPDATE_U32,
+        metadata_URI: (settings.metadataUri && encodeString(settings.metadataUri)) || [],
+        dao_URI: (settings.daoUri && encodeString(settings.daoUri)) || [],
+        proposal_validation_strategy: settings.proposalValidationStrategy || {
+          address: NO_UPDATE_ADDRESS,
+          params: []
+        },
+        proposal_validation_strategy_metadata_URI:
+          settings.proposalValidationStrategyMetadataUri || [],
+        authenticators_to_add: settings.authenticatorsToAdd || [],
+        authenticators_to_remove: settings.authenticatorsToRemove || [],
+        voting_strategies_to_add: settings.votingStrategiesToAdd || [],
+        voting_strategies_to_remove: settings.votingStrategiesToRemove || [],
+        voting_strategies_metadata_URIs_to_add:
+          (settings.votingStrategyMetadataUrisToAdd &&
+            settings.votingStrategyMetadataUrisToAdd.map(str => encodeString(str))) ||
+          []
+      }
+    ];
+
+    const calldata = new CallData(SpaceAbi);
+    calldata.validate(ValidateType.INVOKE, 'update_settings', settingsData);
+
+    return signer.execute({
+      contractAddress: space,
+      entrypoint: 'update_settings',
+      calldata: calldata.compile('update_settings', settingsData)
+    });
+  }
+
+  async cancelProposal({
+    signer,
+    space,
+    proposal
+  }: {
+    signer: Account;
+    space: string;
+    proposal: number;
+  }) {
+    return signer.execute({
+      contractAddress: space,
+      entrypoint: 'cancel_proposal',
+      calldata: CallData.compile({
+        proposal_id: uint256.bnToUint256(proposal)
+      })
+    });
+  }
+
+  async setMinVotingDuration({
+    signer,
+    space,
+    minVotingDuration
+  }: {
+    signer: Account;
+    space: string;
+    minVotingDuration: number;
+  }) {
+    return this.updateSettings({
+      signer,
+      space,
+      settings: {
+        minVotingDuration
+      }
+    });
+  }
+
+  async setMaxVotingDuration({
+    signer,
+    space,
+    maxVotingDuration
+  }: {
+    signer: Account;
+    space: string;
+    maxVotingDuration: number;
+  }) {
+    return this.updateSettings({
+      signer,
+      space,
+      settings: {
+        maxVotingDuration
+      }
+    });
+  }
+
+  async setVotingDelay({
+    signer,
+    space,
+    votingDelay
+  }: {
+    signer: Account;
+    space: string;
+    votingDelay: number;
+  }) {
+    return this.updateSettings({
+      signer,
+      space,
+      settings: {
+        votingDelay
+      }
+    });
+  }
+
+  async setMetadataUri({
+    signer,
+    space,
+    metadataUri
+  }: {
+    signer: Account;
+    space: string;
+    metadataUri: string;
+  }) {
+    return this.updateSettings({
+      signer,
+      space,
+      settings: {
+        metadataUri
+      }
+    });
+  }
+
+  async transferOwnership({
+    signer,
+    space,
+    owner
+  }: {
+    signer: Account;
+    space: string;
+    owner: string;
+  }) {
+    return signer.execute({
+      contractAddress: space,
+      entrypoint: 'transfer_ownership',
+      calldata: CallData.compile({
+        new_owner: owner
+      })
     });
   }
 }
