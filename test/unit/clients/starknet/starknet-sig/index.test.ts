@@ -1,7 +1,7 @@
 import { Account, Provider } from 'starknet';
-import { StarknetSig } from '../../../../../src/clients/starknet/starknet-sig';
+import { StarkNetSig } from '../../../../../src/clients/starknet/starknet-sig';
 
-describe('StarknetSig', () => {
+describe('StarkNetSig', () => {
   const address = '0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4';
   const privateKey = '0xcd613e30d8f16adf91b7584a2265b1f5';
 
@@ -13,7 +13,7 @@ describe('StarknetSig', () => {
 
   const account = new Account(starkProvider, address, privateKey);
 
-  const client = new StarknetSig({
+  const client = new StarkNetSig({
     starkProvider,
     ethUrl: 'https://rpc.brovider.xyz/5'
   });

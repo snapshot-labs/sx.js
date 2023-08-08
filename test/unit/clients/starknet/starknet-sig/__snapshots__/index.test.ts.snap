@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`StarknetSig should create propose envelope 1`] = `
+exports[`StarkNetSig should create propose envelope 1`] = `
 {
   "data": {
     "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
@@ -34,7 +34,7 @@ exports[`StarknetSig should create propose envelope 1`] = `
 }
 `;
 
-exports[`StarknetSig should create update proposal envelope 1`] = `
+exports[`StarkNetSig should create update proposal envelope 1`] = `
 {
   "data": {
     "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
@@ -71,7 +71,7 @@ exports[`StarknetSig should create update proposal envelope 1`] = `
 }
 `;
 
-exports[`StarknetSig should create vote envelope 1`] = `
+exports[`StarkNetSig should create vote envelope 1`] = `
 {
   "data": {
     "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",

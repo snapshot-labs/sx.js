@@ -1,7 +1,7 @@
 import { Account, Provider } from 'starknet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
-import { EthereumTx, StarkNetTx } from '../../../src/clients';
+import { EthereumTx, StarkNetSig, StarkNetTx } from '../../../src/clients';
 import { Choice } from '../../../src/types';
 import { postMessageToL2, setup, TestConfig } from './utils';
 
@@ -24,6 +24,7 @@ describe('StarkNetTx', () => {
 
   let client: StarkNetTx;
   let ethTxClient: EthereumTx;
+  let starkSigClient: StarkNetSig;
   let testConfig: TestConfig;
   let spaceAddress = '';
 
@@ -41,6 +42,11 @@ describe('StarkNetTx', () => {
       ethUrl,
       networkConfig: testConfig.networkConfig,
       sequencerUrl: 'http://127.0.0.1:5050'
+    });
+    starkSigClient = new StarkNetSig({
+      starkProvider,
+      ethUrl,
+      networkConfig: testConfig.networkConfig
     });
   }, 180_000);
 
@@ -164,6 +170,54 @@ describe('StarkNetTx', () => {
         },
         data
       });
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+  });
+
+  describe('starkSig authenticator', () => {
+    it('StarkNetTx.propose()', async () => {
+      const data = {
+        space: spaceAddress,
+        authenticator: testConfig.starkSigAuthenticator,
+        strategies: [],
+        executionStrategy: {
+          addr: testConfig.vanillaExecutionStrategy,
+          params: '0x00'
+        },
+        metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
+      };
+
+      const envelope = await starkSigClient.propose({ signer: account, data });
+
+      const receipt = await client.propose(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+
+    it('StarkNetTx.vote()', async () => {
+      const data = {
+        space: spaceAddress,
+        authenticator: testConfig.starkSigAuthenticator,
+        strategies: [
+          {
+            index: 0,
+            address: testConfig.vanillaVotingStrategy
+          }
+        ],
+        proposal: 3,
+        choice: Choice.For
+      };
+
+      const envelope = await starkSigClient.vote({ signer: account, data });
+
+      const receipt = await client.vote(account, envelope);
       console.log('Receipt', receipt);
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);

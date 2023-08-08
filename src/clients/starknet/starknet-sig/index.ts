@@ -16,7 +16,7 @@ import {
 } from '../../../types';
 import { defaultNetwork } from '../../..';
 
-export class StarknetSig {
+export class StarkNetSig {
   config: ClientConfig;
 
   constructor(opts: ClientOpts) {

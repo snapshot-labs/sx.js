@@ -164,7 +164,7 @@ export async function setup(account: Account): Promise<TestConfig> {
         params: '0x0'
       },
       metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
-      authenticators: [vanillaAuthenticator, ethTxAuthenticator],
+      authenticators: [vanillaAuthenticator, ethTxAuthenticator, starkSigAuthenticator],
       votingStrategies: [
         {
           addr: vanillaVotingStrategy,
