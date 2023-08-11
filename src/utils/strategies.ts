@@ -36,8 +36,10 @@ export async function getStrategiesParams(
 
       return strategy.getParams(
         call,
+        address,
         strategyData.address,
         strategyData.index,
+        strategyData.metadata || null,
         {
           data
         },

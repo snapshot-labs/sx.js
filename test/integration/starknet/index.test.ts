@@ -226,6 +226,61 @@ describe('StarkNetTx', () => {
     }, 60e3);
   });
 
+  describe('vanilla authenticator + merkle tree strategy', () => {
+    it('StarkNetTx.propose()', async () => {
+      const envelope = {
+        signatureData: {
+          address: walletAddress
+        },
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [],
+          executionStrategy: {
+            addr: testConfig.vanillaExecutionStrategy,
+            params: ['0x00']
+          },
+          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
+        }
+      };
+
+      const receipt = await client.propose(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+
+    it('StarkNetTx.vote()', async () => {
+      const envelope = {
+        signatureData: {
+          address: walletAddress
+        },
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [
+            {
+              index: 1,
+              address: testConfig.merkleWhitelistVotingStrategy,
+              metadata: testConfig.merkleWhitelistStrategyMetadata
+            }
+          ],
+          proposal: 4,
+          choice: Choice.For
+        }
+      };
+
+      const receipt = await client.vote(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+  });
+
   it('should cancel proposal', async () => {
     const res = await client.cancelProposal({
       signer: account,

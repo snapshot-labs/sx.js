@@ -47,8 +47,10 @@ export interface Strategy {
   type: string;
   getParams(
     call: 'propose' | 'vote',
+    signerAddress: string,
     address: string,
     index: number,
+    metadata: Record<string, any> | null,
     envelope: Envelope<Message>,
     clientConfig: ClientConfig
   ): Promise<string[]>;
@@ -61,6 +63,7 @@ export interface Strategy {
   getVotingPower: (
     strategyAddress: string,
     voterAddress: string,
+    metadata: Record<string, any> | null,
     timestamp: number,
     params: string[],
     clientConfig: ClientConfig
@@ -101,6 +104,7 @@ export type IndexedConfig = {
 export type StrategyConfig = {
   index: number;
   address: string;
+  metadata?: Record<string, any>;
 };
 
 export type Propose = {

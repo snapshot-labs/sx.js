@@ -8,8 +8,10 @@ export default function createVanillaStrategy(): Strategy {
     type: 'vanilla',
     async getParams(
       call: 'propose' | 'vote',
+      signerAddress: string,
       address: string,
       index: number,
+      metadata: Record<string, any> | null,
       envelope: Envelope<Propose | Vote>,
       clientConfig: ClientConfig
     ): Promise<string[]> {

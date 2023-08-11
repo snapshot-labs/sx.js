@@ -1,5 +1,6 @@
 import { Account, CallData, hash } from 'starknet';
 import { hexPadLeft } from '../../../src/utils/encoding';
+import { AddressType, Leaf, generateMerkleRoot } from '../../../src/utils/merkletree';
 import sxFactoryCasm from './fixtures/sx_Factory.casm.json';
 import sxFactorySierra from './fixtures/sx_Factory.sierra.json';
 import sxSpaceCasm from './fixtures/sx_Space.casm.json';
@@ -16,6 +17,8 @@ import sxVanillaProposalValidationStrategyCasm from './fixtures/sx_VanillaPropos
 import sxVanillaProposalValidationStrategySierra from './fixtures/sx_VanillaProposalValidationStrategy.sierra.json';
 import sxVanillaVotingStrategyCasm from './fixtures/sx_VanillaVotingStrategy.casm.json';
 import sxVanillaVotingStrategySierra from './fixtures/sx_VanillaVotingStrategy.sierra.json';
+import sxMerkleWhitelistVotingStrategyCasm from './fixtures/sx_MerkleWhitelistVotingStrategy.casm.json';
+import sxMerkleWhitelistVotingStrategySierra from './fixtures/sx_MerkleWhitelistVotingStrategy.sierra.json';
 import { NetworkConfig } from '../../../src/types';
 import { StarkNetTx } from '../../../src/clients';
 
@@ -31,6 +34,14 @@ export type TestConfig = {
   vanillaExecutionStrategy: string;
   vanillaProposalValidationStrategy: string;
   vanillaVotingStrategy: string;
+  merkleWhitelistVotingStrategy: string;
+  merkleWhitelistStrategyMetadata: {
+    tree: {
+      type: AddressType;
+      address: string;
+      votingPower: bigint;
+    }[];
+  };
   networkConfig: NetworkConfig;
 };
 
@@ -115,8 +126,26 @@ export async function setup(account: Account): Promise<TestConfig> {
     sxVanillaVotingStrategyCasm
   );
 
+  const merkleWhitelistVotingStrategy = await deployDependency(
+    account,
+    sxMerkleWhitelistVotingStrategySierra,
+    sxMerkleWhitelistVotingStrategyCasm
+  );
+
   const masterSpaceClassHash = masterSpaceResult.declare.class_hash;
   const factoryAddress = factoryResult.deploy.contract_address;
+
+  const leaf = new Leaf(AddressType.ETHEREUM, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 42n);
+  const merkleWhitelistStrategyMetadata = {
+    tree: [leaf].map(leaf => ({
+      type: leaf.type,
+      address: leaf.address,
+      votingPower: leaf.votingPower
+    }))
+  };
+  const hashes = [leaf.hash];
+
+  const merkleTreeRoot = generateMerkleRoot(hashes);
 
   const networkConfig: NetworkConfig = {
     eip712ChainId: 5,
@@ -137,6 +166,9 @@ export async function setup(account: Account): Promise<TestConfig> {
     strategies: {
       [hexPadLeft(vanillaVotingStrategy)]: {
         type: 'vanilla'
+      },
+      [hexPadLeft(merkleWhitelistVotingStrategy)]: {
+        type: 'whitelist'
       }
     },
     executors: {
@@ -169,6 +201,10 @@ export async function setup(account: Account): Promise<TestConfig> {
         {
           addr: vanillaVotingStrategy,
           params: ['0x0']
+        },
+        {
+          addr: merkleWhitelistVotingStrategy,
+          params: [merkleTreeRoot]
         }
       ]
     }
@@ -187,6 +223,8 @@ export async function setup(account: Account): Promise<TestConfig> {
     vanillaExecutionStrategy,
     vanillaProposalValidationStrategy,
     vanillaVotingStrategy,
+    merkleWhitelistVotingStrategy,
+    merkleWhitelistStrategyMetadata,
     networkConfig
   };
 }
