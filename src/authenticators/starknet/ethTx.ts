@@ -26,7 +26,7 @@ export default function createEthTxAuthenticator(): Authenticator {
         },
         {
           address: args.executionStrategy.address,
-          params: [args.executionStrategy.params]
+          params: args.executionStrategy.params
         },
         args.strategiesParams
       ]);
@@ -49,7 +49,7 @@ export default function createEthTxAuthenticator(): Authenticator {
         args.choice,
         args.votingStrategies.map(strategy => ({
           index: strategy.index,
-          params: [strategy.params]
+          params: strategy.params
         }))
       ]);
 
@@ -73,7 +73,7 @@ export default function createEthTxAuthenticator(): Authenticator {
         args.proposalId,
         {
           address: args.executionStrategy.address,
-          params: [args.executionStrategy.params]
+          params: args.executionStrategy.params
         }
       ]);
 

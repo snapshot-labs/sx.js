@@ -86,9 +86,9 @@ export class StarkNetSig {
       author: address,
       executionStrategy: {
         address: data.executionStrategy.addr,
-        params: [data.executionStrategy.params]
+        params: data.executionStrategy.params
       },
-      userProposalValidationParams: strategiesParams,
+      userProposalValidationParams: strategiesParams.flat(),
       salt: this.generateSalt()
     };
 
@@ -121,7 +121,7 @@ export class StarkNetSig {
       proposalId: uint256.bnToUint256(data.proposal),
       executionStrategy: {
         address: data.executionStrategy.addr,
-        params: [data.executionStrategy.params]
+        params: data.executionStrategy.params
       },
       salt: this.generateSalt()
     };
@@ -158,7 +158,7 @@ export class StarkNetSig {
       choice: `0x${data.choice.toString(16)}`,
       userVotingStrategies: data.strategies.map((strategy, index) => ({
         index: strategy.index,
-        params: [strategiesParams[index]]
+        params: strategiesParams[index]
       }))
     };
 

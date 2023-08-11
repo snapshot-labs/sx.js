@@ -13,7 +13,7 @@ describe('ethTxAuthenticator', () => {
       author: '0x0538D033B879aC94C709c1E408CC081345427379',
       executionStrategy: {
         address: '0x04ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d',
-        params: '0x0'
+        params: ['0x0']
       },
       strategiesParams: []
     });

@@ -15,7 +15,7 @@ export type ProposeCallArgs = {
   author: string;
   executionStrategy: {
     address: string;
-    params: string;
+    params: string[];
   };
   strategiesParams: string[];
 };
@@ -32,7 +32,7 @@ export type UpdateProposalCallArgs = {
   proposalId: number;
   executionStrategy: {
     address: string;
-    params: string;
+    params: string[];
   };
 };
 
@@ -51,7 +51,7 @@ export interface Strategy {
     index: number,
     envelope: Envelope<Message>,
     clientConfig: ClientConfig
-  ): Promise<string>;
+  ): Promise<string[]>;
   getExtraProposeCalls(
     address: string,
     index: number,
@@ -90,12 +90,12 @@ export type EthereumSigClientConfig = ClientConfig & {
 // TODO: normalize with EVM
 export type AddressConfig = {
   addr: string;
-  params: string;
+  params: string[];
 };
 
 export type IndexedConfig = {
   index: number;
-  params: string;
+  params: string[];
 };
 
 export type StrategyConfig = {

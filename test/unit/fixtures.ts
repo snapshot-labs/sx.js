@@ -19,7 +19,7 @@ export const proposeEnvelope: Envelope<Propose> = {
     ],
     executionStrategy: {
       addr: '0x04ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d',
-      params: '0x00'
+      params: ['0x00']
     },
     metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
   }

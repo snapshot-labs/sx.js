@@ -23,7 +23,7 @@ describe('vanillaStrategy', () => {
       config
     );
 
-    expect(params).toEqual('0x0');
+    expect(params).toEqual(['0x0']);
   });
 
   it('should return extra propose calls', async () => {

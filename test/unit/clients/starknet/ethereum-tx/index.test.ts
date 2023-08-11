@@ -27,7 +27,7 @@ describe('EthereumTx', () => {
       strategies: [],
       executionStrategy: {
         addr: '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe',
-        params: '0x101'
+        params: ['0x101']
       },
       metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
     };
@@ -61,7 +61,7 @@ describe('EthereumTx', () => {
       proposal: 32,
       executionStrategy: {
         addr: '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe',
-        params: '0x101'
+        params: ['0x101']
       },
       metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
     };

@@ -30,7 +30,7 @@ export default function createStarkSigAuthenticator(): Authenticator {
         author: envelope.signatureData.address,
         executionStrategy: {
           address: args.executionStrategy.address,
-          params: [args.executionStrategy.params]
+          params: args.executionStrategy.params
         },
         userProposalValidationParams: args.strategiesParams,
         salt: envelope.signatureData.message.salt,
@@ -62,7 +62,7 @@ export default function createStarkSigAuthenticator(): Authenticator {
         choice: `0x${args.choice.toString(16)}`,
         userVotingStrategies: args.votingStrategies.map(strategy => ({
           index: strategy.index,
-          params: [strategy.params]
+          params: strategy.params
         })),
         accountType: shortString.encodeShortString('snake')
       });
@@ -94,7 +94,7 @@ export default function createStarkSigAuthenticator(): Authenticator {
         proposalId: uint256.bnToUint256(args.proposalId),
         executionStrategy: {
           address: args.executionStrategy.address,
-          params: [args.executionStrategy.params]
+          params: args.executionStrategy.params
         },
         salt: envelope.signatureData.message.salt,
         accountType: shortString.encodeShortString('snake')

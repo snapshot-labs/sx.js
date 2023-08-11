@@ -35,7 +35,7 @@ describe('StarkNetSig', () => {
         strategies: [],
         executionStrategy: {
           addr: '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe',
-          params: '0x101'
+          params: ['0x101']
         },
         metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
       }
@@ -52,7 +52,7 @@ describe('StarkNetSig', () => {
         authenticator: '0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a',
         executionStrategy: {
           addr: '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe',
-          params: '0x101'
+          params: ['0x101']
         },
         proposal: 1,
         metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'

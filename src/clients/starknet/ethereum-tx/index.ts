@@ -2,7 +2,7 @@ import { CallData, SequencerProvider, constants } from 'starknet';
 import { poseidonHashMany } from 'micro-starknet';
 import StarknetCommitAbi from './abis/StarknetCommit.json';
 import { getStrategiesParams } from '../../../utils/strategies';
-import { ClientConfig, ClientOpts, Envelope, Propose, UpdateProposal, Vote } from '../../../types';
+import { ClientConfig, ClientOpts, Propose, UpdateProposal, Vote } from '../../../types';
 import { defaultNetwork } from '../../..';
 import { Contract } from '@ethersproject/contracts';
 import { Signer } from '@ethersproject/abstract-signer';
@@ -240,9 +240,9 @@ export class EthereumTx {
       { address },
       {
         address: data.executionStrategy.addr,
-        params: [data.executionStrategy.params]
+        params: data.executionStrategy.params
       },
-      strategiesParams
+      strategiesParams.flat()
     ]);
 
     return `0x${poseidonHashMany(compiled.map(v => BigInt(v))).toString(16)}`;
@@ -268,7 +268,7 @@ export class EthereumTx {
       data.choice,
       data.strategies.map((strategy, index) => ({
         index: strategy.index,
-        params: [strategiesParams[index]]
+        params: strategiesParams[index]
       }))
     ]);
 
@@ -286,7 +286,7 @@ export class EthereumTx {
       data.proposal,
       {
         address: data.executionStrategy.addr,
-        params: [data.executionStrategy.params]
+        params: data.executionStrategy.params
       }
     ]);
 

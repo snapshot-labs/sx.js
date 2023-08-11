@@ -1,4 +1,4 @@
-import { Account, CallData, ValidateType, shortString, uint256 } from 'starknet';
+import { Account, CallData, ValidateType, uint256 } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
@@ -80,11 +80,11 @@ export class StarkNetTx {
           voting_delay: votingDelay,
           proposal_validation_strategy: {
             address: proposalValidationStrategy.addr,
-            params: [proposalValidationStrategy.params]
+            params: proposalValidationStrategy.params
           },
           voting_strategies: votingStrategies.map(strategy => ({
             address: strategy.addr,
-            params: [strategy.params]
+            params: strategy.params
           })),
 
           authenticators: authenticators
@@ -117,7 +117,7 @@ export class StarkNetTx {
         address: envelope.data.executionStrategy.addr,
         params: envelope.data.executionStrategy.params
       },
-      strategiesParams
+      strategiesParams: strategiesParams.flat() // TODO: currently it's flat array, will see how it ends up once we have more strategies
     });
 
     const calls = [call];

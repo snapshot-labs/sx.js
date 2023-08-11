@@ -161,14 +161,14 @@ export async function setup(account: Account): Promise<TestConfig> {
       maxVotingDuration: 86400,
       proposalValidationStrategy: {
         addr: vanillaProposalValidationStrategy,
-        params: '0x0'
+        params: ['0x0']
       },
       metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
       authenticators: [vanillaAuthenticator, ethTxAuthenticator, starkSigAuthenticator],
       votingStrategies: [
         {
           addr: vanillaVotingStrategy,
-          params: '0x0'
+          params: ['0x0']
         }
       ]
     }

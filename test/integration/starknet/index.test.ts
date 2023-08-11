@@ -62,7 +62,7 @@ describe('StarkNetTx', () => {
           strategies: [],
           executionStrategy: {
             addr: testConfig.vanillaExecutionStrategy,
-            params: '0x00'
+            params: ['0x00']
           },
           metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
         }
@@ -112,7 +112,7 @@ describe('StarkNetTx', () => {
         strategies: [],
         executionStrategy: {
           addr: testConfig.vanillaExecutionStrategy,
-          params: '0x101'
+          params: ['0x101']
         },
         metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
       };
@@ -186,7 +186,7 @@ describe('StarkNetTx', () => {
         strategies: [],
         executionStrategy: {
           addr: testConfig.vanillaExecutionStrategy,
-          params: '0x00'
+          params: ['0x00']
         },
         metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
       };
