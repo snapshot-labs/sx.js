@@ -1,4 +1,4 @@
-import { Account, CallData, ValidateType, uint256 } from 'starknet';
+import { Account, CallData, ValidateType, shortString, uint256 } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
@@ -20,8 +20,10 @@ type SpaceParams = {
   maxVotingDuration: number;
   proposalValidationStrategy: AddressConfig;
   metadataUri: string;
+  daoUri: string;
   authenticators: string[];
   votingStrategies: AddressConfig[];
+  votingStrategiesMetadata: string[];
 };
 
 type UpdateSettingsInput = {
@@ -58,9 +60,12 @@ export class StarkNetTx {
       votingDelay,
       minVotingDuration,
       maxVotingDuration,
+      metadataUri,
+      daoUri,
       proposalValidationStrategy,
       authenticators,
-      votingStrategies
+      votingStrategies,
+      votingStrategiesMetadata
     }
   }: {
     account: Account;
@@ -82,12 +87,17 @@ export class StarkNetTx {
             address: proposalValidationStrategy.addr,
             params: proposalValidationStrategy.params
           },
+          proposal_validation_strategy_metadata_URI: shortString.splitLongString(''),
           voting_strategies: votingStrategies.map(strategy => ({
             address: strategy.addr,
             params: strategy.params
           })),
-
-          authenticators: authenticators
+          voting_strategies_metadata_URIs: votingStrategiesMetadata.map(metadata =>
+            shortString.splitLongString(metadata)
+          ),
+          authenticators: authenticators,
+          metadata_URI: shortString.splitLongString(metadataUri),
+          dao_URI: shortString.splitLongString(daoUri)
         })
       })
     });
@@ -117,7 +127,8 @@ export class StarkNetTx {
         address: envelope.data.executionStrategy.addr,
         params: envelope.data.executionStrategy.params
       },
-      strategiesParams: strategiesParams.flat() // TODO: currently it's flat array, will see how it ends up once we have more strategies
+      strategiesParams: strategiesParams.flat(), // TODO: currently it's flat array, will see how it ends up once we have more strategies,
+      metadataUri: envelope.data.metadataUri
     });
 
     const calls = [call];
@@ -142,7 +153,8 @@ export class StarkNetTx {
       executionStrategy: {
         address: envelope.data.executionStrategy.addr,
         params: envelope.data.executionStrategy.params
-      }
+      },
+      metadataUri: envelope.data.metadataUri
     });
 
     const calls = [call];
@@ -176,7 +188,8 @@ export class StarkNetTx {
       votingStrategies: envelope.data.strategies.map((strategyConfig, i) => ({
         index: strategyConfig.index,
         params: strategiesParams[i]
-      }))
+      })),
+      metadataUri: ''
     });
 
     const fee = await account.estimateFee(call);

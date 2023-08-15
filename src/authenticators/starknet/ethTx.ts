@@ -1,4 +1,4 @@
-import { Call, CallData } from 'starknet';
+import { Call, CallData, shortString } from 'starknet';
 import EthTxAuthenticatorAbi from './abis/EthTxAuthenticator.json';
 import {
   Authenticator,
@@ -28,7 +28,8 @@ export default function createEthTxAuthenticator(): Authenticator {
           address: args.executionStrategy.address,
           params: args.executionStrategy.params
         },
-        args.strategiesParams
+        args.strategiesParams,
+        shortString.splitLongString(args.metadataUri)
       ]);
 
       return {
@@ -50,7 +51,8 @@ export default function createEthTxAuthenticator(): Authenticator {
         args.votingStrategies.map(strategy => ({
           index: strategy.index,
           params: strategy.params
-        }))
+        })),
+        shortString.splitLongString(args.metadataUri)
       ]);
 
       return {
@@ -74,7 +76,8 @@ export default function createEthTxAuthenticator(): Authenticator {
         {
           address: args.executionStrategy.address,
           params: args.executionStrategy.params
-        }
+        },
+        shortString.splitLongString(args.metadataUri)
       ]);
 
       return {

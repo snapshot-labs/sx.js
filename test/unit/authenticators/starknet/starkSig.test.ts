@@ -15,7 +15,8 @@ describe('starkSigAuthenticator', () => {
         address: '0x04ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d',
         params: ['0x0']
       },
-      strategiesParams: []
+      strategiesParams: [],
+      metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
     });
 
     expect(call).toEqual({
@@ -29,6 +30,9 @@ describe('starkSigAuthenticator', () => {
         '1',
         '0',
         '0',
+        '2',
+        '186294699441980128189377377192603377168975971823877440252735361969625461826',
+        '25964229224351537016195446666313628538517038335615841',
         '0',
         '495773117285'
       ],

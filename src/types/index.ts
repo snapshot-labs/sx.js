@@ -18,6 +18,7 @@ export type ProposeCallArgs = {
     params: string[];
   };
   strategiesParams: string[];
+  metadataUri: string;
 };
 
 export type VoteCallArgs = {
@@ -25,6 +26,7 @@ export type VoteCallArgs = {
   proposalId: number;
   choice: number;
   votingStrategies: IndexedConfig[];
+  metadataUri: string;
 };
 
 export type UpdateProposalCallArgs = {
@@ -34,6 +36,7 @@ export type UpdateProposalCallArgs = {
     address: string;
     params: string[];
   };
+  metadataUri: string;
 };
 
 export type Authenticator = {

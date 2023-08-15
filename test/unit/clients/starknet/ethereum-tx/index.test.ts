@@ -33,7 +33,7 @@ describe('EthereumTx', () => {
     };
 
     const result = await ethereumTx.getProposeHash(wallet, data);
-    expect(result).toEqual('0x592ee3452c4a64acb4d79edecf6178ecafca04773abd79ef3a78bde1166fc3');
+    expect(result).toEqual('0x5f2a12dad7d916ebc92fbb2222c9564a32bd61a3e738e32a6e1da38d38d80ad');
   });
 
   it('should return vote hash', async () => {
@@ -51,7 +51,7 @@ describe('EthereumTx', () => {
     };
 
     const result = await ethereumTx.getVoteHash(wallet, data);
-    expect(result).toEqual('0x3b8c154177b1caa5913c39d61922d380042b84653796ef869d8b0c202908842');
+    expect(result).toEqual('0x56b96d4c0cc4da80f41f11285486d1a1b8cd500df267d9dff9baca4aefc6da2');
   });
 
   it('should return update proposal hash', async () => {
@@ -67,6 +67,6 @@ describe('EthereumTx', () => {
     };
 
     const result = await ethereumTx.getUpdateProposalHash(wallet, data);
-    expect(result).toEqual('0x538b5e3063624c112f5e1b0708ab59ba9d500538e57ea1b7f72f6dea0d56af');
+    expect(result).toEqual('0x612204abe7ec1f8975360b848882b53578bbc03bf2bac834c9566cc828a2ab4');
   });
 });

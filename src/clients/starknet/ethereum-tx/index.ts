@@ -1,4 +1,4 @@
-import { CallData, SequencerProvider, constants } from 'starknet';
+import { CallData, SequencerProvider, constants, shortString } from 'starknet';
 import { poseidonHashMany } from 'micro-starknet';
 import StarknetCommitAbi from './abis/StarknetCommit.json';
 import { getStrategiesParams } from '../../../utils/strategies';
@@ -101,6 +101,10 @@ const ENCODE_ABI = [
       {
         name: 'user_proposal_validation_params',
         type: 'core::array::Array::<core::felt252>'
+      },
+      {
+        name: 'metadata_URI',
+        type: 'core::array::Array::<core::felt252>'
       }
     ],
     outputs: [],
@@ -133,6 +137,10 @@ const ENCODE_ABI = [
       {
         name: 'user_voting_strategies',
         type: 'core::array::Array::<sx::utils::types::IndexedStrategy>'
+      },
+      {
+        name: 'metadata_URI',
+        type: 'core::array::Array::<core::felt252>'
       }
     ],
     outputs: [],
@@ -161,6 +169,10 @@ const ENCODE_ABI = [
       {
         name: 'execution_strategy',
         type: 'sx::utils::types::Strategy'
+      },
+      {
+        name: 'metadata_URI',
+        type: 'core::array::Array::<core::felt252>'
       }
     ],
     outputs: [],
@@ -242,7 +254,8 @@ export class EthereumTx {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
       },
-      strategiesParams.flat()
+      strategiesParams.flat(),
+      shortString.splitLongString(data.metadataUri)
     ]);
 
     return `0x${poseidonHashMany(compiled.map(v => BigInt(v))).toString(16)}`;
@@ -269,7 +282,8 @@ export class EthereumTx {
       data.strategies.map((strategy, index) => ({
         index: strategy.index,
         params: strategiesParams[index]
-      }))
+      })),
+      shortString.splitLongString('') // metadataUri
     ]);
 
     return `0x${poseidonHashMany(compiled.map(v => BigInt(v))).toString(16)}`;
@@ -287,7 +301,8 @@ export class EthereumTx {
       {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
-      }
+      },
+      shortString.splitLongString(data.metadataUri)
     ]);
 
     return `0x${poseidonHashMany(compiled.map(v => BigInt(v))).toString(16)}`;

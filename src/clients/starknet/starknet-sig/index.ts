@@ -1,5 +1,5 @@
 import randomBytes from 'randombytes';
-import { Account, typedData, uint256 } from 'starknet';
+import { Account, shortString, typedData, uint256 } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { baseDomain, proposeTypes, updateProposalTypes, voteTypes } from './types';
 import {
@@ -89,6 +89,9 @@ export class StarkNetSig {
         params: data.executionStrategy.params
       },
       userProposalValidationParams: strategiesParams.flat(),
+      metadataURI: shortString
+        .splitLongString(data.metadataUri)
+        .map(str => shortString.encodeShortString(str)),
       salt: this.generateSalt()
     };
 
@@ -123,6 +126,9 @@ export class StarkNetSig {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
       },
+      metadataURI: shortString
+        .splitLongString(data.metadataUri)
+        .map(str => shortString.encodeShortString(str)),
       salt: this.generateSalt()
     };
 
@@ -159,7 +165,8 @@ export class StarkNetSig {
       userVotingStrategies: data.strategies.map((strategy, index) => ({
         index: strategy.index,
         params: strategiesParams[index]
-      }))
+      })),
+      metadataURI: shortString.splitLongString('').map(str => shortString.encodeShortString(str))
     };
 
     const signatureData = await this.sign(signer, data.authenticator, message, voteTypes, 'Vote');

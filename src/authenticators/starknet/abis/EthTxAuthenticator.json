@@ -97,6 +97,10 @@
           {
             "name": "user_proposal_validation_params",
             "type": "core::array::Array::<core::felt252>"
+          },
+          {
+            "name": "metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
           }
         ],
         "outputs": [],
@@ -125,6 +129,10 @@
           {
             "name": "user_voting_strategies",
             "type": "core::array::Array::<sx::types::indexed_strategy::IndexedStrategy>"
+          },
+          {
+            "name": "metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
           }
         ],
         "outputs": [],
@@ -149,6 +157,10 @@
           {
             "name": "execution_strategy",
             "type": "sx::types::strategy::Strategy"
+          },
+          {
+            "name": "metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
           }
         ],
         "outputs": [],

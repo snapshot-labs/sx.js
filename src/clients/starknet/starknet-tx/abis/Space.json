@@ -402,6 +402,10 @@
           {
             "name": "user_proposal_validation_params",
             "type": "core::array::Array::<core::felt252>"
+          },
+          {
+            "name": "metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
           }
         ],
         "outputs": [],
@@ -426,6 +430,10 @@
           {
             "name": "user_voting_strategies",
             "type": "core::array::Array::<sx::types::indexed_strategy::IndexedStrategy>"
+          },
+          {
+            "name": "metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
           }
         ],
         "outputs": [],
@@ -462,6 +470,10 @@
           {
             "name": "execution_strategy",
             "type": "sx::types::strategy::Strategy"
+          },
+          {
+            "name": "metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
           }
         ],
         "outputs": [],
@@ -518,12 +530,28 @@
         "type": "sx::types::strategy::Strategy"
       },
       {
+        "name": "_proposal_validation_strategy_metadata_URI",
+        "type": "core::array::Array::<core::felt252>"
+      },
+      {
         "name": "_voting_strategies",
         "type": "core::array::Array::<sx::types::strategy::Strategy>"
       },
       {
+        "name": "_voting_strategies_metadata_URIs",
+        "type": "core::array::Array::<core::array::Array::<core::felt252>>"
+      },
+      {
         "name": "_authenticators",
         "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+      },
+      {
+        "name": "_metadata_URI",
+        "type": "core::array::Array::<core::felt252>"
+      },
+      {
+        "name": "_dao_URI",
+        "type": "core::array::Array::<core::felt252>"
       }
     ]
   },

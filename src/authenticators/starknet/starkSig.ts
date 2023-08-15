@@ -33,6 +33,7 @@ export default function createStarkSigAuthenticator(): Authenticator {
           params: args.executionStrategy.params
         },
         userProposalValidationParams: args.strategiesParams,
+        metadataUri: shortString.splitLongString(args.metadataUri),
         salt: envelope.signatureData.message.salt,
         accountType: shortString.encodeShortString('snake')
       });
@@ -64,6 +65,7 @@ export default function createStarkSigAuthenticator(): Authenticator {
           index: strategy.index,
           params: strategy.params
         })),
+        metadataUri: shortString.splitLongString(args.metadataUri),
         accountType: shortString.encodeShortString('snake')
       });
 
@@ -96,6 +98,7 @@ export default function createStarkSigAuthenticator(): Authenticator {
           address: args.executionStrategy.address,
           params: args.executionStrategy.params
         },
+        metadataUri: shortString.splitLongString(args.metadataUri),
         salt: envelope.signatureData.message.salt,
         accountType: shortString.encodeShortString('snake')
       });

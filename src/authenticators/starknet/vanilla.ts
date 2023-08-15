@@ -1,4 +1,4 @@
-import { Call, CallData, hash, uint256 } from 'starknet';
+import { Call, CallData, hash, shortString, uint256 } from 'starknet';
 import {
   Authenticator,
   Envelope,
@@ -21,7 +21,8 @@ export default function createVanillaAuthenticator(): Authenticator {
         enum_index: 1, // Ethereum
         author: args.author,
         executionStrategy: args.executionStrategy,
-        strategiesParams: args.strategiesParams
+        strategiesParams: args.strategiesParams,
+        metadata_URI: shortString.splitLongString(args.metadataUri)
       });
 
       return {
@@ -39,7 +40,8 @@ export default function createVanillaAuthenticator(): Authenticator {
         voter: args.voter,
         proposal_id: uint256.bnToUint256(args.proposalId),
         choice: args.choice,
-        voting_strategies: args.votingStrategies
+        voting_strategies: args.votingStrategies,
+        metadata_URI: shortString.splitLongString(args.metadataUri)
       });
 
       return {
@@ -59,7 +61,8 @@ export default function createVanillaAuthenticator(): Authenticator {
         enum_index: 1, // Ethereum
         author: args.author,
         proposal_id: uint256.bnToUint256(args.proposalId),
-        execution_strategy: args.executionStrategy
+        execution_strategy: args.executionStrategy,
+        metadata_URI: shortString.splitLongString(args.metadataUri)
       });
 
       return {

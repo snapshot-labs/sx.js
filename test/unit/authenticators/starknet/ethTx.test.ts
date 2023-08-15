@@ -15,7 +15,8 @@ describe('ethTxAuthenticator', () => {
         address: '0x04ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d',
         params: ['0x0']
       },
-      strategiesParams: []
+      strategiesParams: [],
+      metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
     });
 
     expect(call).toEqual({
@@ -25,7 +26,10 @@ describe('ethTxAuthenticator', () => {
         '2227609168297539246424361209537869283707901920511493173122155749125022247757',
         '1',
         '0',
-        '0'
+        '0',
+        '2',
+        '186294699441980128189377377192603377168975971823877440252735361969625461826',
+        '25964229224351537016195446666313628538517038335615841'
       ],
       contractAddress: '0x064cce9272197eba6353f5bbf060e097e516b411e66e83a9cf5910a08697df14',
       entrypoint: 'authenticate_propose'

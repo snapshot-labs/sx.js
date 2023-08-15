@@ -1,4 +1,4 @@
-import { Account, CallData, hash } from 'starknet';
+import { Account, CallData, hash, shortString } from 'starknet';
 import { hexPadLeft } from '../../../src/utils/encoding';
 import { AddressType, Leaf, generateMerkleRoot } from '../../../src/utils/merkletree';
 import sxFactoryCasm from './fixtures/sx_Factory.casm.json';
@@ -70,8 +70,12 @@ export async function setup(account: Account): Promise<TestConfig> {
         address: '0x0',
         params: []
       },
+      proposal_validation_strategy_metadata_URI: shortString.splitLongString('ipfs://'),
       voting_strategies: [],
-      authenticators: []
+      voting_strategies_metadata_URIs: [],
+      authenticators: [],
+      metadata_URI: shortString.splitLongString('ipfs://'),
+      dao_URI: shortString.splitLongString('ipfs://')
     })
   });
 
@@ -196,6 +200,7 @@ export async function setup(account: Account): Promise<TestConfig> {
         params: ['0x0']
       },
       metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
+      daoUri: '',
       authenticators: [vanillaAuthenticator, ethTxAuthenticator, starkSigAuthenticator],
       votingStrategies: [
         {
@@ -206,7 +211,8 @@ export async function setup(account: Account): Promise<TestConfig> {
           addr: merkleWhitelistVotingStrategy,
           params: [merkleTreeRoot]
         }
-      ]
+      ],
+      votingStrategiesMetadata: ['', '']
     }
   });
 
