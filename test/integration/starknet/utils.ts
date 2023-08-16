@@ -7,6 +7,8 @@ import sxSpaceCasm from './fixtures/sx_Space.casm.json';
 import sxSpaceSierra from './fixtures/sx_Space.sierra.json';
 import sxVanillaAuthenticatorCasm from './fixtures/sx_VanillaAuthenticator.casm.json';
 import sxVanillaAuthenticatorSierra from './fixtures/sx_VanillaAuthenticator.sierra.json';
+import sxEthSigAuthenticatorCasm from './fixtures/sx_EthSigAuthenticator.casm.json';
+import sxEthSigAuthenticatorSierra from './fixtures/sx_EthSigAuthenticator.sierra.json';
 import sxEthTxAuthenticatorCasm from './fixtures/sx_EthTxAuthenticator.casm.json';
 import sxEthTxAuthenticatorSierra from './fixtures/sx_EthTxAuthenticator.sierra.json';
 import sxStarkSigAuthenticatorCasm from './fixtures/sx_StarkSigAuthenticator.casm.json';
@@ -31,6 +33,7 @@ export type TestConfig = {
   factory: string;
   spaceAddress: string;
   vanillaAuthenticator: string;
+  ethSigAuthenticator: string;
   ethTxAuthenticator: string;
   starkSigAuthenticator: string;
   starkTxAuthenticator: string;
@@ -91,6 +94,12 @@ export async function setup(account: Account): Promise<TestConfig> {
     account,
     sxVanillaAuthenticatorSierra,
     sxVanillaAuthenticatorCasm
+  );
+
+  const ethSigAuthenticator = await deployDependency(
+    account,
+    sxEthSigAuthenticatorSierra,
+    sxEthSigAuthenticatorCasm
   );
 
   const ethTxAuthenticator = await deployDependency(
@@ -161,13 +170,15 @@ export async function setup(account: Account): Promise<TestConfig> {
   const merkleTreeRoot = generateMerkleRoot(hashes);
 
   const networkConfig: NetworkConfig = {
-    eip712ChainId: 5,
-    starknetEip712ChainId: '0x534e5f474f45524c49',
+    eip712ChainId: '0x534e5f474f45524c49',
     spaceFactory: factoryAddress,
     masterSpace: masterSpaceClassHash as string,
     authenticators: {
       [hexPadLeft(vanillaAuthenticator)]: {
         type: 'vanilla'
+      },
+      [hexPadLeft(ethSigAuthenticator)]: {
+        type: 'ethSig'
       },
       [hexPadLeft(ethTxAuthenticator)]: {
         type: 'ethTx'
@@ -215,6 +226,7 @@ export async function setup(account: Account): Promise<TestConfig> {
       daoUri: '',
       authenticators: [
         vanillaAuthenticator,
+        ethSigAuthenticator,
         ethTxAuthenticator,
         starkSigAuthenticator,
         starkTxAuthenticator
@@ -241,6 +253,7 @@ export async function setup(account: Account): Promise<TestConfig> {
     factory: factoryAddress,
     spaceAddress,
     vanillaAuthenticator,
+    ethSigAuthenticator,
     ethTxAuthenticator,
     starkSigAuthenticator,
     starkTxAuthenticator,

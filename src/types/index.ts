@@ -138,7 +138,7 @@ export type Message = Propose | Vote | UpdateProposal;
 
 export type SignatureData = {
   address: string;
-  signature?: [bigint, bigint] | null;
+  signature?: bigint[] | null;
   message?: Record<string, any>;
 };
 
@@ -155,6 +155,7 @@ export type StarknetEIP712ProposeMessage = {
     params: string[];
   };
   userProposalValidationParams: string[];
+  metadataURI: string[];
   salt: string;
 };
 
@@ -166,6 +167,7 @@ export type StarknetEIP712UpdateProposalMessage = {
     address: string;
     params: string[];
   };
+  metadataURI: string[];
   salt: string;
 };
 
@@ -175,6 +177,24 @@ export type StarknetEIP712VoteMessage = {
   proposalId: { low: BigNumberish; high: BigNumberish };
   choice: string;
   userVotingStrategies: { index: number; params: string[] }[];
+  metadataURI: string[];
+};
+
+export type EIP712ProposeMessage = StarknetEIP712ProposeMessage & {
+  authenticator: string;
+};
+
+export type EIP712UpdateProposalMessage = Omit<
+  StarknetEIP712UpdateProposalMessage,
+  'proposalId'
+> & {
+  authenticator: string;
+  proposalId: string;
+};
+
+export type EIP712VoteMessage = Omit<StarknetEIP712VoteMessage, 'proposalId'> & {
+  authenticator: string;
+  proposalId: string;
 };
 
 export type StrategiesAddresses = { index: number; address: string }[];

@@ -1,4 +1,5 @@
 import createVanillaAuthenticator from './vanilla';
+import createEthSigAuthenticator from './ethSig';
 import createEthTxAuthenticator from './ethTx';
 import createStarkSigAuthenticator from './starkSig';
 import createStarkTxAuthenticator from './starkTx';
@@ -14,6 +15,10 @@ export function getAuthenticator(
 
   if (authenticator.type === 'vanilla') {
     return createVanillaAuthenticator();
+  }
+
+  if (authenticator.type === 'ethSig') {
+    return createEthSigAuthenticator();
   }
 
   if (authenticator.type === 'ethTx') {

@@ -1,0 +1,126 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EthereumSig should create propose envelope 1`] = `
+{
+  "data": {
+    "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+    "executionStrategy": {
+      "addr": "0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe",
+      "params": [
+        "0x101",
+      ],
+    },
+    "metadataUri": "ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca",
+    "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+    "strategies": [],
+  },
+  "signatureData": {
+    "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "message": {
+      "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+      "author": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "executionStrategy": {
+        "address": "0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe",
+        "params": [
+          "0x101",
+        ],
+      },
+      "metadataURI": [
+        "0x697066733a2f2f516d4e726d36784b75696231544874576b694e35434b7442",
+        "0x4565725143447055746d6744716961553278446d6361",
+      ],
+      "salt": "0x0",
+      "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+      "userProposalValidationParams": [],
+    },
+    "signature": [
+      16972348663766704202809765083366018752046577681326230548512408306622720674446n,
+      40829145082337313415905023814579731421567176208599041292582688560020507768876n,
+      28n,
+    ],
+  },
+}
+`;
+
+exports[`EthereumSig should create update proposal envelope 1`] = `
+{
+  "data": {
+    "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+    "executionStrategy": {
+      "addr": "0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe",
+      "params": [
+        "0x101",
+      ],
+    },
+    "metadataUri": "ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca",
+    "proposal": 1,
+    "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+  },
+  "signatureData": {
+    "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "message": {
+      "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+      "author": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "executionStrategy": {
+        "address": "0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe",
+        "params": [
+          "0x101",
+        ],
+      },
+      "metadataURI": [
+        "0x697066733a2f2f516d4e726d36784b75696231544874576b694e35434b7442",
+        "0x4565725143447055746d6744716961553278446d6361",
+      ],
+      "proposalId": "0x1",
+      "salt": "0x0",
+      "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+    },
+    "signature": [
+      38552602645839083146296140372453886071180467142446811826188472659332122628413n,
+      43540825032144482802156276165080475772077822565506175534241592396969054493273n,
+      27n,
+    ],
+  },
+}
+`;
+
+exports[`EthereumSig should create vote envelope 1`] = `
+{
+  "data": {
+    "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+    "choice": 1,
+    "proposal": 1,
+    "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+    "strategies": [
+      {
+        "address": "0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a",
+        "index": 0,
+      },
+    ],
+  },
+  "signatureData": {
+    "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "message": {
+      "authenticator": "0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a",
+      "choice": "0x1",
+      "metadataURI": [],
+      "proposalId": "0x1",
+      "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
+      "userVotingStrategies": [
+        {
+          "index": 0,
+          "params": [
+            "0x0",
+          ],
+        },
+      ],
+      "voter": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    },
+    "signature": [
+      108946990378322918397766257599582577799989866872150931099430978543823193311142n,
+      52851927046151014818555199161231656277928011828484288794158959457102021669315n,
+      28n,
+    ],
+  },
+}
+`;

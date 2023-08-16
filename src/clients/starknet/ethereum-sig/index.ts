@@ -1,7 +1,8 @@
 import randomBytes from 'randombytes';
-import { Account, shortString, typedData, uint256 } from 'starknet';
+import { Signer, TypedDataSigner, TypedDataField } from '@ethersproject/abstract-signer';
+import { shortString } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
-import { baseDomain, proposeTypes, updateProposalTypes, voteTypes } from './types';
+import { proposeTypes, updateProposalTypes, voteTypes } from './types';
 import {
   ClientConfig,
   ClientOpts,
@@ -9,14 +10,15 @@ import {
   Propose,
   UpdateProposal,
   Vote,
-  StarknetEIP712ProposeMessage,
-  StarknetEIP712UpdateProposalMessage,
-  StarknetEIP712VoteMessage,
+  EIP712ProposeMessage,
+  EIP712UpdateProposalMessage,
+  EIP712VoteMessage,
   SignatureData
 } from '../../../types';
 import { defaultNetwork } from '../../..';
+import { getRSVFromSig } from '../../../utils/encoding';
 
-export class StarkNetSig {
+export class EthereumSig {
   config: ClientConfig;
 
   constructor(opts: ClientOpts) {
@@ -31,35 +33,24 @@ export class StarkNetSig {
   }
 
   public async sign<
-    T extends
-      | StarknetEIP712ProposeMessage
-      | StarknetEIP712UpdateProposalMessage
-      | StarknetEIP712VoteMessage
+    T extends EIP712ProposeMessage | EIP712UpdateProposalMessage | EIP712VoteMessage
   >(
-    signer: Account,
-    verifyingContract: string,
+    signer: Signer & TypedDataSigner,
     message: T,
-    types: any,
-    primaryType: string
+    types: Record<string, TypedDataField[]>
   ): Promise<SignatureData> {
+    const address = await signer.getAddress();
+
     const domain = {
-      ...baseDomain,
-      chainId: this.config.networkConfig.eip712ChainId,
-      verifyingContract
+      chainId: this.config.networkConfig.eip712ChainId
     };
 
-    const data: typedData.TypedData = {
-      types,
-      primaryType,
-      domain,
-      message
-    };
-
-    const signature = (await signer.signMessage(data)) as any;
+    const signature = await signer._signTypedData(domain, types, message);
+    const { r, s, v } = getRSVFromSig(signature);
 
     return {
-      address: signer.address,
-      signature: [signature.r, signature.s],
+      address,
+      signature: [BigInt(r.toHex()), BigInt(s.toHex()), BigInt(v)],
       message
     };
   }
@@ -68,10 +59,10 @@ export class StarkNetSig {
     signer,
     data
   }: {
-    signer: Account;
+    signer: Signer & TypedDataSigner;
     data: Propose;
   }): Promise<Envelope<Propose>> {
-    const address = signer.address;
+    const address = await signer.getAddress();
 
     const strategiesParams = await getStrategiesParams(
       'propose',
@@ -82,6 +73,7 @@ export class StarkNetSig {
     );
 
     const message = {
+      authenticator: data.authenticator,
       space: data.space,
       author: address,
       executionStrategy: {
@@ -95,13 +87,7 @@ export class StarkNetSig {
       salt: this.generateSalt()
     };
 
-    const signatureData = await this.sign(
-      signer,
-      data.authenticator,
-      message,
-      proposeTypes,
-      'Propose'
-    );
+    const signatureData = await this.sign(signer, message, proposeTypes);
 
     return {
       signatureData,
@@ -113,15 +99,16 @@ export class StarkNetSig {
     signer,
     data
   }: {
-    signer: Account;
+    signer: Signer & TypedDataSigner;
     data: UpdateProposal;
   }): Promise<Envelope<UpdateProposal>> {
-    const address = signer.address;
+    const address = await signer.getAddress();
 
     const message = {
+      authenticator: data.authenticator,
       space: data.space,
       author: address,
-      proposalId: uint256.bnToUint256(data.proposal),
+      proposalId: `0x${data.proposal.toString(16)}`,
       executionStrategy: {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
@@ -132,13 +119,7 @@ export class StarkNetSig {
       salt: this.generateSalt()
     };
 
-    const signatureData = await this.sign(
-      signer,
-      data.authenticator,
-      message,
-      updateProposalTypes,
-      'UpdateProposal'
-    );
+    const signatureData = await this.sign(signer, message, updateProposalTypes);
 
     return {
       signatureData,
@@ -146,8 +127,14 @@ export class StarkNetSig {
     };
   }
 
-  public async vote({ signer, data }: { signer: Account; data: Vote }): Promise<Envelope<Vote>> {
-    const address = signer.address;
+  public async vote({
+    signer,
+    data
+  }: {
+    signer: Signer & TypedDataSigner;
+    data: Vote;
+  }): Promise<Envelope<Vote>> {
+    const address = await signer.getAddress();
 
     const strategiesParams = await getStrategiesParams(
       'vote',
@@ -158,9 +145,10 @@ export class StarkNetSig {
     );
 
     const message = {
+      authenticator: data.authenticator,
       space: data.space,
       voter: address,
-      proposalId: uint256.bnToUint256(data.proposal),
+      proposalId: `0x${data.proposal.toString(16)}`,
       choice: `0x${data.choice.toString(16)}`,
       userVotingStrategies: data.strategies.map((strategy, index) => ({
         index: strategy.index,
@@ -169,7 +157,7 @@ export class StarkNetSig {
       metadataURI: shortString.splitLongString('').map(str => shortString.encodeShortString(str))
     };
 
-    const signatureData = await this.sign(signer, data.authenticator, message, voteTypes, 'Vote');
+    const signatureData = await this.sign(signer, message, voteTypes);
 
     return {
       signatureData,

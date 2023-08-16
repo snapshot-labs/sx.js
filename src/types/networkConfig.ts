@@ -65,8 +65,7 @@ export type AvatarExecutionConfig = {
 };
 
 export type NetworkConfig = {
-  eip712ChainId: number;
-  starknetEip712ChainId: string;
+  eip712ChainId: string;
   spaceFactory: string;
   masterSpace: string;
   authenticators: {
@@ -99,8 +98,9 @@ export type NetworkConfig = {
 
 export type EvmNetworkConfig = Omit<
   NetworkConfig,
-  'starknetEip712ChainId' | 'spaceFactory' | 'executors'
+  'eip712ChainId' | 'spaceFactory' | 'executors'
 > & {
+  eip712ChainId: number;
   proxyFactory: string;
   executionStrategiesImplementations: {
     [key in ExecutorType]?: string;

@@ -1,7 +1,7 @@
 import { Account, Provider } from 'starknet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
-import { EthereumTx, StarkNetSig, StarkNetTx } from '../../../src/clients';
+import { EthereumSig, EthereumTx, StarkNetSig, StarkNetTx } from '../../../src/clients';
 import { Choice } from '../../../src/types';
 import { postMessageToL2, setup, TestConfig } from './utils';
 
@@ -23,6 +23,7 @@ describe('StarkNetTx', () => {
   const account = new Account(starkProvider, address, privateKey);
 
   let client: StarkNetTx;
+  let ethSigClient: EthereumSig;
   let ethTxClient: EthereumTx;
   let starkSigClient: StarkNetSig;
   let testConfig: TestConfig;
@@ -33,6 +34,11 @@ describe('StarkNetTx', () => {
     spaceAddress = testConfig.spaceAddress;
 
     client = new StarkNetTx({
+      starkProvider,
+      ethUrl,
+      networkConfig: testConfig.networkConfig
+    });
+    ethSigClient = new EthereumSig({
       starkProvider,
       ethUrl,
       networkConfig: testConfig.networkConfig
@@ -104,6 +110,54 @@ describe('StarkNetTx', () => {
     }, 60e3);
   });
 
+  describe('ethSig authenticator', () => {
+    it('StarkNetTx.propose()', async () => {
+      const data = {
+        space: spaceAddress,
+        authenticator: testConfig.ethSigAuthenticator,
+        strategies: [],
+        executionStrategy: {
+          addr: testConfig.vanillaExecutionStrategy,
+          params: ['0x00']
+        },
+        metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
+      };
+
+      const envelope = await ethSigClient.propose({ signer: wallet, data });
+
+      const receipt = await client.propose(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+
+    it('StarkNetTx.vote()', async () => {
+      const data = {
+        space: spaceAddress,
+        authenticator: testConfig.ethSigAuthenticator,
+        strategies: [
+          {
+            index: 0,
+            address: testConfig.vanillaVotingStrategy
+          }
+        ],
+        proposal: 2,
+        choice: Choice.For
+      };
+
+      const envelope = await ethSigClient.vote({ signer: wallet, data });
+
+      const receipt = await client.vote(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+  });
+
   describe('ethTx authenticator', () => {
     it('StarkNetTx.propose()', async () => {
       const data = {
@@ -150,7 +204,7 @@ describe('StarkNetTx', () => {
             address: testConfig.vanillaVotingStrategy
           }
         ],
-        proposal: 2,
+        proposal: 3,
         choice: Choice.For
       };
 
@@ -211,7 +265,7 @@ describe('StarkNetTx', () => {
             address: testConfig.vanillaVotingStrategy
           }
         ],
-        proposal: 3,
+        proposal: 4,
         choice: Choice.For
       };
 
@@ -266,7 +320,7 @@ describe('StarkNetTx', () => {
               address: testConfig.vanillaVotingStrategy
             }
           ],
-          proposal: 4,
+          proposal: 5,
           choice: Choice.For
         }
       };
@@ -321,7 +375,7 @@ describe('StarkNetTx', () => {
               metadata: testConfig.merkleWhitelistStrategyMetadata
             }
           ],
-          proposal: 5,
+          proposal: 6,
           choice: Choice.For
         }
       };
