@@ -11,6 +11,8 @@ import sxEthTxAuthenticatorCasm from './fixtures/sx_EthTxAuthenticator.casm.json
 import sxEthTxAuthenticatorSierra from './fixtures/sx_EthTxAuthenticator.sierra.json';
 import sxStarkSigAuthenticatorCasm from './fixtures/sx_StarkSigAuthenticator.casm.json';
 import sxStarkSigAuthenticatorSierra from './fixtures/sx_StarkSigAuthenticator.sierra.json';
+import sxStarkTxAuthenticatorCasm from './fixtures/sx_StarkTxAuthenticator.casm.json';
+import sxStarkTxAuthenticatorSierra from './fixtures/sx_StarkTxAuthenticator.sierra.json';
 import sxVanillaExecutionStrategyCasm from './fixtures/sx_VanillaExecutionStrategy.casm.json';
 import sxVanillaExecutionStrategySierra from './fixtures/sx_VanillaExecutionStrategy.sierra.json';
 import sxVanillaProposalValidationStrategyCasm from './fixtures/sx_VanillaProposalValidationStrategy.casm.json';
@@ -31,6 +33,7 @@ export type TestConfig = {
   vanillaAuthenticator: string;
   ethTxAuthenticator: string;
   starkSigAuthenticator: string;
+  starkTxAuthenticator: string;
   vanillaExecutionStrategy: string;
   vanillaProposalValidationStrategy: string;
   vanillaVotingStrategy: string;
@@ -111,6 +114,12 @@ export async function setup(account: Account): Promise<TestConfig> {
     })
   );
 
+  const starkTxAuthenticator = await deployDependency(
+    account,
+    sxStarkTxAuthenticatorSierra,
+    sxStarkTxAuthenticatorCasm
+  );
+
   const vanillaExecutionStrategy = await deployDependency(
     account,
     sxVanillaExecutionStrategySierra,
@@ -165,6 +174,9 @@ export async function setup(account: Account): Promise<TestConfig> {
       },
       [hexPadLeft(starkSigAuthenticator)]: {
         type: 'starkSig'
+      },
+      [hexPadLeft(starkTxAuthenticator)]: {
+        type: 'starkTx'
       }
     },
     strategies: {
@@ -201,7 +213,12 @@ export async function setup(account: Account): Promise<TestConfig> {
       },
       metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
       daoUri: '',
-      authenticators: [vanillaAuthenticator, ethTxAuthenticator, starkSigAuthenticator],
+      authenticators: [
+        vanillaAuthenticator,
+        ethTxAuthenticator,
+        starkSigAuthenticator,
+        starkTxAuthenticator
+      ],
       votingStrategies: [
         {
           addr: vanillaVotingStrategy,
@@ -226,6 +243,7 @@ export async function setup(account: Account): Promise<TestConfig> {
     vanillaAuthenticator,
     ethTxAuthenticator,
     starkSigAuthenticator,
+    starkTxAuthenticator,
     vanillaExecutionStrategy,
     vanillaProposalValidationStrategy,
     vanillaVotingStrategy,

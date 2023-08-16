@@ -1,6 +1,7 @@
 import createVanillaAuthenticator from './vanilla';
 import createEthTxAuthenticator from './ethTx';
 import createStarkSigAuthenticator from './starkSig';
+import createStarkTxAuthenticator from './starkTx';
 import { hexPadLeft } from '../../utils/encoding';
 import type { Authenticator, NetworkConfig } from '../../types';
 
@@ -21,6 +22,10 @@ export function getAuthenticator(
 
   if (authenticator.type === 'starkSig') {
     return createStarkSigAuthenticator();
+  }
+
+  if (authenticator.type === 'starkTx') {
+    return createStarkTxAuthenticator();
   }
 
   return null;

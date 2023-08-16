@@ -16,6 +16,10 @@ export type StarkSigAuthenticatorConfig = {
   type: 'starkSig';
 };
 
+export type StarkTxAuthenticatorConfig = {
+  type: 'starkTx';
+};
+
 export type VanillaStrategyConfig = {
   type: 'vanilla';
 };
@@ -71,6 +75,7 @@ export type NetworkConfig = {
       | EthTxAuthenticatorConfig
       | EthSigAuthenticatorConfig
       | StarkSigAuthenticatorConfig
+      | StarkTxAuthenticatorConfig
       | undefined;
   };
   strategies: {

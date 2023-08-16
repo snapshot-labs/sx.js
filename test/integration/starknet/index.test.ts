@@ -48,7 +48,7 @@ describe('StarkNetTx', () => {
       ethUrl,
       networkConfig: testConfig.networkConfig
     });
-  }, 180_000);
+  }, 300_000);
 
   describe('vanilla authenticator', () => {
     it('StarkNetTx.propose()', async () => {
@@ -226,6 +226,60 @@ describe('StarkNetTx', () => {
     }, 60e3);
   });
 
+  describe('starkTx authenticator', () => {
+    it('StarkNetTx.propose()', async () => {
+      const envelope = {
+        signatureData: {
+          address
+        },
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.starkTxAuthenticator,
+          strategies: [],
+          executionStrategy: {
+            addr: testConfig.vanillaExecutionStrategy,
+            params: ['0x00']
+          },
+          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
+        }
+      };
+
+      const receipt = await client.propose(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+
+    it('StarkNetTx.vote()', async () => {
+      const envelope = {
+        signatureData: {
+          address
+        },
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.starkTxAuthenticator,
+          strategies: [
+            {
+              index: 0,
+              address: testConfig.vanillaVotingStrategy
+            }
+          ],
+          proposal: 4,
+          choice: Choice.For
+        }
+      };
+
+      const receipt = await client.vote(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+  });
+
   describe('vanilla authenticator + merkle tree strategy', () => {
     it('StarkNetTx.propose()', async () => {
       const envelope = {
@@ -267,7 +321,7 @@ describe('StarkNetTx', () => {
               metadata: testConfig.merkleWhitelistStrategyMetadata
             }
           ],
-          proposal: 4,
+          proposal: 5,
           choice: Choice.For
         }
       };
