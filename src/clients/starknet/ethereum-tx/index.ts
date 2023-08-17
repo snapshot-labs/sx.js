@@ -1,11 +1,12 @@
 import { CallData, SequencerProvider, constants, shortString } from 'starknet';
 import { poseidonHashMany } from 'micro-starknet';
+import { Signer } from '@ethersproject/abstract-signer';
+import { Contract } from '@ethersproject/contracts';
 import StarknetCommitAbi from './abis/StarknetCommit.json';
 import { getStrategiesParams } from '../../../utils/strategies';
-import { ClientConfig, ClientOpts, Propose, UpdateProposal, Vote } from '../../../types';
+import { getChoiceEnum } from '../../../utils/starknet-enums';
 import { defaultNetwork } from '../../..';
-import { Contract } from '@ethersproject/contracts';
-import { Signer } from '@ethersproject/abstract-signer';
+import { ClientConfig, ClientOpts, Propose, UpdateProposal, Vote } from '../../../types';
 
 const ENCODE_ABI = [
   {
@@ -249,7 +250,7 @@ export class EthereumTx {
     const compiled = callData.compile('propose', [
       data.space,
       PROPOSE_SELECTOR,
-      { address },
+      address,
       {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
@@ -276,9 +277,9 @@ export class EthereumTx {
     const compiled = callData.compile('vote', [
       data.space,
       VOTE_SELECTOR,
-      { address },
+      address,
       data.proposal,
-      data.choice,
+      getChoiceEnum(data.choice),
       data.strategies.map((strategy, index) => ({
         index: strategy.index,
         params: strategiesParams[index]
@@ -296,7 +297,7 @@ export class EthereumTx {
     const compiled = callData.compile('update_proposal', [
       data.space,
       UPDATE_PROPOSAL_SELECTOR,
-      { address },
+      address,
       data.proposal,
       {
         address: data.executionStrategy.addr,

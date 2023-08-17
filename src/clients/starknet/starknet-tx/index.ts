@@ -43,6 +43,9 @@ type UpdateSettingsInput = {
 
 const NO_UPDATE_U32 = '0xf2cda9b1';
 const NO_UPDATE_ADDRESS = '0xf2cda9b13ed04e585461605c0d6e804933ca828111bd94d4e6a96c75e8b048';
+
+const callData = new CallData(SpaceAbi);
+
 export class StarkNetTx {
   config: ClientConfig;
 
@@ -78,27 +81,25 @@ export class StarkNetTx {
       calldata: CallData.compile({
         class_hash: this.config.networkConfig.masterSpace,
         contract_address_salt: 0,
-        calldata: CallData.compile({
-          owner: controller,
-          max_voting_duration: maxVotingDuration,
-          min_voting_duration: minVotingDuration,
-          voting_delay: votingDelay,
-          proposal_validation_strategy: {
+        calldata: callData.compile('constructor', [
+          controller,
+          maxVotingDuration,
+          minVotingDuration,
+          votingDelay,
+          {
             address: proposalValidationStrategy.addr,
             params: proposalValidationStrategy.params
           },
-          proposal_validation_strategy_metadata_URI: shortString.splitLongString(''),
-          voting_strategies: votingStrategies.map(strategy => ({
+          shortString.splitLongString(''),
+          votingStrategies.map(strategy => ({
             address: strategy.addr,
             params: strategy.params
           })),
-          voting_strategies_metadata_URIs: votingStrategiesMetadata.map(metadata =>
-            shortString.splitLongString(metadata)
-          ),
-          authenticators: authenticators,
-          metadata_URI: shortString.splitLongString(metadataUri),
-          dao_URI: shortString.splitLongString(daoUri)
-        })
+          votingStrategiesMetadata.map(metadata => shortString.splitLongString(metadata)),
+          authenticators,
+          shortString.splitLongString(metadataUri),
+          shortString.splitLongString(daoUri)
+        ])
       })
     });
 
@@ -235,13 +236,10 @@ export class StarkNetTx {
       }
     ];
 
-    const calldata = new CallData(SpaceAbi);
-    calldata.validate(ValidateType.INVOKE, 'update_settings', settingsData);
-
     return signer.execute({
       contractAddress: space,
       entrypoint: 'update_settings',
-      calldata: calldata.compile('update_settings', settingsData)
+      calldata: callData.compile('update_settings', settingsData)
     });
   }
 
@@ -257,9 +255,7 @@ export class StarkNetTx {
     return signer.execute({
       contractAddress: space,
       entrypoint: 'cancel_proposal',
-      calldata: CallData.compile({
-        proposal_id: uint256.bnToUint256(proposal)
-      })
+      calldata: callData.compile('cancel_proposal', [uint256.bnToUint256(proposal)])
     });
   }
 
@@ -347,9 +343,7 @@ export class StarkNetTx {
     return signer.execute({
       contractAddress: space,
       entrypoint: 'transfer_ownership',
-      calldata: CallData.compile({
-        new_owner: owner
-      })
+      calldata: callData.compile('transfer_ownership', [owner])
     });
   }
 }

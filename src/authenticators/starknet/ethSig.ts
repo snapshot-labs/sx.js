@@ -1,5 +1,6 @@
 import { Call, CallData, shortString } from 'starknet';
 import EthSigAuthenticatorAbi from './abis/EthSigAuthenticator.json';
+import { getChoiceEnum } from '../../utils/starknet-enums';
 import {
   Authenticator,
   Envelope,
@@ -34,9 +35,7 @@ export default function createEthSigAuthenticator(): Authenticator {
         s,
         v,
         space,
-        {
-          address: args.author
-        },
+        args.author,
         {
           address: args.executionStrategy.address,
           params: args.executionStrategy.params
@@ -70,11 +69,9 @@ export default function createEthSigAuthenticator(): Authenticator {
         s,
         v,
         space,
-        {
-          address: args.voter
-        },
+        args.voter,
         args.proposalId,
-        args.choice,
+        getChoiceEnum(args.choice),
         args.votingStrategies.map(strategy => ({
           index: strategy.index,
           params: strategy.params

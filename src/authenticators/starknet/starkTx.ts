@@ -1,5 +1,6 @@
 import { Call, CallData, shortString } from 'starknet';
 import StarkTxAuthenticatorAbi from './abis/StarkTxAuthenticator.json';
+import { getChoiceEnum } from '../../utils/starknet-enums';
 import {
   Authenticator,
   Envelope,
@@ -43,7 +44,7 @@ export default function createStarkTxAuthenticator(): Authenticator {
         space,
         args.voter,
         args.proposalId,
-        args.choice,
+        getChoiceEnum(args.choice),
         args.votingStrategies.map(strategy => ({
           index: strategy.index,
           params: strategy.params

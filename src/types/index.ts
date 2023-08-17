@@ -24,7 +24,7 @@ export type ProposeCallArgs = {
 export type VoteCallArgs = {
   voter: string;
   proposalId: number;
-  choice: number;
+  choice: Choice;
   votingStrategies: IndexedConfig[];
   metadataUri: string;
 };

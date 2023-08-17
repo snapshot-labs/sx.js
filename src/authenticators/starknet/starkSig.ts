@@ -1,4 +1,6 @@
 import { Call, CallData, shortString, uint256 } from 'starknet';
+import StarkSigAuthenticatorAbi from './abis/StarkSigAuthenticator.json';
+import { getChoiceEnum } from '../../utils/starknet-enums';
 import {
   Authenticator,
   Envelope,
@@ -9,6 +11,8 @@ import {
   VoteCallArgs,
   UpdateProposalCallArgs
 } from '../../types';
+
+const callData = new CallData(StarkSigAuthenticatorAbi);
 
 export default function createStarkSigAuthenticator(): Authenticator {
   return {
@@ -24,19 +28,19 @@ export default function createStarkSigAuthenticator(): Authenticator {
         throw new Error('message is required for this authenticator');
       }
 
-      const compiled = CallData.compile({
-        signature: envelope.signatureData.signature,
-        space: envelope.data.space,
-        author: envelope.signatureData.address,
-        executionStrategy: {
+      const compiled = callData.compile('authenticate_propose', [
+        envelope.signatureData.signature,
+        envelope.data.space,
+        envelope.signatureData.address,
+        {
           address: args.executionStrategy.address,
           params: args.executionStrategy.params
         },
-        userProposalValidationParams: args.strategiesParams,
-        metadataUri: shortString.splitLongString(args.metadataUri),
-        salt: envelope.signatureData.message.salt,
-        accountType: shortString.encodeShortString('snake')
-      });
+        args.strategiesParams,
+        shortString.splitLongString(args.metadataUri),
+        envelope.signatureData.message.salt,
+        shortString.encodeShortString('snake')
+      ]);
 
       return {
         contractAddress: authenticator,
@@ -55,19 +59,19 @@ export default function createStarkSigAuthenticator(): Authenticator {
         throw new Error('message is required for this authenticator');
       }
 
-      const compiled = CallData.compile({
-        signature: envelope.signatureData.signature,
-        space: envelope.data.space,
-        voter: envelope.signatureData.address,
-        proposalId: uint256.bnToUint256(args.proposalId),
-        choice: `0x${args.choice.toString(16)}`,
-        userVotingStrategies: args.votingStrategies.map(strategy => ({
+      const compiled = callData.compile('authenticate_vote', [
+        envelope.signatureData.signature,
+        envelope.data.space,
+        envelope.signatureData.address,
+        uint256.bnToUint256(args.proposalId),
+        getChoiceEnum(args.choice),
+        args.votingStrategies.map(strategy => ({
           index: strategy.index,
           params: strategy.params
         })),
-        metadataUri: shortString.splitLongString(args.metadataUri),
-        accountType: shortString.encodeShortString('snake')
-      });
+        shortString.splitLongString(args.metadataUri),
+        shortString.encodeShortString('snake')
+      ]);
 
       return {
         contractAddress: authenticator,
@@ -89,19 +93,19 @@ export default function createStarkSigAuthenticator(): Authenticator {
         throw new Error('message is required for this authenticator');
       }
 
-      const compiled = CallData.compile({
-        signature: envelope.signatureData.signature,
-        space: envelope.data.space,
-        author: envelope.signatureData.address,
-        proposalId: uint256.bnToUint256(args.proposalId),
-        executionStrategy: {
+      const compiled = callData.compile('authenticate_update_proposal', [
+        envelope.signatureData.signature,
+        envelope.data.space,
+        envelope.signatureData.address,
+        uint256.bnToUint256(args.proposalId),
+        {
           address: args.executionStrategy.address,
           params: args.executionStrategy.params
         },
-        metadataUri: shortString.splitLongString(args.metadataUri),
-        salt: envelope.signatureData.message.salt,
-        accountType: shortString.encodeShortString('snake')
-      });
+        shortString.splitLongString(args.metadataUri),
+        envelope.signatureData.message.salt,
+        shortString.encodeShortString('snake')
+      ]);
 
       return {
         contractAddress: authenticator,

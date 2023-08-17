@@ -1,5 +1,6 @@
 import { Call, CallData, shortString } from 'starknet';
 import EthTxAuthenticatorAbi from './abis/EthTxAuthenticator.json';
+import { getChoiceEnum } from '../../utils/starknet-enums';
 import {
   Authenticator,
   Envelope,
@@ -21,9 +22,7 @@ export default function createEthTxAuthenticator(): Authenticator {
 
       const compiled = callData.compile('authenticate_propose', [
         space,
-        {
-          address: args.author
-        },
+        args.author,
         {
           address: args.executionStrategy.address,
           params: args.executionStrategy.params
@@ -43,11 +42,9 @@ export default function createEthTxAuthenticator(): Authenticator {
 
       const compiled = callData.compile('authenticate_vote', [
         space,
-        {
-          address: args.voter
-        },
+        args.voter,
         args.proposalId,
-        args.choice,
+        getChoiceEnum(args.choice),
         args.votingStrategies.map(strategy => ({
           index: strategy.index,
           params: strategy.params
@@ -69,9 +66,7 @@ export default function createEthTxAuthenticator(): Authenticator {
 
       const compiled = callData.compile('authenticate_update_proposal', [
         space,
-        {
-          address: args.author
-        },
+        args.author,
         args.proposalId,
         {
           address: args.executionStrategy.address,
