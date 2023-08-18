@@ -12,7 +12,12 @@ exports[`StarkNetSig should create propose envelope 1`] = `
     },
     "metadataUri": "ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca",
     "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
-    "strategies": [],
+    "strategies": [
+      {
+        "address": "0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a",
+        "index": 0,
+      },
+    ],
   },
   "signatureData": {
     "address": "0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4",
@@ -30,11 +35,16 @@ exports[`StarkNetSig should create propose envelope 1`] = `
       ],
       "salt": "0x0",
       "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
-      "userProposalValidationParams": [],
+      "userProposalValidationParams": [
+        "1",
+        "0",
+        "1",
+        "0",
+      ],
     },
     "signature": [
-      2503545790026143415466423022382063578014382642395783814632485163245035393240n,
-      591992460556044370087723716616026044817744693419393204073707818943183662013n,
+      1076177951221211474026954723006161062874074800886851944438472122248732989180n,
+      67419382486113555916526490349756053425723828065756667873353810646961736422n,
     ],
   },
 }

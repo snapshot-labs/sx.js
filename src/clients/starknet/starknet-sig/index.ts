@@ -1,5 +1,5 @@
 import randomBytes from 'randombytes';
-import { Account, shortString, typedData, uint256 } from 'starknet';
+import { Account, CallData, shortString, typedData, uint256 } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { baseDomain, proposeTypes, updateProposalTypes, voteTypes } from './types';
 import {
@@ -88,7 +88,12 @@ export class StarkNetSig {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
       },
-      userProposalValidationParams: strategiesParams.flat(),
+      userProposalValidationParams: CallData.compile({
+        user_strategies: data.strategies.map((strategyConfig, i) => ({
+          index: strategyConfig.index,
+          params: strategiesParams[i]
+        }))
+      }),
       metadataURI: shortString
         .splitLongString(data.metadataUri)
         .map(str => shortString.encodeShortString(str)),

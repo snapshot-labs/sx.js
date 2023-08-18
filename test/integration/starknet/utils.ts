@@ -1,4 +1,4 @@
-import { Account, CallData, hash, shortString } from 'starknet';
+import { Account, CallData, hash, shortString, uint256 } from 'starknet';
 import { hexPadLeft } from '../../../src/utils/encoding';
 import { AddressType, Leaf, generateMerkleRoot } from '../../../src/utils/merkletree';
 import sxFactoryCasm from './fixtures/sx_Factory.casm.json';
@@ -19,6 +19,8 @@ import sxVanillaExecutionStrategyCasm from './fixtures/sx_VanillaExecutionStrate
 import sxVanillaExecutionStrategySierra from './fixtures/sx_VanillaExecutionStrategy.sierra.json';
 import sxVanillaProposalValidationStrategyCasm from './fixtures/sx_VanillaProposalValidationStrategy.casm.json';
 import sxVanillaProposalValidationStrategySierra from './fixtures/sx_VanillaProposalValidationStrategy.sierra.json';
+import sxProposingPowerProposalValidationStrategyCasm from './fixtures/sx_ProposingPowerProposalValidationStrategy.casm.json';
+import sxProposingPowerProposalValidationStrategySierra from './fixtures/sx_ProposingPowerProposalValidationStrategy.sierra.json';
 import sxVanillaVotingStrategyCasm from './fixtures/sx_VanillaVotingStrategy.casm.json';
 import sxVanillaVotingStrategySierra from './fixtures/sx_VanillaVotingStrategy.sierra.json';
 import sxMerkleWhitelistVotingStrategyCasm from './fixtures/sx_MerkleWhitelistVotingStrategy.casm.json';
@@ -39,6 +41,7 @@ export type TestConfig = {
   starkTxAuthenticator: string;
   vanillaExecutionStrategy: string;
   vanillaProposalValidationStrategy: string;
+  proposingPowerProposalValidationStrategy: string;
   vanillaVotingStrategy: string;
   merkleWhitelistVotingStrategy: string;
   merkleWhitelistStrategyMetadata: {
@@ -142,6 +145,12 @@ export async function setup(account: Account): Promise<TestConfig> {
     sxVanillaProposalValidationStrategyCasm
   );
 
+  const proposingPowerProposalValidationStrategy = await deployDependency(
+    account,
+    sxProposingPowerProposalValidationStrategySierra,
+    sxProposingPowerProposalValidationStrategyCasm
+  );
+
   const vanillaVotingStrategy = await deployDependency(
     account,
     sxVanillaVotingStrategySierra,
@@ -219,8 +228,20 @@ export async function setup(account: Account): Promise<TestConfig> {
       minVotingDuration: 0,
       maxVotingDuration: 86400,
       proposalValidationStrategy: {
-        addr: vanillaProposalValidationStrategy,
-        params: ['0x0']
+        addr: proposingPowerProposalValidationStrategy,
+        params: CallData.compile({
+          threshold: uint256.bnToUint256(1),
+          allowed_strategies: [
+            {
+              address: vanillaVotingStrategy,
+              params: ['0x0']
+            },
+            {
+              address: merkleWhitelistVotingStrategy,
+              params: [merkleTreeRoot]
+            }
+          ]
+        })
       },
       metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
       daoUri: '',
@@ -259,6 +280,7 @@ export async function setup(account: Account): Promise<TestConfig> {
     starkTxAuthenticator,
     vanillaExecutionStrategy,
     vanillaProposalValidationStrategy,
+    proposingPowerProposalValidationStrategy,
     vanillaVotingStrategy,
     merkleWhitelistVotingStrategy,
     merkleWhitelistStrategyMetadata,

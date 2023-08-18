@@ -255,7 +255,12 @@ export class EthereumTx {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
       },
-      strategiesParams.flat(),
+      CallData.compile({
+        user_strategies: data.strategies.map((strategyConfig, i) => ({
+          index: strategyConfig.index,
+          params: strategiesParams[i]
+        }))
+      }),
       shortString.splitLongString(data.metadataUri)
     ]);
 

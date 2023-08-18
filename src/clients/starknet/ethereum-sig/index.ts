@@ -1,6 +1,6 @@
 import randomBytes from 'randombytes';
 import { Signer, TypedDataSigner, TypedDataField } from '@ethersproject/abstract-signer';
-import { shortString } from 'starknet';
+import { CallData, shortString } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { proposeTypes, updateProposalTypes, voteTypes } from './types';
 import {
@@ -80,7 +80,12 @@ export class EthereumSig {
         address: data.executionStrategy.addr,
         params: data.executionStrategy.params
       },
-      userProposalValidationParams: strategiesParams.flat(),
+      userProposalValidationParams: CallData.compile({
+        user_strategies: data.strategies.map((strategyConfig, i) => ({
+          index: strategyConfig.index,
+          params: strategiesParams[i]
+        }))
+      }),
       metadataURI: shortString
         .splitLongString(data.metadataUri)
         .map(str => shortString.encodeShortString(str)),

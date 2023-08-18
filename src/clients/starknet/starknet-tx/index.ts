@@ -128,7 +128,12 @@ export class StarkNetTx {
         address: envelope.data.executionStrategy.addr,
         params: envelope.data.executionStrategy.params
       },
-      strategiesParams: strategiesParams.flat(), // TODO: currently it's flat array, will see how it ends up once we have more strategies,
+      strategiesParams: CallData.compile({
+        user_strategies: envelope.data.strategies.map((strategyConfig, i) => ({
+          index: strategyConfig.index,
+          params: strategiesParams[i]
+        }))
+      }),
       metadataUri: envelope.data.metadataUri
     });
 

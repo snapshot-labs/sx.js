@@ -12,7 +12,12 @@ exports[`EthereumSig should create propose envelope 1`] = `
     },
     "metadataUri": "ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca",
     "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
-    "strategies": [],
+    "strategies": [
+      {
+        "address": "0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a",
+        "index": 0,
+      },
+    ],
   },
   "signatureData": {
     "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -31,11 +36,16 @@ exports[`EthereumSig should create propose envelope 1`] = `
       ],
       "salt": "0x0",
       "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
-      "userProposalValidationParams": [],
+      "userProposalValidationParams": [
+        "1",
+        "0",
+        "1",
+        "0",
+      ],
     },
     "signature": [
-      16972348663766704202809765083366018752046577681326230548512408306622720674446n,
-      40829145082337313415905023814579731421567176208599041292582688560020507768876n,
+      50605421894701922204399580857224268706047776078643988117500883157600132712986n,
+      28190472764386165842191650118656424416229130588213713394619055643900068617830n,
       28n,
     ],
   },

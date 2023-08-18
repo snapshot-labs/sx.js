@@ -17,6 +17,7 @@ export type ProposeCallArgs = {
     address: string;
     params: string[];
   };
+  // rename to user_proposal_validation_params
   strategiesParams: string[];
   metadataUri: string;
 };

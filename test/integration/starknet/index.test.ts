@@ -65,7 +65,12 @@ describe('StarkNetTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.vanillaAuthenticator,
-          strategies: [],
+          strategies: [
+            {
+              index: 0,
+              address: testConfig.vanillaVotingStrategy
+            }
+          ],
           executionStrategy: {
             addr: testConfig.vanillaExecutionStrategy,
             params: ['0x00']
@@ -115,7 +120,12 @@ describe('StarkNetTx', () => {
       const data = {
         space: spaceAddress,
         authenticator: testConfig.ethSigAuthenticator,
-        strategies: [],
+        strategies: [
+          {
+            index: 0,
+            address: testConfig.vanillaVotingStrategy
+          }
+        ],
         executionStrategy: {
           addr: testConfig.vanillaExecutionStrategy,
           params: ['0x00']
@@ -163,7 +173,12 @@ describe('StarkNetTx', () => {
       const data = {
         space: spaceAddress,
         authenticator: testConfig.ethTxAuthenticator,
-        strategies: [],
+        strategies: [
+          {
+            index: 0,
+            address: testConfig.vanillaVotingStrategy
+          }
+        ],
         executionStrategy: {
           addr: testConfig.vanillaExecutionStrategy,
           params: ['0x101']
@@ -237,7 +252,12 @@ describe('StarkNetTx', () => {
       const data = {
         space: spaceAddress,
         authenticator: testConfig.starkSigAuthenticator,
-        strategies: [],
+        strategies: [
+          {
+            index: 0,
+            address: testConfig.vanillaVotingStrategy
+          }
+        ],
         executionStrategy: {
           addr: testConfig.vanillaExecutionStrategy,
           params: ['0x00']
@@ -289,7 +309,12 @@ describe('StarkNetTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.starkTxAuthenticator,
-          strategies: [],
+          strategies: [
+            {
+              index: 0,
+              address: testConfig.vanillaVotingStrategy
+            }
+          ],
           executionStrategy: {
             addr: testConfig.vanillaExecutionStrategy,
             params: ['0x00']
@@ -343,7 +368,13 @@ describe('StarkNetTx', () => {
         data: {
           space: spaceAddress,
           authenticator: testConfig.vanillaAuthenticator,
-          strategies: [],
+          strategies: [
+            {
+              index: 1,
+              address: testConfig.merkleWhitelistVotingStrategy,
+              metadata: testConfig.merkleWhitelistStrategyMetadata
+            }
+          ],
           executionStrategy: {
             addr: testConfig.vanillaExecutionStrategy,
             params: ['0x00']
