@@ -3,6 +3,8 @@ import { hexPadLeft } from '../../../src/utils/encoding';
 import { AddressType, Leaf, generateMerkleRoot } from '../../../src/utils/merkletree';
 import sxFactoryCasm from './fixtures/sx_Factory.casm.json';
 import sxFactorySierra from './fixtures/sx_Factory.sierra.json';
+import sxErc20VotesPresetCasm from './fixtures/sx_ERC20VotesPreset.casm.json';
+import sxErc20VotesPresetSierra from './fixtures/sx_ERC20VotesPreset.sierra.json';
 import sxSpaceCasm from './fixtures/sx_Space.casm.json';
 import sxSpaceSierra from './fixtures/sx_Space.sierra.json';
 import sxVanillaAuthenticatorCasm from './fixtures/sx_VanillaAuthenticator.casm.json';
@@ -25,6 +27,8 @@ import sxVanillaVotingStrategyCasm from './fixtures/sx_VanillaVotingStrategy.cas
 import sxVanillaVotingStrategySierra from './fixtures/sx_VanillaVotingStrategy.sierra.json';
 import sxMerkleWhitelistVotingStrategyCasm from './fixtures/sx_MerkleWhitelistVotingStrategy.casm.json';
 import sxMerkleWhitelistVotingStrategySierra from './fixtures/sx_MerkleWhitelistVotingStrategy.sierra.json';
+import sxErc20VotesVotingStrategyCasm from './fixtures/sx_ERC20VotesVotingStrategy.casm.json';
+import sxErc20VotesVotingStrategySierra from './fixtures/sx_ERC20VotesVotingStrategy.sierra.json';
 import { NetworkConfig } from '../../../src/types';
 import { StarkNetTx } from '../../../src/clients';
 
@@ -33,6 +37,7 @@ const L1_COMMIT = '0x8bf85537c80becba711447f66a9a4452e3575e29';
 export type TestConfig = {
   owner: string;
   factory: string;
+  erc20VotesToken: string;
   spaceAddress: string;
   vanillaAuthenticator: string;
   ethSigAuthenticator: string;
@@ -44,6 +49,7 @@ export type TestConfig = {
   proposingPowerProposalValidationStrategy: string;
   vanillaVotingStrategy: string;
   merkleWhitelistVotingStrategy: string;
+  erc20VotesVotingStrategy: string;
   merkleWhitelistStrategyMetadata: {
     tree: {
       type: AddressType;
@@ -67,30 +73,34 @@ async function deployDependency(account: Account, sierra: any, casm: any, args: 
 }
 
 export async function setup(account: Account): Promise<TestConfig> {
-  const masterSpaceResult = await account.declareAndDeploy({
+  const masterSpaceResult = await account.declareIfNot({
     contract: sxSpaceSierra as any,
-    casm: sxSpaceCasm as any,
-    constructorCalldata: CallData.compile({
-      owner: account.address,
-      min_voting_duration: 0,
-      max_voting_duration: 86400,
-      voting_delay: 0,
-      proposal_validation_strategy: {
-        address: '0x0',
-        params: []
-      },
-      proposal_validation_strategy_metadata_URI: shortString.splitLongString('ipfs://'),
-      voting_strategies: [],
-      voting_strategies_metadata_URIs: [],
-      authenticators: [],
-      metadata_URI: shortString.splitLongString('ipfs://'),
-      dao_URI: shortString.splitLongString('ipfs://')
-    })
+    casm: sxSpaceCasm as any
   });
 
   const factoryResult = await account.declareAndDeploy({
     contract: sxFactorySierra as any,
     casm: sxFactoryCasm as any
+  });
+
+  const erc20VotesToken = await deployDependency(
+    account,
+    sxErc20VotesPresetSierra,
+    sxErc20VotesPresetCasm,
+    CallData.compile({
+      name: 'VOTES',
+      symbol: 'VOTES',
+      supply: uint256.bnToUint256(1000n),
+      owner: account.address
+    })
+  );
+
+  await account.execute({
+    contractAddress: erc20VotesToken,
+    entrypoint: 'delegate',
+    calldata: CallData.compile({
+      delegatee: account.address
+    })
   });
 
   const vanillaAuthenticator = await deployDependency(
@@ -163,7 +173,13 @@ export async function setup(account: Account): Promise<TestConfig> {
     sxMerkleWhitelistVotingStrategyCasm
   );
 
-  const masterSpaceClassHash = masterSpaceResult.declare.class_hash;
+  const erc20VotesVotingStrategy = await deployDependency(
+    account,
+    sxErc20VotesVotingStrategySierra,
+    sxErc20VotesVotingStrategyCasm
+  );
+
+  const masterSpaceClassHash = masterSpaceResult.class_hash;
   const factoryAddress = factoryResult.deploy.contract_address;
 
   const leaf = new Leaf(AddressType.ETHEREUM, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 42n);
@@ -205,6 +221,9 @@ export async function setup(account: Account): Promise<TestConfig> {
       },
       [hexPadLeft(merkleWhitelistVotingStrategy)]: {
         type: 'whitelist'
+      },
+      [hexPadLeft(erc20VotesVotingStrategy)]: {
+        type: 'erc20Votes'
       }
     },
     executors: {
@@ -239,6 +258,10 @@ export async function setup(account: Account): Promise<TestConfig> {
             {
               address: merkleWhitelistVotingStrategy,
               params: [merkleTreeRoot]
+            },
+            {
+              address: erc20VotesVotingStrategy,
+              params: [erc20VotesToken]
             }
           ]
         })
@@ -260,9 +283,13 @@ export async function setup(account: Account): Promise<TestConfig> {
         {
           addr: merkleWhitelistVotingStrategy,
           params: [merkleTreeRoot]
+        },
+        {
+          addr: erc20VotesVotingStrategy,
+          params: [erc20VotesToken]
         }
       ],
-      votingStrategiesMetadata: ['', '']
+      votingStrategiesMetadata: ['', '', '']
     }
   });
 
@@ -272,6 +299,7 @@ export async function setup(account: Account): Promise<TestConfig> {
   return {
     owner: account.address,
     factory: factoryAddress,
+    erc20VotesToken,
     spaceAddress,
     vanillaAuthenticator,
     ethSigAuthenticator,
@@ -283,6 +311,7 @@ export async function setup(account: Account): Promise<TestConfig> {
     proposingPowerProposalValidationStrategy,
     vanillaVotingStrategy,
     merkleWhitelistVotingStrategy,
+    erc20VotesVotingStrategy,
     merkleWhitelistStrategyMetadata,
     networkConfig
   };

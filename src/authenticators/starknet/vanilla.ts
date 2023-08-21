@@ -20,8 +20,9 @@ export default function createVanillaAuthenticator(): Authenticator {
     createProposeCall(envelope: Envelope<Propose>, args: ProposeCallArgs): Call {
       const { space, authenticator } = envelope.data;
 
+      const addressType = args.author.length === 42 ? 'ETHEREUM' : 'STARKNET';
       const calldata = callData.compile('propose', [
-        getUserAddressEnum('ETHEREUM', args.author),
+        getUserAddressEnum(addressType, args.author),
         args.executionStrategy,
         args.strategiesParams,
         shortString.splitLongString(args.metadataUri)
@@ -36,8 +37,9 @@ export default function createVanillaAuthenticator(): Authenticator {
     createVoteCall(envelope: Envelope<Vote>, args: VoteCallArgs): Call {
       const { space, authenticator } = envelope.data;
 
+      const addressType = args.voter.length === 42 ? 'ETHEREUM' : 'STARKNET';
       const calldata = callData.compile('vote', [
-        getUserAddressEnum('ETHEREUM', args.voter),
+        getUserAddressEnum(addressType, args.voter),
         uint256.bnToUint256(args.proposalId),
         getChoiceEnum(args.choice),
         args.votingStrategies,
@@ -56,8 +58,9 @@ export default function createVanillaAuthenticator(): Authenticator {
     ): Call {
       const { space, authenticator } = envelope.data;
 
+      const addressType = args.author.length === 42 ? 'ETHEREUM' : 'STARKNET';
       const calldata = callData.compile('update_proposal', [
-        getUserAddressEnum('ETHEREUM', args.author),
+        getUserAddressEnum(addressType, args.author),
         uint256.bnToUint256(args.proposalId),
         args.executionStrategy,
         shortString.splitLongString(args.metadataUri)

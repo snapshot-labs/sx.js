@@ -47,6 +47,24 @@
     ]
   },
   {
+    "type": "enum",
+    "name": "sx::types::finalization_status::FinalizationStatus",
+    "variants": [
+      {
+        "name": "Pending",
+        "type": "()"
+      },
+      {
+        "name": "Executed",
+        "type": "()"
+      },
+      {
+        "name": "Cancelled",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "struct",
     "name": "core::starknet::eth_address::EthAddress",
     "members": [
@@ -75,38 +93,24 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "sx::types::finalization_status::FinalizationStatus",
-    "variants": [
-      {
-        "name": "Pending",
-        "type": "()"
-      },
-      {
-        "name": "Executed",
-        "type": "()"
-      },
-      {
-        "name": "Cancelled",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "struct",
     "name": "sx::types::proposal::Proposal",
     "members": [
       {
-        "name": "start_block_number",
+        "name": "start_timestamp",
         "type": "core::integer::u32"
       },
       {
-        "name": "min_end_block_number",
+        "name": "min_end_timestamp",
         "type": "core::integer::u32"
       },
       {
-        "name": "max_end_block_number",
+        "name": "max_end_timestamp",
         "type": "core::integer::u32"
+      },
+      {
+        "name": "finalization_status",
+        "type": "sx::types::finalization_status::FinalizationStatus"
       },
       {
         "name": "execution_payload_hash",
@@ -119,10 +123,6 @@
       {
         "name": "author",
         "type": "sx::types::user_address::UserAddress"
-      },
-      {
-        "name": "finalization_status",
-        "type": "sx::types::finalization_status::FinalizationStatus"
       },
       {
         "name": "active_voting_strategies",
@@ -389,6 +389,58 @@
       },
       {
         "type": "function",
+        "name": "initialize",
+        "inputs": [
+          {
+            "name": "owner",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "min_voting_duration",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "max_voting_duration",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "voting_delay",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "proposal_validation_strategy",
+            "type": "sx::types::strategy::Strategy"
+          },
+          {
+            "name": "proposal_validation_strategy_metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
+          },
+          {
+            "name": "voting_strategies",
+            "type": "core::array::Array::<sx::types::strategy::Strategy>"
+          },
+          {
+            "name": "voting_strategy_metadata_URIs",
+            "type": "core::array::Array::<core::array::Array::<core::felt252>>"
+          },
+          {
+            "name": "authenticators",
+            "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+          },
+          {
+            "name": "metadata_URI",
+            "type": "core::array::Array::<core::felt252>"
+          },
+          {
+            "name": "dao_URI",
+            "type": "core::array::Array::<core::felt252>"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
         "name": "propose",
         "inputs": [
           {
@@ -498,60 +550,14 @@
           {
             "name": "class_hash",
             "type": "core::starknet::class_hash::ClassHash"
+          },
+          {
+            "name": "initialize_calldata",
+            "type": "core::array::Array::<core::felt252>"
           }
         ],
         "outputs": [],
         "state_mutability": "external"
-      }
-    ]
-  },
-  {
-    "type": "constructor",
-    "name": "constructor",
-    "inputs": [
-      {
-        "name": "_owner",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "name": "_max_voting_duration",
-        "type": "core::integer::u32"
-      },
-      {
-        "name": "_min_voting_duration",
-        "type": "core::integer::u32"
-      },
-      {
-        "name": "_voting_delay",
-        "type": "core::integer::u32"
-      },
-      {
-        "name": "_proposal_validation_strategy",
-        "type": "sx::types::strategy::Strategy"
-      },
-      {
-        "name": "_proposal_validation_strategy_metadata_URI",
-        "type": "core::array::Array::<core::felt252>"
-      },
-      {
-        "name": "_voting_strategies",
-        "type": "core::array::Array::<sx::types::strategy::Strategy>"
-      },
-      {
-        "name": "_voting_strategies_metadata_URIs",
-        "type": "core::array::Array::<core::array::Array::<core::felt252>>"
-      },
-      {
-        "name": "_authenticators",
-        "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
-      },
-      {
-        "name": "_metadata_URI",
-        "type": "core::array::Array::<core::felt252>"
-      },
-      {
-        "name": "_dao_URI",
-        "type": "core::array::Array::<core::felt252>"
       }
     ]
   },

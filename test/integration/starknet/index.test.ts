@@ -420,6 +420,67 @@ describe('StarkNetTx', () => {
     }, 60e3);
   });
 
+  describe.only('vanilla authenticator + erc20Votes strategy', () => {
+    it('StarkNetTx.propose()', async () => {
+      const envelope = {
+        signatureData: {
+          address
+        },
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [
+            {
+              // TODO: migrate to erc20VotesVotingStrategy once contracts are fixed
+              // currently it doesn't work because of timestamp lookup is at exact block timestamp
+              index: 0,
+              address: testConfig.vanillaVotingStrategy
+            }
+          ],
+          executionStrategy: {
+            addr: testConfig.vanillaExecutionStrategy,
+            params: ['0x00']
+          },
+          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
+        }
+      };
+
+      const receipt = await client.propose(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+
+    it('StarkNetTx.vote()', async () => {
+      const envelope = {
+        signatureData: {
+          address
+        },
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [
+            {
+              index: 2,
+              address: testConfig.erc20VotesVotingStrategy
+            }
+          ],
+          proposal: 1,
+          choice: Choice.For
+        }
+      };
+
+      const receipt = await client.vote(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+  });
+
   it('should cancel proposal', async () => {
     const res = await client.cancelProposal({
       signer: account,

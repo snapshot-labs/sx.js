@@ -32,6 +32,10 @@ export type OzVotesStrategyConfig = {
   type: 'ozVotes';
 };
 
+export type Erc20VotesStrategyConfig = {
+  type: 'erc20Votes';
+};
+
 export type WhitelistStrategyConfig = {
   type: 'whitelist';
 };
@@ -82,6 +86,7 @@ export type NetworkConfig = {
       | VanillaStrategyConfig
       | CompStrategyConfig
       | OzVotesStrategyConfig
+      | Erc20VotesStrategyConfig
       | WhitelistStrategyConfig
       | SingleSlotProofStrategyConfig
       | undefined;

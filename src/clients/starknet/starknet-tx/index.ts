@@ -1,4 +1,4 @@
-import { Account, CallData, ValidateType, shortString, uint256 } from 'starknet';
+import { Account, CallData, shortString, uint256 } from 'starknet';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
@@ -81,10 +81,10 @@ export class StarkNetTx {
       calldata: CallData.compile({
         class_hash: this.config.networkConfig.masterSpace,
         contract_address_salt: 0,
-        calldata: callData.compile('constructor', [
+        calldata: callData.compile('initialize', [
           controller,
-          maxVotingDuration,
           minVotingDuration,
+          maxVotingDuration,
           votingDelay,
           {
             address: proposalValidationStrategy.addr,
