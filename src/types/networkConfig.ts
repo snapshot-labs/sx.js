@@ -1,4 +1,8 @@
-export type ExecutorType = 'SimpleQuorumVanilla' | 'SimpleQuorumAvatar' | 'SimpleQuorumTimelock';
+export type ExecutorType =
+  | 'SimpleQuorumVanilla'
+  | 'SimpleQuorumAvatar'
+  | 'SimpleQuorumTimelock'
+  | 'EthRelayer';
 
 export type VanillaAuthenticatorConfig = {
   type: 'vanilla';
@@ -48,26 +52,6 @@ export type SingleSlotProofStrategyConfig = {
   };
 };
 
-export type StarknetExecutionConfig = {
-  type: 'starknet';
-};
-
-export type VanillaExecutionConfig = {
-  type: 'vanilla';
-};
-
-export type EthRelayerExecutionConfig = {
-  type: 'ethRelayer';
-  params: {
-    destination: string;
-    chainId: number;
-  };
-};
-
-export type AvatarExecutionConfig = {
-  type: 'avatar';
-};
-
 export type NetworkConfig = {
   eip712ChainId: string;
   spaceFactory: string;
@@ -89,14 +73,6 @@ export type NetworkConfig = {
       | Erc20VotesStrategyConfig
       | WhitelistStrategyConfig
       | SingleSlotProofStrategyConfig
-      | undefined;
-  };
-  executors: {
-    [key: string]:
-      | StarknetExecutionConfig
-      | VanillaExecutionConfig
-      | EthRelayerExecutionConfig
-      | AvatarExecutionConfig
       | undefined;
   };
 };

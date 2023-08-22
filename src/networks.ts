@@ -95,11 +95,6 @@ export const goerli1: NetworkConfig = {
     '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a': {
       type: 'vanilla'
     }
-  },
-  executors: {
-    '0x040de235a2b53e921d37c2ea2b160750ca2e94f01d709f78f870963559de8fbe': {
-      type: 'vanilla'
-    }
   }
 };
 
@@ -126,21 +121,6 @@ export const goerli2: NetworkConfig = {
           '0x69606dd1655fdbbf8189e88566c54890be8f7e4a3650398ac17f6586a4a336d',
         fossilFactRegistryAddress:
           '0x2e39818908f0da118fde6b88b52e4dbdf13d2e171e488507f40deb6811bde3f'
-      }
-    }
-  },
-  executors: {
-    '1': {
-      type: 'starknet'
-    },
-    '0x4ecc83848a519cc22b0d0ffb70e65ec8dde85d3d13439eff7145d4063cf6b4d': {
-      type: 'vanilla'
-    },
-    '0x21dda40770f4317582251cffd5a0202d6b223dc167e5c8db25dc887d11eba81': {
-      type: 'ethRelayer',
-      params: {
-        destination: '0x196F0548E3140D2C7f6532a206dd54FbC12232a4',
-        chainId: 5
       }
     }
   }

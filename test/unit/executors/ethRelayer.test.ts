@@ -2,8 +2,7 @@ import createEthRelayerExecutor from '../../../src/executors/ethRelayer';
 
 describe('ethRelayerExecutor', () => {
   const ethRelayerExecutor = createEthRelayerExecutor({
-    destination: '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca',
-    chainId: 5
+    destination: '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca'
   });
 
   const address = '0x21dda40770f4317582251cffd5a0202d6b223dc167e5c8db25dc887d11eba81';
@@ -25,8 +24,8 @@ describe('ethRelayerExecutor', () => {
       executor: address,
       executionParams: [
         '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca',
-        '0xa54ae382d03ab474d9d2ddd47d3fac68',
-        '0xb21b273bd32558c5eba5bb6576ac8592'
+        '0x8869f726747656add8e2f72a37d82d3d',
+        '0xd4f0e8e4a53816cd4aa7f172075505b2'
       ]
     });
   });

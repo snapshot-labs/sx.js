@@ -2,6 +2,7 @@ import { Account, Provider } from 'starknet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
 import { EthereumSig, EthereumTx, StarkNetSig, StarkNetTx } from '../../../src/clients';
+import { getExecutionData } from '../../../src/executors';
 import { Choice } from '../../../src/types';
 import { postMessageToL2, setup, TestConfig } from './utils';
 
@@ -420,7 +421,7 @@ describe('StarkNetTx', () => {
     }, 60e3);
   });
 
-  describe.only('vanilla authenticator + erc20Votes strategy', () => {
+  describe('vanilla authenticator + erc20Votes strategy', () => {
     it('StarkNetTx.propose()', async () => {
       const envelope = {
         signatureData: {
@@ -467,12 +468,92 @@ describe('StarkNetTx', () => {
               address: testConfig.erc20VotesVotingStrategy
             }
           ],
-          proposal: 1,
+          proposal: 7,
           choice: Choice.For
         }
       };
 
       const receipt = await client.vote(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+  });
+
+  describe('ethRelayer execution', () => {
+    const transactions = [
+      {
+        to: '0x1ABC7154748D1CE5144478CDEB574AE244B939B5',
+        value: 1,
+        data: '0x',
+        operation: 0,
+        salt: 1n
+      }
+    ];
+
+    it('should propose with ethRelayer', async () => {
+      const { executionParams } = getExecutionData(
+        'EthRelayer',
+        testConfig.ethRelayerExecutionStrategy,
+        { transactions, destination: '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca' }
+      );
+
+      const envelope = {
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
+          executionStrategy: {
+            addr: testConfig.ethRelayerExecutionStrategy,
+            params: executionParams
+          },
+          metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca'
+        }
+      };
+
+      const receipt = await client.propose(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+
+    it('should vote via authenticator', async () => {
+      const envelope = {
+        data: {
+          space: spaceAddress,
+          authenticator: testConfig.vanillaAuthenticator,
+          strategies: [{ index: 0, address: testConfig.vanillaVotingStrategy }],
+          proposal: 8,
+          choice: 1,
+          metadataUri: ''
+        }
+      };
+
+      const receipt = await client.vote(account, envelope);
+      console.log('Receipt', receipt);
+
+      await starkProvider.waitForTransaction(receipt.transaction_hash);
+
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60e3);
+
+    it('should execute', async () => {
+      const { executionParams } = getExecutionData(
+        'EthRelayer',
+        testConfig.ethRelayerExecutionStrategy,
+        { transactions, destination: '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca' }
+      );
+
+      const receipt = await client.execute({
+        signer: account,
+        space: spaceAddress,
+        proposalId: 8,
+        executionPayload: executionParams
+      });
       console.log('Receipt', receipt);
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);

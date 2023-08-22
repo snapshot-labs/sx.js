@@ -203,4 +203,6 @@ export type StrategiesAddresses = { index: number; address: string }[];
 export type ExecutionInput = {
   calls?: Call[];
   transactions?: MetaTransaction[];
+  // ethRelayer
+  destination?: string;
 };

@@ -204,6 +204,24 @@ export class StarkNetTx {
     });
   }
 
+  execute({
+    signer,
+    space,
+    proposalId,
+    executionPayload
+  }: {
+    signer: Account;
+    space: string;
+    proposalId: number;
+    executionPayload: string[];
+  }) {
+    return signer.execute({
+      contractAddress: space,
+      entrypoint: 'execute',
+      calldata: callData.compile('execute', [uint256.bnToUint256(proposalId), executionPayload])
+    });
+  }
+
   async updateSettings({
     signer,
     space,

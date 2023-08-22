@@ -1,4 +1,4 @@
-import { Account, CallData, hash, shortString, uint256 } from 'starknet';
+import { Account, CallData, hash, uint256 } from 'starknet';
 import { hexPadLeft } from '../../../src/utils/encoding';
 import { AddressType, Leaf, generateMerkleRoot } from '../../../src/utils/merkletree';
 import sxFactoryCasm from './fixtures/sx_Factory.casm.json';
@@ -19,6 +19,8 @@ import sxStarkTxAuthenticatorCasm from './fixtures/sx_StarkTxAuthenticator.casm.
 import sxStarkTxAuthenticatorSierra from './fixtures/sx_StarkTxAuthenticator.sierra.json';
 import sxVanillaExecutionStrategyCasm from './fixtures/sx_VanillaExecutionStrategy.casm.json';
 import sxVanillaExecutionStrategySierra from './fixtures/sx_VanillaExecutionStrategy.sierra.json';
+import sxEthRelayerExecutionStrategyCasm from './fixtures/sx_EthRelayerExecutionStrategy.casm.json';
+import sxEthRelayerExecutionStrategySierra from './fixtures/sx_EthRelayerExecutionStrategy.sierra.json';
 import sxVanillaProposalValidationStrategyCasm from './fixtures/sx_VanillaProposalValidationStrategy.casm.json';
 import sxVanillaProposalValidationStrategySierra from './fixtures/sx_VanillaProposalValidationStrategy.sierra.json';
 import sxProposingPowerProposalValidationStrategyCasm from './fixtures/sx_ProposingPowerProposalValidationStrategy.casm.json';
@@ -45,6 +47,7 @@ export type TestConfig = {
   starkSigAuthenticator: string;
   starkTxAuthenticator: string;
   vanillaExecutionStrategy: string;
+  ethRelayerExecutionStrategy: string;
   vanillaProposalValidationStrategy: string;
   proposingPowerProposalValidationStrategy: string;
   vanillaVotingStrategy: string;
@@ -149,6 +152,12 @@ export async function setup(account: Account): Promise<TestConfig> {
     [1, 0]
   );
 
+  const ethRelayerExecutionStrategy = await deployDependency(
+    account,
+    sxEthRelayerExecutionStrategySierra,
+    sxEthRelayerExecutionStrategyCasm
+  );
+
   const vanillaProposalValidationStrategy = await deployDependency(
     account,
     sxVanillaProposalValidationStrategySierra,
@@ -224,11 +233,6 @@ export async function setup(account: Account): Promise<TestConfig> {
       },
       [hexPadLeft(erc20VotesVotingStrategy)]: {
         type: 'erc20Votes'
-      }
-    },
-    executors: {
-      [hexPadLeft(vanillaExecutionStrategy)]: {
-        type: 'vanilla'
       }
     }
   };
@@ -307,6 +311,7 @@ export async function setup(account: Account): Promise<TestConfig> {
     starkSigAuthenticator,
     starkTxAuthenticator,
     vanillaExecutionStrategy,
+    ethRelayerExecutionStrategy,
     vanillaProposalValidationStrategy,
     proposingPowerProposalValidationStrategy,
     vanillaVotingStrategy,
