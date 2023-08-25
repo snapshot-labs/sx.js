@@ -562,9 +562,469 @@
     ]
   },
   {
+    "type": "struct",
+    "name": "core::array::Span::<core::felt252>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::felt252>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<sx::types::strategy::Strategy>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<sx::types::strategy::Strategy>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<core::array::Array::<core::felt252>>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::array::Array::<core::felt252>>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<core::starknet::contract_address::ContractAddress>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::starknet::contract_address::ContractAddress>"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::SpaceCreated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "space",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "min_voting_duration",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "max_voting_duration",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "voting_delay",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "proposal_validation_strategy",
+        "type": "sx::types::strategy::Strategy",
+        "kind": "data"
+      },
+      {
+        "name": "proposal_validation_strategy_metadata_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      },
+      {
+        "name": "voting_strategies",
+        "type": "core::array::Span::<sx::types::strategy::Strategy>",
+        "kind": "data"
+      },
+      {
+        "name": "voting_strategy_metadata_URIs",
+        "type": "core::array::Span::<core::array::Array::<core::felt252>>",
+        "kind": "data"
+      },
+      {
+        "name": "authenticators",
+        "type": "core::array::Span::<core::starknet::contract_address::ContractAddress>",
+        "kind": "data"
+      },
+      {
+        "name": "metadata_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      },
+      {
+        "name": "dao_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::ProposalCreated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "proposal_id",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "author",
+        "type": "sx::types::user_address::UserAddress",
+        "kind": "data"
+      },
+      {
+        "name": "proposal",
+        "type": "sx::types::proposal::Proposal",
+        "kind": "data"
+      },
+      {
+        "name": "payload",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      },
+      {
+        "name": "metadata_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::VoteCast",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "proposal_id",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "voter",
+        "type": "sx::types::user_address::UserAddress",
+        "kind": "data"
+      },
+      {
+        "name": "choice",
+        "type": "sx::types::choice::Choice",
+        "kind": "data"
+      },
+      {
+        "name": "voting_power",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "metadata_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::ProposalExecuted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "proposal_id",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::ProposalUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "proposal_id",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "execution_strategy",
+        "type": "sx::types::strategy::Strategy",
+        "kind": "data"
+      },
+      {
+        "name": "metadata_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::ProposalCancelled",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "proposal_id",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::VotingStrategiesAdded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "voting_strategies",
+        "type": "core::array::Span::<sx::types::strategy::Strategy>",
+        "kind": "data"
+      },
+      {
+        "name": "voting_strategy_metadata_URIs",
+        "type": "core::array::Span::<core::array::Array::<core::felt252>>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<core::integer::u8>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::integer::u8>"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::VotingStrategiesRemoved",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "voting_strategy_indices",
+        "type": "core::array::Span::<core::integer::u8>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::AuthenticatorsAdded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "authenticators",
+        "type": "core::array::Span::<core::starknet::contract_address::ContractAddress>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::AuthenticatorsRemoved",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "authenticators",
+        "type": "core::array::Span::<core::starknet::contract_address::ContractAddress>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::MetadataUriUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "metadata_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::DaoUriUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "dao_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::MaxVotingDurationUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "max_voting_duration",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::MinVotingDurationUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "min_voting_duration",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::ProposalValidationStrategyUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "proposal_validation_strategy",
+        "type": "sx::types::strategy::Strategy",
+        "kind": "data"
+      },
+      {
+        "name": "proposal_validation_strategy_metadata_URI",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::VotingDelayUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "voting_delay",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "sx::space::space::Space::Upgraded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      },
+      {
+        "name": "initialize_calldata",
+        "type": "core::array::Span::<core::felt252>",
+        "kind": "data"
+      }
+    ]
+  },
+  {
     "type": "event",
     "name": "sx::space::space::Space::Event",
     "kind": "enum",
-    "variants": []
+    "variants": [
+      {
+        "name": "SpaceCreated",
+        "type": "sx::space::space::Space::SpaceCreated",
+        "kind": "nested"
+      },
+      {
+        "name": "ProposalCreated",
+        "type": "sx::space::space::Space::ProposalCreated",
+        "kind": "nested"
+      },
+      {
+        "name": "VoteCast",
+        "type": "sx::space::space::Space::VoteCast",
+        "kind": "nested"
+      },
+      {
+        "name": "ProposalExecuted",
+        "type": "sx::space::space::Space::ProposalExecuted",
+        "kind": "nested"
+      },
+      {
+        "name": "ProposalUpdated",
+        "type": "sx::space::space::Space::ProposalUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "ProposalCancelled",
+        "type": "sx::space::space::Space::ProposalCancelled",
+        "kind": "nested"
+      },
+      {
+        "name": "VotingStrategiesAdded",
+        "type": "sx::space::space::Space::VotingStrategiesAdded",
+        "kind": "nested"
+      },
+      {
+        "name": "VotingStrategiesRemoved",
+        "type": "sx::space::space::Space::VotingStrategiesRemoved",
+        "kind": "nested"
+      },
+      {
+        "name": "AuthenticatorsAdded",
+        "type": "sx::space::space::Space::AuthenticatorsAdded",
+        "kind": "nested"
+      },
+      {
+        "name": "AuthenticatorsRemoved",
+        "type": "sx::space::space::Space::AuthenticatorsRemoved",
+        "kind": "nested"
+      },
+      {
+        "name": "MetadataUriUpdated",
+        "type": "sx::space::space::Space::MetadataUriUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "DaoUriUpdated",
+        "type": "sx::space::space::Space::DaoUriUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "MaxVotingDurationUpdated",
+        "type": "sx::space::space::Space::MaxVotingDurationUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "MinVotingDurationUpdated",
+        "type": "sx::space::space::Space::MinVotingDurationUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "ProposalValidationStrategyUpdated",
+        "type": "sx::space::space::Space::ProposalValidationStrategyUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "VotingDelayUpdated",
+        "type": "sx::space::space::Space::VotingDelayUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "Upgraded",
+        "type": "sx::space::space::Space::Upgraded",
+        "kind": "nested"
+      }
+    ]
   }
 ]
