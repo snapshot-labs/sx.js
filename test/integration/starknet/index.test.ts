@@ -432,10 +432,8 @@ describe('StarkNetTx', () => {
           authenticator: testConfig.vanillaAuthenticator,
           strategies: [
             {
-              // TODO: migrate to erc20VotesVotingStrategy once contracts are fixed
-              // currently it doesn't work because of timestamp lookup is at exact block timestamp
-              index: 0,
-              address: testConfig.vanillaVotingStrategy
+              index: 2,
+              address: testConfig.erc20VotesVotingStrategy
             }
           ],
           executionStrategy: {
