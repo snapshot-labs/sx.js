@@ -270,7 +270,7 @@ export async function setup(account: Account): Promise<TestConfig> {
           ]
         })
       },
-      metadataUri: 'ipfs://QmNrm6xKuib1THtWkiN5CKtBEerQCDpUtmgDqiaU2xDmca',
+      metadataUri: 'ipfs://QmQnbnRF7vsFXYi4ivED2RSmZNC7wi4QKWhFMzSsGjEWp7',
       daoUri: '',
       authenticators: [
         vanillaAuthenticator,
