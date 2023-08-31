@@ -1,4 +1,5 @@
-import { Account, CallData, hash, uint256 } from 'starknet';
+import { Account, CallData, uint256 } from 'starknet';
+import { starknet } from 'hardhat';
 import { hexPadLeft } from '../../../src/utils/encoding';
 import { AddressType, Leaf, generateMerkleRoot } from '../../../src/utils/merkletree';
 import sxFactoryCasm from './fixtures/sx_Factory.casm.json';
@@ -324,38 +325,9 @@ export async function setup(account: Account): Promise<TestConfig> {
 
 export async function postMessageToL2(
   l2Address: string,
-  selector: string,
+  functionName: string,
   payload: string[],
   fee: number
 ) {
-  const res = await fetch('http://127.0.0.1:5050/postman/send_message_to_l2', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      l1_contract_address: L1_COMMIT,
-      l2_contract_address: l2Address,
-      entry_point_selector: hash.getSelectorFromName(selector),
-      payload,
-      paid_fee_on_l1: `0x${fee.toString(16)}`,
-      nonce: '0x0'
-    })
-  });
-
-  return res.json();
-}
-
-export async function increaseTime(timeInSeconds: number) {
-  const res = await fetch('http://127.0.0.1:5050/increase_time', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      time: timeInSeconds
-    })
-  });
-
-  return res.json();
+  return starknet.devnet.sendMessageToL2(l2Address, functionName, L1_COMMIT, payload, 0, fee);
 }
