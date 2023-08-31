@@ -345,3 +345,17 @@ export async function postMessageToL2(
 
   return res.json();
 }
+
+export async function increaseTime(timeInSeconds: number) {
+  const res = await fetch('http://127.0.0.1:5050/increase_time', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      time: timeInSeconds
+    })
+  });
+
+  return res.json();
+}

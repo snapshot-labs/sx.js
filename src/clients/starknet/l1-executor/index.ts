@@ -8,6 +8,7 @@ type DeployParams = {
   starknetCore: string;
   executionRelayer: string;
   starknetSpaces: string[];
+  quorum: bigint;
 };
 
 type ExecuteParams = {
@@ -34,7 +35,7 @@ type ExecuteParams = {
 export class L1Executor {
   async deploy({
     signer,
-    params: { owner, target, starknetCore, executionRelayer, starknetSpaces }
+    params: { owner, target, starknetCore, executionRelayer, starknetSpaces, quorum }
   }: {
     signer: Signer;
     params: DeployParams;
@@ -50,7 +51,8 @@ export class L1Executor {
       target,
       starknetCore,
       executionRelayer,
-      starknetSpaces
+      starknetSpaces,
+      quorum
     );
 
     return {

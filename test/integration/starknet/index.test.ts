@@ -4,7 +4,7 @@ import { Wallet } from '@ethersproject/wallet';
 import { EthereumSig, EthereumTx, StarkNetSig, StarkNetTx } from '../../../src/clients';
 import { getExecutionData } from '../../../src/executors';
 import { Choice } from '../../../src/types';
-import { postMessageToL2, setup, TestConfig } from './utils';
+import { increaseTime, postMessageToL2, setup, TestConfig } from './utils';
 
 describe('StarkNetTx', () => {
   const ethUrl = 'https://rpc.brovider.xyz/5';
@@ -540,6 +540,8 @@ describe('StarkNetTx', () => {
     }, 60e3);
 
     it('should execute', async () => {
+      await increaseTime(86400);
+
       const { executionParams } = getExecutionData(
         'EthRelayer',
         testConfig.ethRelayerExecutionStrategy,
