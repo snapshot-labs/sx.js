@@ -1,6 +1,10 @@
-import { Contract, utils, BigNumber, BigNumberish, Signer, PopulatedTransaction } from 'ethers';
-import { TypedDataSigner } from '@ethersproject/abstract-signer';
+import { Contract } from '@ethersproject/contracts';
+import { arrayify } from '@ethersproject/bytes';
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
+import { Signer, TypedDataSigner } from '@ethersproject/abstract-signer';
+import { pack } from '@ethersproject/solidity';
 import { AddressZero } from '@ethersproject/constants';
+import { _TypedDataEncoder } from '@ethersproject/hash';
 
 export const EIP712_TYPES = {
   Transaction: [
@@ -77,8 +81,8 @@ export interface SafeSignature {
 }
 
 const encodeMetaTransaction = (tx: MetaTransaction): string => {
-  const data = utils.arrayify(tx.data);
-  const encoded = utils.solidityPack(
+  const data = arrayify(tx.data);
+  const encoded = pack(
     ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
     [tx.operation, tx.to, tx.value, data.length, data]
   );
@@ -99,7 +103,7 @@ export const buildMultiSendSafeTx = (
 };
 
 export const calculateSafeDomainSeparator = (safe: Contract, chainId: BigNumberish): string => {
-  return utils._TypedDataEncoder.hashDomain({ verifyingContract: safe.address, chainId });
+  return _TypedDataEncoder.hashDomain({ verifyingContract: safe.address, chainId });
 };
 
 export const preimageSafeTransactionHash = (
@@ -107,7 +111,7 @@ export const preimageSafeTransactionHash = (
   safeTx: SafeTransaction,
   chainId: BigNumberish
 ): string => {
-  return utils._TypedDataEncoder.encode(
+  return _TypedDataEncoder.encode(
     { verifyingContract: safe.address, chainId },
     EIP712_SAFE_TX_TYPE,
     safeTx
@@ -119,7 +123,7 @@ export const calculateSafeTransactionHash = (
   safeTx: SafeTransaction,
   chainId: BigNumberish
 ): string => {
-  return utils._TypedDataEncoder.hash(
+  return _TypedDataEncoder.hash(
     { verifyingContract: safe.address, chainId },
     EIP712_SAFE_TX_TYPE,
     safeTx
@@ -131,7 +135,7 @@ export const calculateSafeMessageHash = (
   message: string,
   chainId: BigNumberish
 ): string => {
-  return utils._TypedDataEncoder.hash(
+  return _TypedDataEncoder.hash(
     { verifyingContract: safe.address, chainId },
     EIP712_SAFE_MESSAGE_TYPE,
     {
@@ -149,7 +153,7 @@ export const safeApproveHash = async (
   if (!skipOnChainApproval) {
     if (!signer.provider) throw Error('Provider required for on-chain approval');
     const chainId = (await signer.provider.getNetwork()).chainId;
-    const typedDataHash = utils.arrayify(calculateSafeTransactionHash(safe, safeTx, chainId));
+    const typedDataHash = arrayify(calculateSafeTransactionHash(safe, safeTx, chainId));
     const signerSafe = safe.connect(signer);
     await signerSafe.approveHash(typedDataHash);
   }
@@ -186,7 +190,7 @@ export const safeSignTypedData = async (
 };
 
 export const signHash = async (signer: Signer, hash: string): Promise<SafeSignature> => {
-  const typedDataHash = utils.arrayify(hash);
+  const typedDataHash = arrayify(hash);
   const signerAddress = await signer.getAddress();
   return {
     signer: signerAddress,
@@ -254,7 +258,7 @@ export const populateExecuteTx = async (
   safeTx: SafeTransaction,
   signatures: SafeSignature[],
   overrides?: any
-): Promise<PopulatedTransaction> => {
+) => {
   const signatureBytes = buildSignatureBytes(signatures);
   return safe.populateTransaction.execTransaction(
     safeTx.to,

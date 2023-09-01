@@ -1,5 +1,3 @@
-/// <reference types="@types/mocha" />
-import { expect } from 'chai';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
 import { EthereumTx } from '../../../src/clients/evm/ethereum-tx';
@@ -24,7 +22,7 @@ describe('EthereumTx', () => {
   let ethSigClient: EthereumSig;
   let testConfig: TestConfig;
   let spaceAddress = '';
-  before(async () => {
+  beforeAll(async () => {
     testConfig = await setup(provider, signer);
     spaceAddress = testConfig.spaceAddress;
 
@@ -48,7 +46,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -67,7 +65,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
@@ -87,7 +85,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -106,7 +104,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
@@ -127,7 +125,7 @@ describe('EthereumTx', () => {
         signer: manaSigner,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -147,7 +145,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
@@ -169,7 +167,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -188,7 +186,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
@@ -210,7 +208,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -229,7 +227,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
@@ -252,7 +250,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -274,7 +272,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
@@ -313,7 +311,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -332,7 +330,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should execute', async () => {
@@ -348,7 +346,7 @@ describe('EthereumTx', () => {
         proposal: 7,
         executionParams: executionParams[0]
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
@@ -387,7 +385,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should vote via authenticator', async () => {
@@ -406,7 +404,7 @@ describe('EthereumTx', () => {
         signer,
         envelope
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should execute', async () => {
@@ -422,7 +420,7 @@ describe('EthereumTx', () => {
         proposal: 8,
         executionParams: executionParams[0]
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
 
     it('should execute queued proposal', async () => {
@@ -437,74 +435,71 @@ describe('EthereumTx', () => {
         executionStrategy: executor,
         executionParams: executionParams[0]
       });
-      expect(res.hash).not.to.be.undefined;
+      expect(res.hash).toBeDefined();
     });
   });
 
-  describe('helpers', () => {
-    it('should cancel', async () => {
-      const res = await ethTxClient.cancel({
-        signer,
-        space: spaceAddress,
-        proposal: PROPOSAL_ID
-      });
+  it('should cancel', async () => {
+    const res = await ethTxClient.cancel({
+      signer,
+      space: spaceAddress,
+      proposal: PROPOSAL_ID
+    });
+    expect(res.hash).toBeDefined();
+  });
 
-      expect(res.hash).not.to.be.undefined;
+  it('should get proposal status', async () => {
+    const res = await ethTxClient.getProposalStatus({
+      signer,
+      space: spaceAddress,
+      proposal: PROPOSAL_ID
     });
 
-    it('should get proposal status', async () => {
-      const res = await ethTxClient.getProposalStatus({
-        signer,
-        space: spaceAddress,
-        proposal: PROPOSAL_ID
-      });
+    expect(res).toBe(6);
+  });
 
-      expect(res).to.equal(6);
+  it('should set max voting duration', async () => {
+    const res = await ethTxClient.setMaxVotingDuration({
+      signer,
+      space: spaceAddress,
+      maxVotingDuration: 80000
     });
+    expect(res.hash).toBeDefined();
+  });
 
-    it('should set max voting duration', async () => {
-      const res = await ethTxClient.setMaxVotingDuration({
-        signer,
-        space: spaceAddress,
-        maxVotingDuration: 80000
-      });
-      expect(res.hash).not.to.be.undefined;
+  it('should set min voting duration', async () => {
+    const res = await ethTxClient.setMinVotingDuration({
+      signer,
+      space: spaceAddress,
+      minVotingDuration: 5000
     });
+    expect(res.hash).toBeDefined();
+  });
 
-    it('should set min voting duration', async () => {
-      const res = await ethTxClient.setMinVotingDuration({
-        signer,
-        space: spaceAddress,
-        minVotingDuration: 5000
-      });
-      expect(res.hash).not.to.be.undefined;
+  it('should set metadata uri', async () => {
+    const res = await ethTxClient.setMetadataUri({
+      signer,
+      space: spaceAddress,
+      metadataUri: 'https://snapshot.org'
     });
+    expect(res.hash).toBeDefined();
+  });
 
-    it('should set metadata uri', async () => {
-      const res = await ethTxClient.setMetadataUri({
-        signer,
-        space: spaceAddress,
-        metadataUri: 'https://snapshot.org'
-      });
-      expect(res.hash).not.to.be.undefined;
+  it('should set voting delay', async () => {
+    const res = await ethTxClient.setVotingDelay({
+      signer,
+      space: spaceAddress,
+      votingDelay: 10
     });
+    expect(res.hash).toBeDefined();
+  });
 
-    it('should set voting delay', async () => {
-      const res = await ethTxClient.setVotingDelay({
-        signer,
-        space: spaceAddress,
-        votingDelay: 10
-      });
-      expect(res.hash).not.to.be.undefined;
+  it('should transfer ownership', async () => {
+    const res = await ethTxClient.transferOwnership({
+      signer,
+      space: spaceAddress,
+      owner: '0x000000000000000000000000000000000000dead'
     });
-
-    it('should transfer ownership', async () => {
-      const res = await ethTxClient.transferOwnership({
-        signer,
-        space: spaceAddress,
-        owner: '0x000000000000000000000000000000000000dead'
-      });
-      expect(res.hash).not.to.be.undefined;
-    });
+    expect(res.hash).toBeDefined();
   });
 });

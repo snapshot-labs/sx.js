@@ -1,5 +1,3 @@
-/// <reference types="@types/mocha" />
-import { expect } from 'chai';
 import { Account, Provider, uint256 } from 'starknet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
@@ -16,9 +14,7 @@ import {
   TestConfig
 } from './utils';
 
-describe('sx-starknet', function () {
-  this.timeout(60_000);
-
+describe('sx-starknet', () => {
   const ethUrl = 'http://127.0.0.1:8545';
   const address = '0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4';
   const privateKey = '0xcd613e30d8f16adf91b7584a2265b1f5';
@@ -42,9 +38,7 @@ describe('sx-starknet', function () {
   let testConfig: TestConfig;
   let spaceAddress = '';
 
-  before(async function () {
-    this.timeout(300_000);
-
+  beforeAll(async () => {
     setTime(Math.floor(Date.now() / 1000));
 
     testConfig = await setup({
@@ -74,7 +68,7 @@ describe('sx-starknet', function () {
       ethUrl,
       networkConfig: testConfig.networkConfig
     });
-  });
+  }, 300_000);
 
   describe('vanilla authenticator', () => {
     it('StarkNetTx.propose()', async () => {
@@ -104,8 +98,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('StarkNetTx.vote()', async () => {
       const envelope = {
@@ -131,8 +125,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
   });
 
   describe('ethSig authenticator', () => {
@@ -160,8 +154,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('StarkNetTx.vote()', async () => {
       const data = {
@@ -184,8 +178,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
   });
 
   describe('ethTx authenticator', () => {
@@ -226,8 +220,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('StarkNetTx.vote()', async () => {
       const data = {
@@ -263,8 +257,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
   });
 
   describe('starkSig authenticator', () => {
@@ -292,8 +286,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('StarkNetTx.vote()', async () => {
       const data = {
@@ -316,8 +310,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
   });
 
   describe('starkTx authenticator', () => {
@@ -348,8 +342,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('StarkNetTx.vote()', async () => {
       const envelope = {
@@ -375,8 +369,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
   });
 
   describe('vanilla authenticator + merkle tree strategy', () => {
@@ -408,8 +402,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('StarkNetTx.vote()', async () => {
       const envelope = {
@@ -436,8 +430,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
   });
 
   describe('vanilla authenticator + erc20Votes strategy', () => {
@@ -468,8 +462,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('StarkNetTx.vote()', async () => {
       const envelope = {
@@ -495,8 +489,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
   });
 
   describe('ethRelayer execution', () => {
@@ -535,8 +529,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('should vote via authenticator', async () => {
       const envelope = {
@@ -555,8 +549,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('should execute', async () => {
       await increaseTime(86400);
@@ -578,8 +572,8 @@ describe('sx-starknet', function () {
 
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
-      expect(receipt.transaction_hash).not.to.be.undefined;
-    });
+      expect(receipt.transaction_hash).toBeDefined();
+    }, 60_000);
 
     it('should execute on l1', async () => {
       const flushL2Response = await flush();
@@ -633,69 +627,67 @@ describe('sx-starknet', function () {
         transactions
       });
 
-      expect(res.hash).not.to.be.undefined;
-    });
+      expect(res.hash).toBeDefined();
+    }, 60_000);
   });
 
-  describe('helpers', () => {
-    it('should cancel proposal', async () => {
-      const res = await client.cancelProposal({
-        signer: account,
-        space: spaceAddress,
-        proposal: 3
-      });
-
-      expect(res.transaction_hash).not.to.be.undefined;
+  it('should cancel proposal', async () => {
+    const res = await client.cancelProposal({
+      signer: account,
+      space: spaceAddress,
+      proposal: 3
     });
 
-    it('should set min voting duration', async () => {
-      const res = await client.setMinVotingDuration({
-        signer: account,
-        space: spaceAddress,
-        minVotingDuration: 1
-      });
+    expect(res.transaction_hash).toBeDefined();
+  }, 60_000);
 
-      expect(res.transaction_hash).not.to.be.undefined;
+  it('should set min voting duration', async () => {
+    const res = await client.setMinVotingDuration({
+      signer: account,
+      space: spaceAddress,
+      minVotingDuration: 1
     });
 
-    it('should set max voting duration', async () => {
-      const res = await client.setMaxVotingDuration({
-        signer: account,
-        space: spaceAddress,
-        maxVotingDuration: 1
-      });
+    expect(res.transaction_hash).toBeDefined();
+  }, 60_000);
 
-      expect(res.transaction_hash).not.to.be.undefined;
+  it('should set max voting duration', async () => {
+    const res = await client.setMaxVotingDuration({
+      signer: account,
+      space: spaceAddress,
+      maxVotingDuration: 1
     });
 
-    it('should set voting delay', async () => {
-      const res = await client.setVotingDelay({
-        signer: account,
-        space: spaceAddress,
-        votingDelay: 1
-      });
+    expect(res.transaction_hash).toBeDefined();
+  }, 60_000);
 
-      expect(res.transaction_hash).not.to.be.undefined;
+  it('should set voting delay', async () => {
+    const res = await client.setVotingDelay({
+      signer: account,
+      space: spaceAddress,
+      votingDelay: 1
     });
 
-    it('should set metadataUri', async () => {
-      const res = await client.setMetadataUri({
-        signer: account,
-        space: spaceAddress,
-        metadataUri: ''
-      });
+    expect(res.transaction_hash).toBeDefined();
+  }, 60_000);
 
-      expect(res.transaction_hash).not.to.be.undefined;
+  it('should set metadataUri', async () => {
+    const res = await client.setMetadataUri({
+      signer: account,
+      space: spaceAddress,
+      metadataUri: ''
     });
 
-    it('should transfer ownership', async () => {
-      const res = await client.transferOwnership({
-        signer: account,
-        space: spaceAddress,
-        owner: '0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4'
-      });
+    expect(res.transaction_hash).toBeDefined();
+  }, 60_000);
 
-      expect(res.transaction_hash).not.to.be.undefined;
+  it('should transfer ownership', async () => {
+    const res = await client.transferOwnership({
+      signer: account,
+      space: spaceAddress,
+      owner: '0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4'
     });
-  });
+
+    expect(res.transaction_hash).toBeDefined();
+  }, 60_000);
 });

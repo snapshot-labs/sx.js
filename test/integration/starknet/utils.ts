@@ -1,9 +1,11 @@
 import { Account, CallData, hash, uint256 } from 'starknet';
 import { Signer } from '@ethersproject/abstract-signer';
-import { Interface } from '@ethersproject/abi';
+import { Interface, defaultAbiCoder } from '@ethersproject/abi';
 import { Contract, ContractFactory, ContractInterface } from '@ethersproject/contracts';
+import { keccak256 } from '@ethersproject/keccak256';
+import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
+import { getCreate2Address } from '@ethersproject/address';
 import { Wallet } from '@ethersproject/wallet';
-import { ethers } from 'hardhat';
 import { StarkNetTx } from '../../../src/clients';
 import { executeContractCallWithSigners } from './safeUtils';
 import { hexPadLeft } from '../../../src/utils/encoding';
@@ -398,12 +400,12 @@ export async function setupL1ExecutionStrategy(
   await safeContract.setup(
     [signerAddress],
     1,
-    ethers.constants.AddressZero,
+    '0x0000000000000000000000000000000000000000',
     '0x',
-    ethers.constants.AddressZero,
-    ethers.constants.AddressZero,
+    '0x0000000000000000000000000000000000000000',
+    '0x0000000000000000000000000000000000000000',
     0,
-    ethers.constants.AddressZero
+    '0x0000000000000000000000000000000000000000'
   );
 
   const moduleFactory = await deployL1Dependency(signer, ModuleProxyFactoryContract);
@@ -418,7 +420,7 @@ export async function setupL1ExecutionStrategy(
     0
   );
 
-  const encodedInitParams = ethers.utils.defaultAbiCoder.encode(
+  const encodedInitParams = defaultAbiCoder.encode(
     ['address', 'address', 'address', 'uint256', 'uint256[]', 'uint256'],
     [template, template, starknetCore, ethRelayerAddress, [spaceAddress], quorum]
   );
@@ -435,17 +437,13 @@ export async function setupL1ExecutionStrategy(
   //This is the bytecode of the module proxy contract
   const byteCode = `0x602d8060093d393df3363d3d373d3d3d363d73${masterCopyAddress}5af43d82803e903d91602b57fd5bf3`;
 
-  const salt = ethers.utils.solidityKeccak256(
+  const salt = solidityKeccak256(
     ['bytes32', 'uint256'],
-    [ethers.utils.solidityKeccak256(['bytes'], [initData]), '0x01']
+    [solidityKeccak256(['bytes'], [initData]), '0x01']
   );
 
   // TODO: can it be deployed without proxy?
-  const expectedAddress = ethers.utils.getCreate2Address(
-    moduleFactory,
-    salt,
-    ethers.utils.keccak256(byteCode)
-  );
+  const expectedAddress = getCreate2Address(moduleFactory, salt, keccak256(byteCode));
 
   const moduleFactoryContract = new Contract(moduleFactory, ModuleProxyFactoryContract.abi, signer);
   await moduleFactoryContract.deployModule(masterL1AvatarExecutionStrategy, initData, '0x01');
@@ -470,77 +468,53 @@ export async function setupL1ExecutionStrategy(
   };
 }
 
-export async function postMessageToL2(
+export async function postDevnet(path: string, body: Record<string, any>) {
+  const res = await fetch(`http://127.0.0.1:5050/${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  return res.json();
+}
+
+export function postMessageToL2(
   l2Address: string,
   selector: string,
   payload: string[],
   fee: number
 ) {
-  const res = await fetch('http://127.0.0.1:5050/postman/send_message_to_l2', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      l1_contract_address: L1_COMMIT,
-      l2_contract_address: l2Address,
-      entry_point_selector: hash.getSelectorFromName(selector),
-      payload,
-      paid_fee_on_l1: `0x${fee.toString(16)}`,
-      nonce: '0x0'
-    })
+  return postDevnet('postman/send_message_to_l2', {
+    l1_contract_address: L1_COMMIT,
+    l2_contract_address: l2Address,
+    entry_point_selector: hash.getSelectorFromName(selector),
+    payload,
+    paid_fee_on_l1: `0x${fee.toString(16)}`,
+    nonce: '0x0'
   });
-
-  return res.json();
 }
 
-export async function setTime(time: number) {
-  const res = await fetch('http://127.0.0.1:5050/set_time', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      time
-    })
+export function setTime(time: number) {
+  return postDevnet('set_time', {
+    time
   });
-
-  return res.json();
 }
 
-export async function increaseTime(timeIncrease: number) {
-  const res = await fetch('http://127.0.0.1:5050/increase_time', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      time: timeIncrease
-    })
+export function increaseTime(timeIncrease: number) {
+  return postDevnet('increase_time', {
+    time: timeIncrease
   });
-
-  return res.json();
 }
 
-export async function loadL1MessagingContract(networkUrl: string, address: string) {
-  const res = await fetch('http://127.0.0.1:5050/postman/load_l1_messaging_contract', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      networkUrl,
-      address
-    })
+export function loadL1MessagingContract(networkUrl: string, address: string) {
+  return postDevnet('postman/load_l1_messaging_contract', {
+    networkUrl,
+    address
   });
-
-  return res.json();
 }
 
-export async function flush() {
-  const res = await fetch('http://127.0.0.1:5050/postman/flush', {
-    method: 'POST'
-  });
-
-  return res.json();
+export function flush() {
+  return postDevnet('postman/flush', {});
 }
