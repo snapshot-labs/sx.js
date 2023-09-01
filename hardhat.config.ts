@@ -8,13 +8,12 @@ const config: HardhatUserConfig = {
       url: 'http://localhost:8545',
       chainId: 31337
     },
-    integratedDevnet: {
-      url: 'http://127.0.0.1:5050',
-      args: ['--seed', '1']
+    starknetLocal: {
+      url: 'http://localhost:5050'
     }
   },
   starknet: {
-    network: 'integratedDevnet'
+    network: 'starknetLocal'
   }
 };
 

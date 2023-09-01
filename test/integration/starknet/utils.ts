@@ -1,5 +1,11 @@
-import { Account, CallData, uint256 } from 'starknet';
-import { starknet } from 'hardhat';
+import { Account, CallData, hash, uint256 } from 'starknet';
+import { Signer } from '@ethersproject/abstract-signer';
+import { Interface } from '@ethersproject/abi';
+import { Contract, ContractFactory, ContractInterface } from '@ethersproject/contracts';
+import { Wallet } from '@ethersproject/wallet';
+import { ethers } from 'hardhat';
+import { StarkNetTx } from '../../../src/clients';
+import { executeContractCallWithSigners } from './safeUtils';
 import { hexPadLeft } from '../../../src/utils/encoding';
 import { AddressType, Leaf, generateMerkleRoot } from '../../../src/utils/merkletree';
 import sxFactoryCasm from './fixtures/sx_Factory.casm.json';
@@ -32,12 +38,17 @@ import sxMerkleWhitelistVotingStrategyCasm from './fixtures/sx_MerkleWhitelistVo
 import sxMerkleWhitelistVotingStrategySierra from './fixtures/sx_MerkleWhitelistVotingStrategy.sierra.json';
 import sxErc20VotesVotingStrategyCasm from './fixtures/sx_ERC20VotesVotingStrategy.casm.json';
 import sxErc20VotesVotingStrategySierra from './fixtures/sx_ERC20VotesVotingStrategy.sierra.json';
+import GnosisSafeL2Contract from './fixtures/l1/GnosisSafeL2.json';
+import GnosisSafeProxyFactoryContract from './fixtures/l1/GnosisSafeProxyFactory.json';
+import ModuleProxyFactoryContract from './fixtures/l1/ModuleProxyFactory.json';
+import L1AvatarExecutionStrategyMockMessagingContract from './fixtures/l1/L1AvatarExecutionStrategyMockMessaging.json';
+import MockStarknetMessaging from './fixtures/l1/MockStarknetMessaging.json';
 import { NetworkConfig } from '../../../src/types';
-import { StarkNetTx } from '../../../src/clients';
 
 const L1_COMMIT = '0x8bf85537c80becba711447f66a9a4452e3575e29';
 
 export type TestConfig = {
+  starknetCore: string;
   owner: string;
   factory: string;
   erc20VotesToken: string;
@@ -61,6 +72,8 @@ export type TestConfig = {
       votingPower: bigint;
     }[];
   };
+  l1AvatarExecutionStrategyContract: Contract;
+  safeContract: Contract;
   networkConfig: NetworkConfig;
 };
 
@@ -76,51 +89,72 @@ async function deployDependency(account: Account, sierra: any, casm: any, args: 
   return contract_address;
 }
 
-export async function setup(account: Account): Promise<TestConfig> {
-  const masterSpaceResult = await account.declareIfNot({
+async function deployL1Dependency(
+  signer: Signer,
+  contractDetails: {
+    abi: ContractInterface;
+    bytecode: string;
+  },
+  ...args: any[]
+) {
+  const factory = new ContractFactory(contractDetails.abi, contractDetails.bytecode, signer);
+
+  const contract = await factory.deploy(...args);
+
+  return contract.address;
+}
+
+export async function setup({
+  starknetAccount,
+  ethereumWallet
+}: {
+  starknetAccount: Account;
+  ethereumWallet: Wallet;
+}): Promise<TestConfig> {
+  const masterSpaceResult = await starknetAccount.declareIfNot({
     contract: sxSpaceSierra as any,
     casm: sxSpaceCasm as any
   });
 
-  const factoryResult = await account.declareAndDeploy({
+  const factoryResult = await starknetAccount.declareAndDeploy({
     contract: sxFactorySierra as any,
     casm: sxFactoryCasm as any
   });
 
   const erc20VotesToken = await deployDependency(
-    account,
+    starknetAccount,
     sxErc20VotesPresetSierra,
     sxErc20VotesPresetCasm,
     CallData.compile({
       name: 'VOTES',
       symbol: 'VOTES',
       supply: uint256.bnToUint256(1000n),
-      owner: account.address
+      owner: starknetAccount.address
     })
   );
 
-  await account.execute({
+  await starknetAccount.execute({
     contractAddress: erc20VotesToken,
     entrypoint: 'delegate',
     calldata: CallData.compile({
-      delegatee: account.address
+      delegatee: starknetAccount.address
     })
   });
 
   const vanillaAuthenticator = await deployDependency(
-    account,
+    starknetAccount,
     sxVanillaAuthenticatorSierra,
     sxVanillaAuthenticatorCasm
   );
 
   const ethSigAuthenticator = await deployDependency(
-    account,
+    starknetAccount,
     sxEthSigAuthenticatorSierra,
     sxEthSigAuthenticatorCasm
   );
 
   const ethTxAuthenticator = await deployDependency(
-    account,
+    starknetAccount,
     sxEthTxAuthenticatorSierra,
     sxEthTxAuthenticatorCasm,
     CallData.compile({
@@ -131,7 +165,7 @@ export async function setup(account: Account): Promise<TestConfig> {
   );
 
   const starkSigAuthenticator = await deployDependency(
-    account,
+    starknetAccount,
     sxStarkSigAuthenticatorSierra,
     sxStarkSigAuthenticatorCasm,
     CallData.compile({
@@ -141,50 +175,50 @@ export async function setup(account: Account): Promise<TestConfig> {
   );
 
   const starkTxAuthenticator = await deployDependency(
-    account,
+    starknetAccount,
     sxStarkTxAuthenticatorSierra,
     sxStarkTxAuthenticatorCasm
   );
 
   const vanillaExecutionStrategy = await deployDependency(
-    account,
+    starknetAccount,
     sxVanillaExecutionStrategySierra,
     sxVanillaExecutionStrategyCasm,
     [1, 0]
   );
 
   const ethRelayerExecutionStrategy = await deployDependency(
-    account,
+    starknetAccount,
     sxEthRelayerExecutionStrategySierra,
     sxEthRelayerExecutionStrategyCasm
   );
 
   const vanillaProposalValidationStrategy = await deployDependency(
-    account,
+    starknetAccount,
     sxVanillaProposalValidationStrategySierra,
     sxVanillaProposalValidationStrategyCasm
   );
 
   const proposingPowerProposalValidationStrategy = await deployDependency(
-    account,
+    starknetAccount,
     sxProposingPowerProposalValidationStrategySierra,
     sxProposingPowerProposalValidationStrategyCasm
   );
 
   const vanillaVotingStrategy = await deployDependency(
-    account,
+    starknetAccount,
     sxVanillaVotingStrategySierra,
     sxVanillaVotingStrategyCasm
   );
 
   const merkleWhitelistVotingStrategy = await deployDependency(
-    account,
+    starknetAccount,
     sxMerkleWhitelistVotingStrategySierra,
     sxMerkleWhitelistVotingStrategyCasm
   );
 
   const erc20VotesVotingStrategy = await deployDependency(
-    account,
+    starknetAccount,
     sxErc20VotesVotingStrategySierra,
     sxErc20VotesVotingStrategyCasm
   );
@@ -239,15 +273,15 @@ export async function setup(account: Account): Promise<TestConfig> {
   };
 
   const client = new StarkNetTx({
-    starkProvider: account,
+    starkProvider: starknetAccount,
     ethUrl: 'https://rpc.brovider.xyz/5',
     networkConfig
   });
 
   const txId = await client.deploySpace({
-    account,
+    account: starknetAccount,
     params: {
-      controller: account.address,
+      controller: starknetAccount.address,
       votingDelay: 0,
       minVotingDuration: 0,
       maxVotingDuration: 86400,
@@ -298,11 +332,19 @@ export async function setup(account: Account): Promise<TestConfig> {
     }
   });
 
-  const receipt = await account.getTransactionReceipt(txId);
+  const receipt = await starknetAccount.getTransactionReceipt(txId);
   const spaceAddress = (receipt as any).events[0].from_address; // hacky right now, find better way to read it, returned value is not what we expect
 
+  const { l1AvatarExecutionStrategyContract, safeContract, starknetCore } =
+    await setupL1ExecutionStrategy(ethereumWallet, {
+      spaceAddress,
+      ethRelayerAddress: ethRelayerExecutionStrategy,
+      quorum: 1n
+    });
+
   return {
-    owner: account.address,
+    starknetCore,
+    owner: starknetAccount.address,
     factory: factoryAddress,
     erc20VotesToken,
     spaceAddress,
@@ -319,15 +361,186 @@ export async function setup(account: Account): Promise<TestConfig> {
     merkleWhitelistVotingStrategy,
     erc20VotesVotingStrategy,
     merkleWhitelistStrategyMetadata,
+    l1AvatarExecutionStrategyContract,
+    safeContract,
     networkConfig
+  };
+}
+
+export async function setupL1ExecutionStrategy(
+  signer: Wallet,
+  {
+    spaceAddress,
+    ethRelayerAddress,
+    quorum
+  }: {
+    spaceAddress: string;
+    ethRelayerAddress: string;
+    quorum: bigint;
+  }
+) {
+  const signerAddress = await signer.getAddress();
+
+  const singleton = await deployL1Dependency(signer, GnosisSafeL2Contract);
+  const factory = await deployL1Dependency(signer, GnosisSafeProxyFactoryContract);
+  const starknetCore = await deployL1Dependency(signer, MockStarknetMessaging, 5 * 60);
+
+  const gnosisSafeProxyFactoryContract = new Contract(
+    factory,
+    GnosisSafeProxyFactoryContract.abi,
+    signer
+  );
+
+  const template = await gnosisSafeProxyFactoryContract.callStatic.createProxy(singleton, '0x');
+  await gnosisSafeProxyFactoryContract.createProxy(singleton, '0x');
+
+  const safeContract = new Contract(template, GnosisSafeL2Contract.abi, signer);
+  await safeContract.setup(
+    [signerAddress],
+    1,
+    ethers.constants.AddressZero,
+    '0x',
+    ethers.constants.AddressZero,
+    ethers.constants.AddressZero,
+    0,
+    ethers.constants.AddressZero
+  );
+
+  const moduleFactory = await deployL1Dependency(signer, ModuleProxyFactoryContract);
+  const masterL1AvatarExecutionStrategy = await deployL1Dependency(
+    signer,
+    L1AvatarExecutionStrategyMockMessagingContract,
+    '0x0000000000000000000000000000000000000001',
+    '0x0000000000000000000000000000000000000001',
+    '0x0000000000000000000000000000000000000001',
+    1,
+    [],
+    0
+  );
+
+  const encodedInitParams = ethers.utils.defaultAbiCoder.encode(
+    ['address', 'address', 'address', 'uint256', 'uint256[]', 'uint256'],
+    [template, template, starknetCore, ethRelayerAddress, [spaceAddress], quorum]
+  );
+
+  const l1AvatarExecutionStrategyMockMessagingInterface = new Interface(
+    L1AvatarExecutionStrategyMockMessagingContract.abi
+  );
+  const initData = l1AvatarExecutionStrategyMockMessagingInterface.encodeFunctionData('setUp', [
+    encodedInitParams
+  ]);
+
+  const masterCopyAddress = masterL1AvatarExecutionStrategy.toLowerCase().replace(/^0x/, '');
+
+  //This is the bytecode of the module proxy contract
+  const byteCode = `0x602d8060093d393df3363d3d373d3d3d363d73${masterCopyAddress}5af43d82803e903d91602b57fd5bf3`;
+
+  const salt = ethers.utils.solidityKeccak256(
+    ['bytes32', 'uint256'],
+    [ethers.utils.solidityKeccak256(['bytes'], [initData]), '0x01']
+  );
+
+  // TODO: can it be deployed without proxy?
+  const expectedAddress = ethers.utils.getCreate2Address(
+    moduleFactory,
+    salt,
+    ethers.utils.keccak256(byteCode)
+  );
+
+  const moduleFactoryContract = new Contract(moduleFactory, ModuleProxyFactoryContract.abi, signer);
+  await moduleFactoryContract.deployModule(masterL1AvatarExecutionStrategy, initData, '0x01');
+
+  const l1AvatarExecutionStrategyContract = new Contract(
+    expectedAddress,
+    L1AvatarExecutionStrategyMockMessagingContract.abi
+  );
+
+  await executeContractCallWithSigners(
+    safeContract,
+    safeContract,
+    'enableModule',
+    [expectedAddress],
+    [signer]
+  );
+
+  return {
+    starknetCore,
+    l1AvatarExecutionStrategyContract,
+    safeContract
   };
 }
 
 export async function postMessageToL2(
   l2Address: string,
-  functionName: string,
+  selector: string,
   payload: string[],
   fee: number
 ) {
-  return starknet.devnet.sendMessageToL2(l2Address, functionName, L1_COMMIT, payload, 0, fee);
+  const res = await fetch('http://127.0.0.1:5050/postman/send_message_to_l2', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      l1_contract_address: L1_COMMIT,
+      l2_contract_address: l2Address,
+      entry_point_selector: hash.getSelectorFromName(selector),
+      payload,
+      paid_fee_on_l1: `0x${fee.toString(16)}`,
+      nonce: '0x0'
+    })
+  });
+
+  return res.json();
+}
+
+export async function setTime(time: number) {
+  const res = await fetch('http://127.0.0.1:5050/set_time', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      time
+    })
+  });
+
+  return res.json();
+}
+
+export async function increaseTime(timeIncrease: number) {
+  const res = await fetch('http://127.0.0.1:5050/increase_time', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      time: timeIncrease
+    })
+  });
+
+  return res.json();
+}
+
+export async function loadL1MessagingContract(networkUrl: string, address: string) {
+  const res = await fetch('http://127.0.0.1:5050/postman/load_l1_messaging_contract', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      networkUrl,
+      address
+    })
+  });
+
+  return res.json();
+}
+
+export async function flush() {
+  const res = await fetch('http://127.0.0.1:5050/postman/flush', {
+    method: 'POST'
+  });
+
+  return res.json();
 }

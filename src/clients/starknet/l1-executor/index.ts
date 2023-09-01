@@ -1,6 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { Contract, ContractFactory } from '@ethersproject/contracts';
 import L1ExecutorContract from './abis/L1AvatarExecutionStrategy.json';
+import { MetaTransaction } from '../../../utils/encoding';
 
 type DeployParams = {
   owner: string;
@@ -23,13 +24,13 @@ type ExecuteParams = {
     executionStrategy: string;
     authorAddressType: 0 | 1 | 2;
     author: string;
-    activeVotingStrategies: string;
+    activeVotingStrategies: bigint;
   };
-  votesFor: string;
-  votesAgainst: string;
-  votesAbstain: string;
+  votesFor: bigint;
+  votesAgainst: bigint;
+  votesAbstain: bigint;
   executionHash: string;
-  payload: string;
+  transactions: MetaTransaction[];
 };
 
 export class L1Executor {
@@ -70,7 +71,7 @@ export class L1Executor {
     votesAgainst,
     votesAbstain,
     executionHash,
-    payload
+    transactions
   }: {
     signer: Signer;
   } & ExecuteParams) {
@@ -83,7 +84,7 @@ export class L1Executor {
       votesAgainst,
       votesAbstain,
       executionHash,
-      payload
+      transactions
     );
   }
 }

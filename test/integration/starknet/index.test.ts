@@ -1,18 +1,25 @@
 /// <reference types="@types/mocha" />
 import { expect } from 'chai';
-import { Account, Provider } from 'starknet';
-import { starknet } from 'hardhat';
+import { Account, Provider, uint256 } from 'starknet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
-import { EthereumSig, EthereumTx, StarkNetSig, StarkNetTx } from '../../../src/clients';
+import { EthereumSig, EthereumTx, L1Executor, StarkNetSig, StarkNetTx } from '../../../src/clients';
 import { getExecutionData } from '../../../src/executors';
 import { Choice } from '../../../src/types';
-import { postMessageToL2, setup, TestConfig } from './utils';
+import {
+  flush,
+  increaseTime,
+  loadL1MessagingContract,
+  postMessageToL2,
+  setTime,
+  setup,
+  TestConfig
+} from './utils';
 
 describe('sx-starknet', function () {
   this.timeout(60_000);
 
-  const ethUrl = 'https://rpc.brovider.xyz/5';
+  const ethUrl = 'http://127.0.0.1:8545';
   const address = '0x7d2f37b75a5e779f7da01c22acee1b66c39e8ba470ee5448f05e1462afcedb4';
   const privateKey = '0xcd613e30d8f16adf91b7584a2265b1f5';
   const ethPrivateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
@@ -23,8 +30,8 @@ describe('sx-starknet', function () {
     }
   });
 
-  const ethProvider = new JsonRpcProvider('https://rpc.brovider.xyz/5');
-  const wallet = new Wallet(ethPrivateKey, ethProvider);
+  const provider = new JsonRpcProvider('http://127.0.0.1:8545');
+  const wallet = new Wallet(ethPrivateKey, provider);
   const walletAddress = wallet.address;
   const account = new Account(starkProvider, address, privateKey);
 
@@ -38,7 +45,12 @@ describe('sx-starknet', function () {
   before(async function () {
     this.timeout(300_000);
 
-    testConfig = await setup(account);
+    setTime(Math.floor(Date.now() / 1000));
+
+    testConfig = await setup({
+      starknetAccount: account,
+      ethereumWallet: wallet
+    });
     spaceAddress = testConfig.spaceAddress;
 
     client = new StarkNetTx({
@@ -490,9 +502,9 @@ describe('sx-starknet', function () {
   describe('ethRelayer execution', () => {
     const transactions = [
       {
-        to: '0x1ABC7154748D1CE5144478CDEB574AE244B939B5',
-        value: 1,
-        data: '0x',
+        to: wallet.address,
+        value: 0,
+        data: '0x11',
         operation: 0,
         salt: 1n
       }
@@ -502,7 +514,7 @@ describe('sx-starknet', function () {
       const { executionParams } = getExecutionData(
         'EthRelayer',
         testConfig.ethRelayerExecutionStrategy,
-        { transactions, destination: '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca' }
+        { transactions, destination: testConfig.l1AvatarExecutionStrategyContract.address }
       );
 
       const envelope = {
@@ -547,12 +559,13 @@ describe('sx-starknet', function () {
     });
 
     it('should execute', async () => {
-      await starknet.devnet.increaseTime(86400);
+      await increaseTime(86400);
+      await loadL1MessagingContract(ethUrl, testConfig.starknetCore);
 
       const { executionParams } = getExecutionData(
         'EthRelayer',
         testConfig.ethRelayerExecutionStrategy,
-        { transactions, destination: '0xa88f72e92cc519d617b684F8A78d3532E7bb61ca' }
+        { transactions, destination: testConfig.l1AvatarExecutionStrategyContract.address }
       );
 
       const receipt = await client.execute({
@@ -566,6 +579,61 @@ describe('sx-starknet', function () {
       await starkProvider.waitForTransaction(receipt.transaction_hash);
 
       expect(receipt.transaction_hash).not.to.be.undefined;
+    });
+
+    it('should execute on l1', async () => {
+      const flushL2Response = await flush();
+      const message_payload = flushL2Response.consumed_messages.from_l2[0].payload;
+
+      const { executionParams } = getExecutionData(
+        'EthRelayer',
+        testConfig.ethRelayerExecutionStrategy,
+        { transactions, destination: testConfig.l1AvatarExecutionStrategyContract.address }
+      );
+
+      const executionHash = `${executionParams[2]}${executionParams[1].slice(2)}`;
+
+      const proposal = {
+        startTimestamp: message_payload[1],
+        minEndTimestamp: message_payload[2],
+        maxEndTimestamp: message_payload[3],
+        finalizationStatus: message_payload[4],
+        executionPayloadHash: message_payload[5],
+        executionStrategy: message_payload[6],
+        authorAddressType: message_payload[7],
+        author: message_payload[8],
+        activeVotingStrategies: uint256.uint256ToBN({
+          low: message_payload[9],
+          high: message_payload[10]
+        })
+      };
+      const votesFor = uint256.uint256ToBN({
+        low: message_payload[11],
+        high: message_payload[12]
+      });
+      const votesAgainst = uint256.uint256ToBN({
+        low: message_payload[13],
+        high: message_payload[14]
+      });
+      const votesAbstain = uint256.uint256ToBN({
+        low: message_payload[15],
+        high: message_payload[16]
+      });
+
+      const l1ExecutorClient = new L1Executor();
+      const res = await l1ExecutorClient.execute({
+        signer: wallet,
+        executor: testConfig.l1AvatarExecutionStrategyContract.address,
+        space: spaceAddress,
+        proposal,
+        votesFor,
+        votesAgainst,
+        votesAbstain,
+        executionHash,
+        transactions
+      });
+
+      expect(res.hash).not.to.be.undefined;
     });
   });
 
