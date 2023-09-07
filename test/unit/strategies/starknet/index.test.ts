@@ -6,7 +6,7 @@ describe('voting strategies', () => {
     it('should return correct strategy from predefined default addresses', () => {
       expect(
         getStrategy(
-          '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a',
+          '0x04ad4a117a2b047fc3e25bf52791bc8f29a0871ac3c41a3e176f18c8a1087815',
           defaultNetwork
         )?.type
       ).toBe('vanilla');

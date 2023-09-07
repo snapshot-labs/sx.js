@@ -26,7 +26,7 @@ describe('EthereumTx', () => {
       authenticator: '0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a',
       strategies: [
         {
-          address: '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a',
+          address: '0x04ad4a117a2b047fc3e25bf52791bc8f29a0871ac3c41a3e176f18c8a1087815',
           index: 0
         }
       ],
@@ -48,7 +48,7 @@ describe('EthereumTx', () => {
       strategies: [
         {
           index: 0,
-          address: '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a'
+          address: '0x04ad4a117a2b047fc3e25bf52791bc8f29a0871ac3c41a3e176f18c8a1087815'
         }
       ],
       proposal: 32,

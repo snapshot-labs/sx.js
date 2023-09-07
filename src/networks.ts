@@ -81,18 +81,18 @@ export const evmLineaGoerli: EvmNetworkConfig = {
 
 export const goerli1: NetworkConfig = {
   eip712ChainId: '0x534e5f474f45524c49',
-  spaceFactory: '',
-  masterSpace: '',
+  spaceFactory: '0x3b04349f509c875827a8f7532b63103cd02d07539f2075783f43acf282114ab',
+  masterSpace: '0x31ba161238220dcca438d4ee5ceba75ea9dd67e410d4dde1b83f57fb43033e1',
   authenticators: {
-    '0x02c38c9a8f20e1c4c974503e1cac5a06658161df4a8be3b24762168c99c58dbd': {
+    '0x06c363a572f7f86b58fff89abf6f924cb75e97a92af2b2acbdd0156ddd18761d': {
       type: 'vanilla'
     },
-    '0x00e6533da3322019c3e26bd6942b647a74593af805021003bab707267717952a': {
+    '0x002c27791b44910c295e3fadaa4d3a9b095cefb5554f885f2362c40209978555': {
       type: 'ethTx'
     }
   },
   strategies: {
-    '0x0277bc9bb7b7e7f48faaf5a2023f247e5c7cd81bfab1221bd7e91c9d4894ec1a': {
+    '0x04ad4a117a2b047fc3e25bf52791bc8f29a0871ac3c41a3e176f18c8a1087815': {
       type: 'vanilla'
     }
   }
