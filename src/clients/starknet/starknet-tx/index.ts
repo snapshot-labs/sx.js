@@ -231,17 +231,14 @@ export class StarkNetTx {
     space: string;
     settings: UpdateSettingsInput;
   }) {
-    const encodeString = (str: string) => {
-      return str.split('').map(c => `0x${c.charCodeAt(0).toString(16)})`);
-    };
-
     const settingsData = [
       {
         min_voting_duration: settings.minVotingDuration || NO_UPDATE_U32,
         max_voting_duration: settings.maxVotingDuration || NO_UPDATE_U32,
         voting_delay: settings.votingDelay || NO_UPDATE_U32,
-        metadata_URI: (settings.metadataUri && encodeString(settings.metadataUri)) || [],
-        dao_URI: (settings.daoUri && encodeString(settings.daoUri)) || [],
+        metadata_URI:
+          (settings.metadataUri && shortString.splitLongString(settings.metadataUri)) || [],
+        dao_URI: (settings.daoUri && shortString.splitLongString(settings.daoUri)) || [],
         proposal_validation_strategy: settings.proposalValidationStrategy || {
           address: NO_UPDATE_ADDRESS,
           params: []
@@ -254,7 +251,9 @@ export class StarkNetTx {
         voting_strategies_to_remove: settings.votingStrategiesToRemove || [],
         voting_strategies_metadata_URIs_to_add:
           (settings.votingStrategyMetadataUrisToAdd &&
-            settings.votingStrategyMetadataUrisToAdd.map(str => encodeString(str))) ||
+            settings.votingStrategyMetadataUrisToAdd.map(str =>
+              shortString.splitLongString(str)
+            )) ||
           []
       }
     ];
