@@ -1,4 +1,5 @@
-import { Account, CallData, shortString, uint256 } from 'starknet';
+import { Account, CallData, shortString, uint256, hash } from 'starknet';
+import randomBytes from 'randombytes';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { defaultNetwork } from '../../../networks';
@@ -69,18 +70,23 @@ export class StarkNetTx {
       authenticators,
       votingStrategies,
       votingStrategiesMetadata
-    }
+    },
+    salt
   }: {
     account: Account;
     params: SpaceParams;
     salt?: string;
-  }): Promise<string> {
+  }): Promise<{ txId: string; address: string }> {
+    salt = salt || `0x${randomBytes(30).toString('hex')}`;
+
+    const address = await this.predictSpaceAddress({ salt });
+
     const res = await account.execute({
       contractAddress: this.config.networkConfig.spaceFactory,
       entrypoint: 'deploy',
       calldata: CallData.compile({
         class_hash: this.config.networkConfig.masterSpace,
-        contract_address_salt: 0,
+        contract_address_salt: salt,
         calldata: callData.compile('initialize', [
           controller,
           minVotingDuration,
@@ -103,7 +109,16 @@ export class StarkNetTx {
       })
     });
 
-    return res.transaction_hash;
+    return { txId: res.transaction_hash, address };
+  }
+
+  async predictSpaceAddress({ salt }: { salt: string }) {
+    return hash.calculateContractAddressFromHash(
+      salt,
+      this.config.networkConfig.masterSpace,
+      CallData.compile([]),
+      this.config.networkConfig.spaceFactory
+    );
   }
 
   async propose(account: Account, envelope: Envelope<Propose>) {

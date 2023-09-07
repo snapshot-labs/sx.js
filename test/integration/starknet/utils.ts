@@ -280,7 +280,7 @@ export async function setup({
     networkConfig
   });
 
-  const txId = await client.deploySpace({
+  const { address } = await client.deploySpace({
     account: starknetAccount,
     params: {
       controller: starknetAccount.address,
@@ -334,8 +334,7 @@ export async function setup({
     }
   });
 
-  const receipt = await starknetAccount.getTransactionReceipt(txId);
-  const spaceAddress = (receipt as any).events[0].from_address; // hacky right now, find better way to read it, returned value is not what we expect
+  const spaceAddress = address;
 
   const { l1AvatarExecutionStrategyContract, safeContract, starknetCore } =
     await setupL1ExecutionStrategy(ethereumWallet, {
