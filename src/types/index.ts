@@ -68,7 +68,7 @@ export interface Strategy {
     strategyAddress: string,
     voterAddress: string,
     metadata: Record<string, any> | null,
-    timestamp: number,
+    timestamp: number | null,
     params: string[],
     clientConfig: ClientConfig
   ) => Promise<bigint>;

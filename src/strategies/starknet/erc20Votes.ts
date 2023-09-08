@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { Contract, type Call } from 'starknet';
-import ERC20VotesAbi from './abis/ERC20Votes.json';
+import ERC20VotesTokenAbi from './abis/ERC20VotesToken.json';
 import type { ClientConfig, Envelope, Strategy, Propose, Vote } from '../../types';
 import { getUserAddressEnum } from '../../utils/starknet-enums';
 
@@ -31,18 +31,20 @@ export default function createErc20VotesStrategy(): Strategy {
       strategyAddress: string,
       voterAddress: string,
       metadata: Record<string, any> | null,
-      timestamp: number,
+      timestamp: number | null,
       params: string[],
       clientConfig: ClientConfig
     ): Promise<bigint> {
-      const contract = new Contract(ERC20VotesAbi, strategyAddress, clientConfig.starkProvider);
+      const isEthereumAddress = voterAddress.length === 42;
+      if (isEthereumAddress) return 0n;
 
-      return contract.get_voting_power(
-        timestamp,
-        getUserAddressEnum('STARKNET', voterAddress),
-        params,
-        []
-      );
+      const contract = new Contract(ERC20VotesTokenAbi, params[0], clientConfig.starkProvider);
+
+      if (timestamp) {
+        return contract.get_past_votes(voterAddress, timestamp);
+      }
+
+      return contract.get_votes(voterAddress);
     }
   };
 }

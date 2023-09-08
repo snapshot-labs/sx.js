@@ -94,6 +94,9 @@ export const goerli1: NetworkConfig = {
   strategies: {
     '0x04ad4a117a2b047fc3e25bf52791bc8f29a0871ac3c41a3e176f18c8a1087815': {
       type: 'vanilla'
+    },
+    '0x02581d59cc3961ea2db43e7fca258823c01165b1455e91d4186255e14f7d540a': {
+      type: 'erc20Votes'
     }
   }
 };
