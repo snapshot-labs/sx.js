@@ -87,6 +87,9 @@ export const goerli1: NetworkConfig = {
     '0x06c363a572f7f86b58fff89abf6f924cb75e97a92af2b2acbdd0156ddd18761d': {
       type: 'vanilla'
     },
+    '0x052a8c751db001ed116d2194521331426910cd800a656d57b575929e1058b35b': {
+      type: 'starkTx'
+    },
     '0x002c27791b44910c295e3fadaa4d3a9b095cefb5554f885f2362c40209978555': {
       type: 'ethTx'
     }
