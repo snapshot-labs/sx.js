@@ -15,7 +15,8 @@ describe('StarkNetSig', () => {
 
   const client = new StarkNetSig({
     starkProvider,
-    ethUrl: 'https://rpc.brovider.xyz/5'
+    ethUrl: 'https://rpc.brovider.xyz/5',
+    manaUrl: 'http://localhost:3001'
   });
 
   beforeAll(() => {

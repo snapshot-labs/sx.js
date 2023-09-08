@@ -66,7 +66,8 @@ describe('sx-starknet', () => {
     starkSigClient = new StarkNetSig({
       starkProvider,
       ethUrl,
-      networkConfig: testConfig.networkConfig
+      networkConfig: testConfig.networkConfig,
+      manaUrl: 'http://localhost:3000'
     });
   }, 300_000);
 

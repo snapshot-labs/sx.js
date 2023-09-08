@@ -50,7 +50,7 @@ export class EthereumSig {
 
     return {
       address,
-      signature: [BigInt(r.toHex()), BigInt(s.toHex()), BigInt(v)],
+      signature: [r.toHex(), s.toHex(), v],
       message
     };
   }

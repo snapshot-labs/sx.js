@@ -35,7 +35,7 @@ export const proposeEnvelope: Envelope<Propose> = {
     message: {
       salt: '0x0'
     },
-    signature: [21n, 42n]
+    signature: ['21', '42']
   },
   data: proposeData
 };
@@ -46,7 +46,7 @@ export const voteEnvelope: Envelope<Vote> = {
     message: {
       salt: '0x0'
     },
-    signature: [21n, 42n]
+    signature: ['21', '42']
   },
   data: voteData
 };
@@ -57,7 +57,7 @@ export const proposeEthSigEnvelope: Envelope<Propose> = {
     message: {
       salt: '0x0'
     },
-    signature: [21n, 42n, 1337n]
+    signature: ['21', '42', '1337']
   },
   data: proposeData
 };
@@ -68,7 +68,7 @@ export const voteEthSigEnvelope: Envelope<Vote> = {
     message: {
       salt: '0x0'
     },
-    signature: [21n, 42n, 1337n]
+    signature: ['21', '42', '1337']
   },
   data: voteData
 };

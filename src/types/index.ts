@@ -139,8 +139,9 @@ export type Message = Propose | Vote | UpdateProposal;
 
 export type SignatureData = {
   address: string;
-  signature?: bigint[] | null;
+  signature?: string[] | null;
   message?: Record<string, any>;
+  primaryType?: any;
 };
 
 export type Envelope<T extends Message> = {

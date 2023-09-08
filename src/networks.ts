@@ -90,6 +90,9 @@ export const goerli1: NetworkConfig = {
     '0x052a8c751db001ed116d2194521331426910cd800a656d57b575929e1058b35b': {
       type: 'starkTx'
     },
+    '0x0256cd338bb24decbfaf05366b540c2b0fb9c504475d4b3baba01e6975cf2a6e': {
+      type: 'starkSig'
+    },
     '0x002c27791b44910c295e3fadaa4d3a9b095cefb5554f885f2362c40209978555': {
       type: 'ethTx'
     }

@@ -17,9 +17,9 @@ import {
 import { defaultNetwork } from '../../..';
 
 export class StarkNetSig {
-  config: ClientConfig;
+  config: ClientConfig & { manaUrl: string };
 
-  constructor(opts: ClientOpts) {
+  constructor(opts: ClientOpts & { manaUrl: string }) {
     this.config = {
       networkConfig: defaultNetwork,
       ...opts
@@ -28,6 +28,30 @@ export class StarkNetSig {
 
   generateSalt() {
     return `0x${randomBytes(4).toString('hex')}`;
+  }
+
+  public async send(envelope) {
+    const body = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'send',
+        params: { envelope },
+        id: null
+      })
+    };
+
+    const res = await fetch(
+      `${this.config.manaUrl}/stark_rpc/${this.config.networkConfig.eip712ChainId}`,
+      body
+    );
+    const json = await res.json();
+
+    return json.result;
   }
 
   public async sign<
@@ -55,12 +79,15 @@ export class StarkNetSig {
       message
     };
 
-    const signature = (await signer.signMessage(data)) as any;
+    const signature = await signer.signMessage(data);
 
     return {
       address: signer.address,
-      signature: [signature.r, signature.s],
-      message
+      signature: Array.isArray(signature)
+        ? signature.map(v => `0x${BigInt(v).toString(16)}`)
+        : [`0x${signature.r.toString(16)}`, `0x${signature.s.toString(16)}`],
+      message,
+      primaryType
     };
   }
 
