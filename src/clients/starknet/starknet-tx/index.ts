@@ -2,6 +2,7 @@ import { Account, CallData, shortString, uint256, hash } from 'starknet';
 import randomBytes from 'randombytes';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
+import { hexPadLeft } from '../../../utils/encoding';
 import { defaultNetwork } from '../../../networks';
 import SpaceAbi from './abis/Space.json';
 import {
@@ -113,11 +114,13 @@ export class StarkNetTx {
   }
 
   async predictSpaceAddress({ salt }: { salt: string }) {
-    return hash.calculateContractAddressFromHash(
-      salt,
-      this.config.networkConfig.masterSpace,
-      CallData.compile([]),
-      this.config.networkConfig.spaceFactory
+    return hexPadLeft(
+      hash.calculateContractAddressFromHash(
+        salt,
+        this.config.networkConfig.masterSpace,
+        CallData.compile([]),
+        this.config.networkConfig.spaceFactory
+      )
     );
   }
 
