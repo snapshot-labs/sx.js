@@ -14,7 +14,7 @@ exports[`StarkNetSig should create propose envelope 1`] = `
     "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
     "strategies": [
       {
-        "address": "0x04ad4a117a2b047fc3e25bf52791bc8f29a0871ac3c41a3e176f18c8a1087815",
+        "address": "0x510d1e6d386a2adcfc6f2a57f80c4c4268baeccbd4a09334e843b17ce9225ee",
         "index": 0,
       },
     ],
@@ -104,7 +104,7 @@ exports[`StarkNetSig should create vote envelope 1`] = `
     "space": "0x06330d3e48f59f5411c201ee2e9e9ccdc738fb3bb192b0e77e4eda26fa1a22f8",
     "strategies": [
       {
-        "address": "0x04ad4a117a2b047fc3e25bf52791bc8f29a0871ac3c41a3e176f18c8a1087815",
+        "address": "0x510d1e6d386a2adcfc6f2a57f80c4c4268baeccbd4a09334e843b17ce9225ee",
         "index": 0,
       },
     ],
