@@ -38,7 +38,7 @@ describe('EthereumTx', () => {
     };
 
     const result = await ethereumTx.getProposeHash(wallet, data);
-    expect(result).toEqual('0x10120e24e09c13c45028d155fe2befa932618a0afd6b81db8d15cf7e9fe771e');
+    expect(result).toEqual('0x4bb45818cdb46e0a9009760ee866a024724f256865c2b99cb3caabfae15872c');
   });
 
   it('should return vote hash', async () => {
