@@ -6,7 +6,7 @@ import StarknetCommitAbi from './abis/StarknetCommit.json';
 import { getStrategiesParams } from '../../../utils/strategies';
 import { getChoiceEnum } from '../../../utils/starknet-enums';
 import { defaultNetwork } from '../../..';
-import { ClientConfig, ClientOpts, Propose, UpdateProposal, Vote } from '../../../types';
+import { ClientConfig, ClientOpts, Envelope, Propose, UpdateProposal, Vote } from '../../../types';
 
 const ENCODE_ABI = [
   {
@@ -311,7 +311,7 @@ export class EthereumTx {
     return `0x${poseidonHashMany(compiled.map(v => BigInt(v))).toString(16)}`;
   }
 
-  async initializePropose(signer: Signer, data: Propose) {
+  async initializePropose(signer: Signer, data: Propose): Promise<Envelope<Propose>> {
     const commitContract = new Contract(
       this.config.networkConfig.starknetCommit,
       StarknetCommitAbi,
@@ -321,10 +321,20 @@ export class EthereumTx {
     const hash = await this.getProposeHash(signer, data);
     const { overall_fee } = await this.estimateProposeFee(signer, data);
 
-    return commitContract.commit(data.authenticator, hash, { value: overall_fee });
+    const res = await commitContract.commit(data.authenticator, hash, { value: overall_fee });
+
+    return {
+      signatureData: {
+        address: await signer.getAddress(),
+        commitTxId: res.hash,
+        commitHash: hash,
+        primaryType: 'Propose'
+      },
+      data
+    };
   }
 
-  async initializeVote(signer: Signer, data: Vote) {
+  async initializeVote(signer: Signer, data: Vote): Promise<Envelope<Vote>> {
     const commitContract = new Contract(
       this.config.networkConfig.starknetCommit,
       StarknetCommitAbi,
@@ -334,10 +344,23 @@ export class EthereumTx {
     const hash = await this.getVoteHash(signer, data);
     const { overall_fee } = await this.estimateVoteFee(signer, data);
 
-    return commitContract.commit(data.authenticator, hash, { value: overall_fee });
+    const res = await commitContract.commit(data.authenticator, hash, { value: overall_fee });
+
+    return {
+      signatureData: {
+        address: await signer.getAddress(),
+        commitTxId: res.hash,
+        commitHash: hash,
+        primaryType: 'Vote'
+      },
+      data
+    };
   }
 
-  async initializeUpdateProposal(signer: Signer, data: UpdateProposal) {
+  async initializeUpdateProposal(
+    signer: Signer,
+    data: UpdateProposal
+  ): Promise<Envelope<UpdateProposal>> {
     const commitContract = new Contract(
       this.config.networkConfig.starknetCommit,
       StarknetCommitAbi,
@@ -347,6 +370,16 @@ export class EthereumTx {
     const hash = await this.getUpdateProposalHash(signer, data);
     const { overall_fee } = await this.estimateUpdateProposalFee(signer, data);
 
-    return commitContract.commit(data.authenticator, hash, { value: overall_fee });
+    const res = await commitContract.commit(data.authenticator, hash, { value: overall_fee });
+
+    return {
+      signatureData: {
+        address: await signer.getAddress(),
+        commitTxId: res.hash,
+        commitHash: hash,
+        primaryType: 'UpdateProposal'
+      },
+      data
+    };
   }
 }
