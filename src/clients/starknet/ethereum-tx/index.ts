@@ -181,9 +181,6 @@ const ENCODE_ABI = [
   }
 ];
 
-// TODO: move to config
-const STARKNET_COMMIT_ADDRESS = '0x8bf85537c80becba711447f66a9a4452e3575e29';
-
 const PROPOSE_SELECTOR = '0x1bfd596ae442867ef71ca523061610682af8b00fc2738329422f4ad8d220b81';
 const VOTE_SELECTOR = '0x132bdf85fc8aa10ac3c22f02317f8f53d4b4f52235ed1eabb3a4cbbe08b5c41';
 const UPDATE_PROPOSAL_SELECTOR =
@@ -205,7 +202,7 @@ export class EthereumTx {
     const sequencerProvider = new SequencerProvider({ baseUrl: this.config.sequencerUrl });
 
     const fees = await sequencerProvider.estimateMessageFee({
-      from_address: STARKNET_COMMIT_ADDRESS,
+      from_address: this.config.networkConfig.starknetCommit,
       to_address: l2Address,
       entry_point_selector: 'commit',
       payload
@@ -315,29 +312,41 @@ export class EthereumTx {
   }
 
   async initializePropose(signer: Signer, data: Propose) {
-    const spaceContract = new Contract(STARKNET_COMMIT_ADDRESS, StarknetCommitAbi, signer);
+    const commitContract = new Contract(
+      this.config.networkConfig.starknetCommit,
+      StarknetCommitAbi,
+      signer
+    );
 
     const hash = await this.getProposeHash(signer, data);
     const { overall_fee } = await this.estimateProposeFee(signer, data);
 
-    return spaceContract.commit(data.authenticator, hash, { value: overall_fee });
+    return commitContract.commit(data.authenticator, hash, { value: overall_fee });
   }
 
   async initializeVote(signer: Signer, data: Vote) {
-    const spaceContract = new Contract(STARKNET_COMMIT_ADDRESS, StarknetCommitAbi, signer);
+    const commitContract = new Contract(
+      this.config.networkConfig.starknetCommit,
+      StarknetCommitAbi,
+      signer
+    );
 
     const hash = await this.getVoteHash(signer, data);
     const { overall_fee } = await this.estimateVoteFee(signer, data);
 
-    return spaceContract.commit(data.authenticator, hash, { value: overall_fee });
+    return commitContract.commit(data.authenticator, hash, { value: overall_fee });
   }
 
   async initializeUpdateProposal(signer: Signer, data: UpdateProposal) {
-    const spaceContract = new Contract(STARKNET_COMMIT_ADDRESS, StarknetCommitAbi, signer);
+    const commitContract = new Contract(
+      this.config.networkConfig.starknetCommit,
+      StarknetCommitAbi,
+      signer
+    );
 
     const hash = await this.getUpdateProposalHash(signer, data);
     const { overall_fee } = await this.estimateUpdateProposalFee(signer, data);
 
-    return spaceContract.commit(data.authenticator, hash, { value: overall_fee });
+    return commitContract.commit(data.authenticator, hash, { value: overall_fee });
   }
 }
