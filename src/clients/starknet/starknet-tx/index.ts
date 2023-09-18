@@ -45,6 +45,7 @@ type UpdateSettingsInput = {
 
 const NO_UPDATE_U32 = '0xf2cda9b1';
 const NO_UPDATE_ADDRESS = '0xf2cda9b13ed04e585461605c0d6e804933ca828111bd94d4e6a96c75e8b048';
+const NO_UPDATE_STRING = 'No update';
 
 const callData = new CallData(SpaceAbi);
 
@@ -245,9 +246,8 @@ export class StarkNetTx {
         min_voting_duration: settings.minVotingDuration || NO_UPDATE_U32,
         max_voting_duration: settings.maxVotingDuration || NO_UPDATE_U32,
         voting_delay: settings.votingDelay || NO_UPDATE_U32,
-        metadata_uri:
-          (settings.metadataUri && shortString.splitLongString(settings.metadataUri)) || [],
-        dao_uri: (settings.daoUri && shortString.splitLongString(settings.daoUri)) || [],
+        metadata_uri: shortString.splitLongString(settings.metadataUri || NO_UPDATE_STRING),
+        dao_uri: shortString.splitLongString(settings.daoUri || NO_UPDATE_STRING),
         proposal_validation_strategy: settings.proposalValidationStrategy || {
           address: NO_UPDATE_ADDRESS,
           params: []
