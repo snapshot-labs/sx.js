@@ -1,6 +1,6 @@
 import { Account, CallData, shortString, uint256, hash } from 'starknet';
 import randomBytes from 'randombytes';
-import { getStrategiesParams } from '../../../utils/strategies';
+import { getStrategiesWithParams } from '../../../utils/strategies';
 import { getAuthenticator } from '../../../authenticators/starknet';
 import { hexPadLeft } from '../../../utils/encoding';
 import { defaultNetwork } from '../../../networks';
@@ -135,7 +135,7 @@ export class StarkNetTx {
       throw new Error('Invalid authenticator');
     }
 
-    const strategiesParams = await getStrategiesParams(
+    const userStrategies = await getStrategiesWithParams(
       'propose',
       envelope.data.strategies,
       authorAddress,
@@ -150,10 +150,7 @@ export class StarkNetTx {
         params: envelope.data.executionStrategy.params
       },
       strategiesParams: CallData.compile({
-        user_strategies: envelope.data.strategies.map((strategyConfig, i) => ({
-          index: strategyConfig.index,
-          params: strategiesParams[i]
-        }))
+        userStrategies
       }),
       metadataUri: envelope.data.metadataUri
     });
@@ -194,7 +191,7 @@ export class StarkNetTx {
       throw new Error('Invalid authenticator');
     }
 
-    const strategiesParams = await getStrategiesParams(
+    const votingStrategies = await getStrategiesWithParams(
       'vote',
       envelope.data.strategies,
       voterAddress,
@@ -206,10 +203,7 @@ export class StarkNetTx {
       voter: voterAddress,
       proposalId: envelope.data.proposal,
       choice: envelope.data.choice,
-      votingStrategies: envelope.data.strategies.map((strategyConfig, i) => ({
-        index: strategyConfig.index,
-        params: strategiesParams[i]
-      })),
+      votingStrategies,
       metadataUri: ''
     });
 
