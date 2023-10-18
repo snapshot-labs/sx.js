@@ -61,7 +61,7 @@ type CallOptions = {
   noWait?: boolean;
 };
 
-const NO_UPDATE_HASH = '0xf2cda9b13ed04e585461605c0d6e804933ca828111bd94d4e6a96c75e8b048ba';
+const NO_UPDATE_STRING = 'No update';
 const NO_UPDATE_ADDRESS = '0xf2cda9b13ed04e585461605c0d6e804933ca8281';
 const NO_UPDATE_UINT32 = '0xf2cda9b1';
 
@@ -467,8 +467,8 @@ export class EthereumTx {
       minVotingDuration: settings.minVotingDuration ?? NO_UPDATE_UINT32,
       maxVotingDuration: settings.maxVotingDuration ?? NO_UPDATE_UINT32,
       votingDelay: settings.votingDelay ?? NO_UPDATE_UINT32,
-      metadataURI: settings.metadataUri ?? NO_UPDATE_HASH,
-      daoURI: settings.daoUri ?? NO_UPDATE_HASH,
+      metadataURI: settings.metadataUri ?? NO_UPDATE_STRING,
+      daoURI: settings.daoUri ?? NO_UPDATE_STRING,
       proposalValidationStrategy: settings.proposalValidationStrategy ?? {
         addr: NO_UPDATE_ADDRESS,
         params: '0x00'
