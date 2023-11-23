@@ -88,7 +88,7 @@ export const starknetMainnet: NetworkConfig = {
   eip712ChainId: '0x534e5f4d41494e',
   spaceFactory: '0x0250e28c97e729842190c3672f9fcf8db0fc78b8080e87a894831dc69e4f4439',
   masterSpace: '0x00f20287bef9f46c6051e425a84094d2436bcc1fef804db353e60f93661961ac',
-  starknetCommit: '',
+  starknetCommit: '0xf1ec7b0276aa5af11ecefe56efb0f198a77016e9',
   authenticators: {
     '0x00c4b0a7d8626638e7dd410b16ccbc48fe36e68f864dec75b23ef41e3732d5d2': {
       type: 'vanilla'
@@ -99,7 +99,7 @@ export const starknetMainnet: NetworkConfig = {
     '0x06e9de29d8c3551e7f845888f323e864ff214359b56a137633bf7e191035b442': {
       type: 'starkSig'
     },
-    UPDATE_ME: {
+    '0x063c89d1c6b938b68e88db2719cf2546a121c23642974c268515238b442b0ea0': {
       type: 'ethTx'
     },
     '0x00b610082a0f39458e03a96663767ec25d6fb259f32c1e0dd19bf2be7a52532c': {
