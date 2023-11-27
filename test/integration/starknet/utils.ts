@@ -179,7 +179,7 @@ export async function setup({
     sxStarkSigAuthenticatorSierra,
     sxStarkSigAuthenticatorCasm,
     CallData.compile({
-      name: 'sx-sn',
+      name: 'sx-starknet',
       version: '0.1.0'
     })
   );
