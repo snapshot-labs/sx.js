@@ -33,34 +33,12 @@ export const evmMainnet: EvmNetworkConfig = {
 };
 
 export const evmGoerli: EvmNetworkConfig = {
+  ...evmMainnet,
   eip712ChainId: 5,
-  proxyFactory: '0x4B4F7f64Be813Ccc66AEFC3bFCe2baA01188631c',
-  masterSpace: '0xC3031A7d3326E47D49BfF9D374d74f364B29CE4D',
+  masterSpace: '0xc3031a7d3326e47d49bff9d374d74f364b29ce4d',
   executionStrategiesImplementations: {
-    SimpleQuorumAvatar: '0xecE4f6b01a2d7FF5A9765cA44162D453fC455e42',
-    SimpleQuorumTimelock: '0xf2A1C2f2098161af98b2Cc7E382AB7F3ba86Ebc4'
-  },
-  authenticators: {
-    '0x5f9B7D78c9a37a439D78f801E0E339C6E711e260': {
-      type: 'ethSig'
-    },
-    '0xBA06E6cCb877C332181A6867c05c8b746A21Aed1': {
-      type: 'ethTx'
-    }
-  },
-  strategies: {
-    '0xC1245C5DCa7885C73E32294140F1e5d30688c202': {
-      type: 'vanilla'
-    },
-    '0x0c2De612982Efd102803161fc7C74CcA15Db932c': {
-      type: 'comp'
-    },
-    '0x2c8631584474E750CEdF2Fb6A904f2e84777Aefe': {
-      type: 'ozVotes'
-    },
-    '0x34f0AfFF5A739bBf3E285615F50e40ddAaf2A829': {
-      type: 'whitelist'
-    }
+    SimpleQuorumAvatar: '0xece4f6b01a2d7ff5a9765ca44162d453fc455e42',
+    SimpleQuorumTimelock: '0xf2a1c2f2098161af98b2cc7e382ab7f3ba86ebc4'
   }
 };
 
