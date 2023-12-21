@@ -167,7 +167,8 @@ export class StarknetTx {
 
     const calls = [call];
 
-    return account.execute(calls, undefined, opts);
+    const fee = await account.estimateFee(calls);
+    return account.execute(calls, undefined, { ...opts, maxFee: fee.suggestedMaxFee });
   }
 
   async updateProposal(account: Account, envelope: Envelope<UpdateProposal>, opts?: Opts) {
@@ -190,7 +191,8 @@ export class StarknetTx {
 
     const calls = [call];
 
-    return account.execute(calls, undefined, opts);
+    const fee = await account.estimateFee(calls);
+    return account.execute(calls, undefined, { ...opts, maxFee: fee.suggestedMaxFee });
   }
 
   async vote(account: Account, envelope: Envelope<Vote>, opts?: Opts) {
@@ -217,7 +219,8 @@ export class StarknetTx {
       metadataUri: ''
     });
 
-    return account.execute(call, undefined, opts);
+    const fee = await account.estimateFee(call);
+    return account.execute(call, undefined, { ...opts, maxFee: fee.suggestedMaxFee });
   }
 
   execute({
