@@ -180,14 +180,7 @@ export class EthereumTx {
 
   async deployAxiomExecution({
     signer,
-    params: {
-      controller,
-      quorum,
-      contractAddress,
-      slotIndex,
-      space,
-      querySchema
-    },
+    params: { controller, quorum, contractAddress, slotIndex, space, querySchema },
     saltNonce
   }: {
     signer: Signer;
