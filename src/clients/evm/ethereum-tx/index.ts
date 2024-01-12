@@ -62,8 +62,8 @@ type CallOptions = {
 };
 
 const NO_UPDATE_STRING = 'No update';
-const NO_UPDATE_ADDRESS = '0xf2cda9b13ed04e585461605c0d6e804933ca8281';
-const NO_UPDATE_UINT32 = '0xf2cda9b1';
+const NO_UPDATE_ADDRESS = '0x49345182D578B1b3c7Ed4B2e6eCD8Aef63DD2CA3';
+const NO_UPDATE_UINT32 = '0x49345182';
 
 export class EthereumTx {
   networkConfig: EvmNetworkConfig;
