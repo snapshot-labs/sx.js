@@ -46,8 +46,7 @@ export const evmSepolia: EvmNetworkConfig = {
   ...evmGoerli,
   eip712ChainId: 11155111,
   executionStrategiesImplementations: {
-    SimpleQuorumAvatar: '0xece4f6b01a2d7ff5a9765ca44162d453fc455e42',
-    SimpleQuorumTimelock: '0xf2a1c2f2098161af98b2cc7e382ab7f3ba86ebc4',
+    ...evmGoerli.executionStrategiesImplementations,
     Axiom: '0xeaF78F64d136CBAef1eF18854f6465e9CbadA42c'
   }
 };
